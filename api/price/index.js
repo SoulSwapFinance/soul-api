@@ -207,9 +207,5 @@ async function derivedPriceOfToken(ctx) {
     await logics(ctx, true)
 }
 
-async function priceOfTokenAdjusted(ctx) {
-    ctx.body = ((await cache.getPrice()).div(_1E18)).toString();
-}
-
 const cache = new Cache()
-module.exports = { priceOfToken, derivedPriceOfToken, priceOfTokenAdjusted };
+module.exports = { priceOfToken, derivedPriceOfToken };
