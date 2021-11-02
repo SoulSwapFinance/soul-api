@@ -9,7 +9,6 @@ const BN = require('bn.js');
 const web3 = web3Factory(FTM_CHAIN_ID);
 const soulContract = new web3.eth.Contract(SoulContractABI, SOUL_ADDRESS);
 
-
 class Cache {
     minElapsedTimeInMs = 10000; // 10 seconds
 
@@ -18,7 +17,6 @@ class Cache {
         this.cachedMaxSupply = undefined
         this.cachedTotalSupply = undefined
     }
-
 
     async getTotalSupply() {
         if (!this.cachedTotalSupply ||
@@ -54,7 +52,8 @@ class Cache {
                 getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57")     // FTM-SOUL [5]
             ])
 
-            const circulatingSupply = new BN(results[0].sub(new BN(results[4])))
+            // total - seance (staking rewards) - DAO
+            const circulatingSupply = new BN(results[0].sub(new BN(results[2]).sub(new BN(results[4]))))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}
@@ -78,7 +77,6 @@ async function circulatingSupplyAdjusted(ctx) {
 async function maxSupply(ctx) {
     ctx.body = (await cache.getMaxSupply()).toString();
 }
-
 
 async function totalSupply(ctx) {
     ctx.body = (await cache.getTotalSupply()).toString();
