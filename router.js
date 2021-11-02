@@ -17,7 +17,6 @@ router.get('/nft/spider', nftSpider.infos);
 router.get('/nft/spider/:id', nftSpider.infos)
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
-router.get('/priceusd-adjusted/:tokenAddress', price.priceOfTokenAdjusted)
 router.get('/lending/supply', lending.totalSupply)
 router.get('/lending/borrow', lending.totalBorrow)
 router.get('/', noop);
