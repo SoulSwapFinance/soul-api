@@ -165,7 +165,6 @@ async function getPrice(tokenAddress, derived) {
     return await cache.getPrice(tokenAddress, derived)
 }
 
-
 async function getPairAddress(tokenAddress) {
     return (
         tokenAddress ?
@@ -208,5 +207,9 @@ async function derivedPriceOfToken(ctx) {
     await logics(ctx, true)
 }
 
+async function priceOfTokenAdjusted(ctx) {
+    ctx.body = ((await cache.getPrice()).div(_1E18)).toString();
+}
+
 const cache = new Cache()
-module.exports = { priceOfToken, derivedPriceOfToken };
+module.exports = { priceOfToken, derivedPriceOfToken, priceOfTokenAdjusted };
