@@ -41,7 +41,7 @@ class Cache {
         return this.cachedMaxSupply.maxSupply
     }
 
-    async getCirculatingSupply() {
+        async getCirculatingSupply() {
         if (!this.cachedCirculatingSupply ||
             this.cachedCirculatingSupply.lastRequestTimestamp + this.minElapsedTimeInMs < Date.now() // check if supply needs to be updated
         ) {
@@ -54,7 +54,8 @@ class Cache {
                 getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57")     // FTM-SOUL [5]
             ])
 
-            const circulatingSupply = new BN(results[0].sub(new BN(results[4])))
+            // total - seance (staking rewards) - DAO
+            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4]))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}
