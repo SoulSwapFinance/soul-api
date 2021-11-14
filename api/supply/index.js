@@ -9,7 +9,6 @@ const BN = require('bn.js');
 const web3 = web3Factory(FTM_CHAIN_ID);
 const soulContract = new web3.eth.Contract(SoulContractABI, SOUL_ADDRESS);
 
-
 class Cache {
     minElapsedTimeInMs = 10000; // 10 seconds
 
@@ -18,7 +17,6 @@ class Cache {
         this.cachedMaxSupply = undefined
         this.cachedTotalSupply = undefined
     }
-
 
     async getTotalSupply() {
         if (!this.cachedTotalSupply ||
@@ -51,11 +49,12 @@ class Cache {
                 getBalanceOf("0x124B06C5ce47De7A6e9EFDA71a946717130079E6"),    // SeanceCircle [2]
                 getBalanceOf("0x8f1E15cD3d5a0bb85B8189d5c6B61BB64398E19b"),    // SOUL-SEANCE [3]
                 getBalanceOf("0x1c63c726926197bd3cb75d86bcfb1daebcd87250"),    // DAO [4]
-                getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57")     // FTM-SOUL [5]
+                getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57"),     // FTM-SOUL [5]
+                getBalanceOf("0x8d3c3f3f3754Fa6cA088E1991616ca74FCfABFf1")      // EXCHANGE LIQ. [6]
             ])
 
-            // total - seance (staking rewards) - DAO
-            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4]))
+            // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY
+            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4])).sub(new BN(results[6]))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}
@@ -79,7 +78,6 @@ async function circulatingSupplyAdjusted(ctx) {
 async function maxSupply(ctx) {
     ctx.body = (await cache.getMaxSupply()).toString();
 }
-
 
 async function totalSupply(ctx) {
     ctx.body = (await cache.getTotalSupply()).toString();
