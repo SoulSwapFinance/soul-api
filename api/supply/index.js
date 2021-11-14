@@ -39,7 +39,7 @@ class Cache {
         return this.cachedMaxSupply.maxSupply
     }
 
-    async getCirculatingSupply() {
+        async getCirculatingSupply() {
         if (!this.cachedCirculatingSupply ||
             this.cachedCirculatingSupply.lastRequestTimestamp + this.minElapsedTimeInMs < Date.now() // check if supply needs to be updated
         ) {
