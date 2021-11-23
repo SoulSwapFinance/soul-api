@@ -75,13 +75,17 @@ async function circulatingSupplyAdjusted(ctx) {
     ctx.body = ((await cache.getCirculatingSupply()).div(_1E18)).toString();
 }
 
-async function maxSupply(ctx) {
-    ctx.body = (await cache.getMaxSupply()).toString();
-}
-
 async function totalSupply(ctx) {
     ctx.body = (await cache.getTotalSupply()).toString();
 }
 
+async function totalSupplyAdjusted(ctx) {
+    ctx.body = ((await cache.getTotalSupply()).div(_1E18)).toString();
+}
+
+async function maxSupply(ctx) {
+    ctx.body = (await cache.getMaxSupply()).toString();
+}
+
 const cache = new Cache()
-module.exports = { circulatingSupply, circulatingSupplyAdjusted, totalSupply, maxSupply };
+module.exports = { circulatingSupply, circulatingSupplyAdjusted, totalSupply, totalSupplyAdjusted, maxSupply };
