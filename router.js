@@ -12,6 +12,7 @@ const lending = require('./api/lending');
 router.get('/supply/circulating', supply.circulatingSupply);
 router.get('/supply/circulating-adjusted', supply.circulatingSupplyAdjusted);
 router.get('/supply/total', supply.totalSupply);
+router.get('/supply/total-adjusted', supply.totalSupplyAdjusted);
 router.get('/supply/max', supply.maxSupply);
 router.get('/nft/spider', nftSpider.infos);
 router.get('/nft/spider/:id', nftSpider.infos)
