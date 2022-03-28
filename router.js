@@ -26,9 +26,7 @@ router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
 router.get('/users/:userAddress/:id', users.infos)
 router.get('/lending/supply', lending.totalSupply)
-router.get('/luxor/total', luxor.totalLuxorSupply)
-router.get('/luxor/warmupPeriod', luxor.warmupPeriod)
-router.get('/luxor/epoch', luxor.epoch)
+router.get('/luxor', luxor.infos)
 router.get('/', noop);
 
 module.exports = router;
