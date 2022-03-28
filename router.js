@@ -28,6 +28,7 @@ router.get('/users/:userAddress/:id', users.infos)
 router.get('/lending/supply', lending.totalSupply)
 router.get('/luxor', luxor.infos)
 router.get('/luxor/:id', luxor.bondInfo)
+router.get('/luxor/treasury', luxor.treasuryInfo)
 router.get('/', noop);
 
 module.exports = router;
