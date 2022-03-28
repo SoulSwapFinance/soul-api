@@ -1,7 +1,9 @@
 'use strict';
 
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID } = require("../../constants");
+const { FTM_CHAIN_ID
+
+} = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -11,15 +13,36 @@ const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
 const StakeHelperABI = require('../../abis/StakeHelperABI.json');
+
 // const { FTM_CHAIN_ID } = require("../../constants");
 const BondHelperAddress = "0xdC7Bd8bA29ba99A250da6F0820ad9A1a285fE82a";
 const LuxorAddress = "0x6671E20b83Ba463F270c8c75dAe57e3Cc246cB2b";
 const LuxorStakeHelperAddress = "0x2Dd0D30f525e65641962904470660507e80940e4";
+
 const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
 
 const BondHelperContract = new web3.eth.Contract(BondHelperABI, BondHelperAddress);
+
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LuxorAddress);
+
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+
+const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_ADDRESS);
+
+const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, FTM_WLUM_ADDRESS);
+
+const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_ADDRESS);
+
+const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_ADDRESS);
+
+const FtmLendContract = new web3.eth.Contract(ERC20ContractABI, FTM_LEND_ADDRESS);
+
+const DaiLendContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_ADDRESS);
+
+const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_ADDRESS);
+
+const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_ADDRESS);
+
 
 async function getInfo() {
 
@@ -51,6 +74,46 @@ async function getInfo() {
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${LuxorAddress}/logo.png`
         }
 }
+
+async function getTreasuryInfo() {
+
+    // METHOD CALLS //
+    
+    // reserveBalance =
+      // ftmBalance + daiBalance
+    
+    // liquidityBalance =
+     // luxFtmBalance + luxDaiBalance
+    
+    // investBalance =
+     // ftmWlumBalance + ftmLendBalance +
+     // daiLendBalance + ftmDaiBalance
+  
+    const ftmBalance = 
+    const tokenName = await LuxorContract.methods.name().call();
+    
+
+    return {
+            "address": TreasuryAddress,
+  
+            "reserveBalance": reserveBalance,
+            "liquidityBalance": liquidityBalance,
+            "investBalance": investBalance,
+            
+            "ftmBalance": ftmBalance,
+            "daiBalance": daiBalance,
+            
+            "luxFtmBalance": luxFtmBalance,
+            "luxDaiBalance": luxDaiBalance,
+            
+            "ftmWlumBalance": ftmWlumBalance,
+            "daiLendBalance": daiLendbalance,
+            "ftmLendBalance": ftmLendBalance,
+            "ftmDaiBalance": ftmDaiBalance,
+         
+        }
+}
+
 
 async function getBondInfo(ctx) {
 
