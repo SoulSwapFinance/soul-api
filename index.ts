@@ -26,6 +26,6 @@ index.context.cache = {};
 index.use(router.routes());
 index.use(router.allowedMethods());
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 index.listen(port);
 console.log(`> soul-api running! (:${port})`);
