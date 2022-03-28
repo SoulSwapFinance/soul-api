@@ -24,7 +24,6 @@ const FTM_LEND_DAI="0xFD9BE6a83c7e9cFF48f6D9a3036bb6b20598ED61"
 const DAI_LEND_FTM="0xF4Bfdd73FE65D1B46b9968A24443A77ab89908dd"
 
 
-
 // CONTRACTS //
 
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
@@ -39,7 +38,6 @@ const FtmContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
 const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_LP);
 
 const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_LP);
-
 
 // Investments
 const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_LP);

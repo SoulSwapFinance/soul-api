@@ -169,7 +169,7 @@ async function bondInfo(ctx) {
 }
 
 async function treasuryInfo(ctx) {
-    ctx.body = (await getBondInfo(ctx))
+    ctx.body = (await getTreasuryInfo(ctx))
 }
 
 module.exports = { bondInfo, infos, treasuryInfo };
