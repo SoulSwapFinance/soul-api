@@ -59,6 +59,7 @@ const _1E18 = new BN("1000000000000000000");
 module.exports = {
   API_BASE_URL,
   _1E18,
+  TREASURY_ADDRESS,
   
   // erc20s
   LuxorContract,
