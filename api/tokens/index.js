@@ -22,7 +22,7 @@ async function getTokenInfo(ctx) {
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
-    const treasuryBalance = await PairContract.methods.balanceOf(TREASURY_ADDRESS).call();
+    const treasuryBalance = await TokenContract.methods.balanceOf(TREASURY_ADDRESS).call();
 
     if (!("id" in ctx.params))
         return {"name": "Tokens"};
@@ -43,8 +43,8 @@ async function getTokenInfo(ctx) {
     }
 }
 
-async function infos(ctx) {
+async function tokenInfo(ctx) {
     ctx.body = (await getTokenInfo(ctx))
 }
 
-module.exports = {infos};
+module.exports = {tokenInfo};

@@ -129,7 +129,6 @@ class Cache {
             await this.getFtmPrice()
         }
 
-
         return derived ?
             this.cachedPrice[tokenAddress].lastResult :
             this.cachedPrice[WFTM_ADDRESS].lastResult.mul(this.cachedPrice[tokenAddress].lastResult).div(E18)
