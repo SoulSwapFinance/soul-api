@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID } = require("../../constants");
+const { FTM_CHAIN_ID, TREASURY_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -8,7 +8,7 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
-async function getInfo(ctx) {
+async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
@@ -22,6 +22,7 @@ async function getInfo(ctx) {
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
+    const treasuryBalance = await PairContract.methods.balanceOf(TREASURY_ADDRESS).call();
 
     if (!("id" in ctx.params))
         return {"name": "Tokens"};
@@ -34,6 +35,7 @@ async function getInfo(ctx) {
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
+            "treasuryBalance": treasuryBalance,
             "api": "https://api.soulswap.finance/info/tokens/" + ctx.params.id,
             "ftmscan": `https://ftmscan.com/address/${ctx.params.id}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${ctx.params.id}/logo.png`
@@ -42,7 +44,7 @@ async function getInfo(ctx) {
 }
 
 async function infos(ctx) {
-    ctx.body = (await getInfo(ctx))
+    ctx.body = (await getTokenInfo(ctx))
 }
 
 module.exports = {infos};
