@@ -1,7 +1,13 @@
 'use strict';
 
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID } = require("../../constants");
+const { 
+  FTM_CHAIN_ID,
+  TREASURY_ADDRESS,
+  LUX, DAI, WLUM, WFTM, FTM_DAI_LP, FTM_WLUM_LP, DAI_LUX_LP, 
+  FTM_LUX_LP, FTM_LEND_DAI, DAI_LEND_FTM,
+
+} = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -11,14 +17,32 @@ const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
 const StakeHelperABI = require('../../abis/StakeHelperABI.json');
-// const { FTM_CHAIN_ID } = require("../../constants");
+
 const BondHelperAddress = "0xdC7Bd8bA29ba99A250da6F0820ad9A1a285fE82a";
 const LuxorAddress = "0x6671E20b83Ba463F270c8c75dAe57e3Cc246cB2b";
 const LuxorStakeHelperAddress = "0x2Dd0D30f525e65641962904470660507e80940e4";
-const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
+const TreasuryAddress="0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24";
 
+// CONTRACTS //
+const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
+
+// Reserves
+const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI);
+const FtmContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
+
+// Liquidity
+const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_LP);
+const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_LP);
+
+// Investments
+const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_LP);
+const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, FTM_WLUM_LP);
+const DaiLendFtmContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_FTM);
+const FtmLendDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_LEND_DAI);
+
+// Helpers
+const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
 const BondHelperContract = new web3.eth.Contract(BondHelperABI, BondHelperAddress);
-const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LuxorAddress);
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
 
 async function getInfo() {
@@ -36,6 +60,10 @@ async function getInfo() {
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
 
+    const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call();
+    const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call();
+    reserveBalance 
+
         return {
             "address": LuxorAddress,
             "name": tokenName,
@@ -46,11 +74,55 @@ async function getInfo() {
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
+            "reserveBalance": ftmBalance,
             "api": "https://api.soulswap.finance/info/tokens/" + LuxorAddress,
             "ftmscan": `https://ftmscan.com/address/${LuxorAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${LuxorAddress}/logo.png`
         }
 }
+
+// async function getTreasuryInfo() {
+
+//     // METHOD CALLS //
+    
+//     // reserveBalance =
+//       // ftmBalance + daiBalance
+    
+//     const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call();
+//     const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call();
+
+//     // liquidityBalance =
+//      // luxFtmBalance + luxDaiBalance
+//     const luxFtmBalance = await FtmLuxContract.methods.balanceOf(TreasuryAddress).call();
+
+//     const luxDaiBalance = await DaiLuxContract.methods.balanceOf(TreasuryAddress).call();
+
+//     // investBalance =
+//      // ftmWlumBalance + ftmLendBalance +
+//      // daiLendBalance + ftmDaiBalance
+  
+//     const ftmWlumBalance = await FtmWlumContract.methods.balanceOf(TreasuryAddress).call();
+//     const ftmLendBalance = await DaiLendFtmContract.methods.balanceOf(TreasuryAddress).call();
+//     const daiLendBalance = await FtmLendDaiContract.methods.balanceOf(TreasuryAddress).call();
+//     const ftmDaiBalance = await FtmDaiContract.methods.balanceOf(TreasuryAddress).call();
+
+//     return {
+//             // "address": TreasuryAddress,
+  
+//             // "ftmBalance": ftmBalance,
+//             // "daiBalance": daiBalance,
+            
+//             // "luxFtmBalance": luxFtmBalance,
+//             // "luxDaiBalance": luxDaiBalance,
+            
+//             // "ftmWlumBalance": ftmWlumBalance,
+//             // "daiLendBalance": daiLendBalance,
+//             // "ftmLendBalance": ftmLendBalance,
+//             "ftmDaiBalance": ftmDaiBalance,
+         
+//         }
+// }
+
 
 async function getBondInfo(ctx) {
 
@@ -99,4 +171,9 @@ async function infos(ctx) {
 async function bondInfo(ctx) {
     ctx.body = (await getBondInfo(ctx))
 }
+
+// async function treasuryInfo(ctx) {
+//     ctx.body = (await getTreasuryInfo(ctx))
+// }
+
 module.exports = { bondInfo, infos };
