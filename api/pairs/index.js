@@ -1,0 +1,33 @@
+'use strict';
+const {web3Factory} = require("../../utils/web3");
+const { FTM_CHAIN_ID, TREASURY_ADDRESS } = require("../../constants");
+
+const web3 = web3Factory( FTM_CHAIN_ID );
+const PairContractABI = require('../../abis/PairContractABI.json');
+const BN = require('bn.js');
+
+async function getInfo(ctx) {
+    const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
+    const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
+    const treasuryAddress = TREASURY_ADDRESS;
+    // METHOD CALLS //
+    const totalSupply = await PairContract.methods.totalSupply().call();
+    const treasuryBalance = await PairContract.methods.balanceOf(treasuryAddress).call();
+
+    if (!("id" in ctx.params))
+        return {"name": "Pairs"};
+    else {
+        return {
+            "address": pairAddress,
+            "supply": totalSupply,
+            "treasuryBalance": treasuryBalance,
+            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+        }
+    }
+}
+
+async function infos(ctx) {
+    ctx.body = (await getInfo(ctx))
+}
+
+module.exports = {infos};

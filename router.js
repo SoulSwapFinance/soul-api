@@ -7,6 +7,7 @@ const noop = require('./api/noop');
 const supply = require('./api/supply');
 const price = require('./api/price');
 const tokens = require('./api/tokens');
+const pairs = require('./api/pairs');
 const users = require('./api/users');
 const luxor = require('./api/luxor');
 const nftSpider = require('./api/nft/spider');
@@ -21,6 +22,8 @@ router.get('/nft/spider', nftSpider.infos);
 router.get('/nft/spider/:id', nftSpider.infos);
 
 router.get('/tokens', tokens.infos);
+router.get('/pairs', pairs.infos);
+router.get('/pairs/:id', pairs.infos);
 router.get('/tokens/:id', tokens.infos);
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
