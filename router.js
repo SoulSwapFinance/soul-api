@@ -21,10 +21,10 @@ router.get('/supply/max', supply.maxSupply);
 router.get('/nft/spider', nftSpider.infos);
 router.get('/nft/spider/:id', nftSpider.infos);
 
-router.get('/tokens', tokens.infos);
-router.get('/pairs', pairs.infos);
-router.get('/pairs/:id', pairs.infos);
-router.get('/tokens/:id', tokens.infos);
+router.get('/tokens', tokens.tokenInfo);
+router.get('/pairs', pairs.pairInfo);
+router.get('/pairs/:id', pairs.pairInfo);
+router.get('/tokens/:id', tokens.tokenInfo);
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
 router.get('/users/:userAddress/:id', users.infos)

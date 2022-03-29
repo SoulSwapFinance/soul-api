@@ -6,7 +6,7 @@ const web3 = web3Factory( FTM_CHAIN_ID );
 const PairContractABI = require('../../abis/PairContractABI.json');
 const BN = require('bn.js');
 
-async function getInfo(ctx) {
+async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
     const treasuryAddress = TREASURY_ADDRESS;
@@ -26,8 +26,8 @@ async function getInfo(ctx) {
     }
 }
 
-async function infos(ctx) {
-    ctx.body = (await getInfo(ctx))
+async function pairInfo(ctx) {
+    ctx.body = (await getPairInfo(ctx))
 }
 
-module.exports = {infos};
+module.exports = {pairInfo};
