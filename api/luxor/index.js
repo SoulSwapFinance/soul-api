@@ -73,8 +73,6 @@ async function getInfo() {
     const ftmValue = ftmBalance * ftmPrice
     const reserveBalance = ftmValue + daiBalance
 
-
-
         return {
             "address": LuxorAddress,
             "name": tokenName,
