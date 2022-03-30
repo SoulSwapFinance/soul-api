@@ -4,7 +4,7 @@ const {web3Factory} = require("../../utils/web3");
 const { 
   FTM_CHAIN_ID,
   TREASURY_ADDRESS,
-  LUX, DAI, WLUM, WFTM, FTM_DAI_LP, FTM_WLUM_LP, DAI_LUX_LP, 
+  LUX, DAI, LUM, WFTM, WLUM, FTM_DAI_LP, FTM_WLUM_LP, DAI_LUX_LP, 
   FTM_LUX_LP, FTM_LEND_DAI, DAI_LEND_FTM,
 
 } = require("../../constants");
@@ -21,24 +21,27 @@ const StakeHelperABI = require('../../abis/StakeHelperABI.json');
 const BondHelperAddress = "0xdC7Bd8bA29ba99A250da6F0820ad9A1a285fE82a";
 const LuxorAddress = "0x6671E20b83Ba463F270c8c75dAe57e3Cc246cB2b";
 const LuxorStakeHelperAddress = "0x2Dd0D30f525e65641962904470660507e80940e4";
+const LuxorStakeAddress = "0xf3F0BCFd430085e198466cdCA4Db8C2Af47f0802";
+const WarmupAddress = "0x2B6Fe815F3D0b8C13E8F908A2501cdDC23D4Ed48";
 const TreasuryAddress="0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24";
 
 // CONTRACTS //
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
+const LumensContract = new web3.eth.Contract(ERC20ContractABI, LUM);
 
 // Reserves
 const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI);
 const FtmContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
 
 // Liquidity
-const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_LP);
-const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_LP);
+// const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_LP);
+// const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_LP);
 
 // Investments
-const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_LP);
-const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, FTM_WLUM_LP);
-const DaiLendFtmContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_FTM);
-const FtmLendDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_LEND_DAI);
+// const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_LP);
+// const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, FTM_WLUM_LP);
+// const DaiLendFtmContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_FTM);
+// const FtmLendDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_LEND_DAI);
 
 // Helpers
 const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
@@ -53,16 +56,21 @@ async function getInfo() {
     const tokenName = await LuxorContract.methods.name().call();
     const tokenDecimals = await LuxorContract.methods.decimals().call();
 
-    const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LuxorAddress).call();
-    const tokenPrice = rawPrice / 1e18
+    const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call();
+    const ftmPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
-    const marketCap = totalSupply * tokenPrice / divisor
+    const marketCap = totalSupply * ftmPrice / divisor
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
-
+    
+    const stakingBalance = new BN(await LuxorContract.methods.balanceOf(LuxorStakeAddress).call());
+    const warmupBalance = new BN(await LumensContract.methods.balanceOf(WarmupAddress).call());
     const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call();
     const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call();
-    reserveBalance 
+    const ftmValue = ftmBalance * ftmPrice
+    const reserveBalance = ftmValue + daiBalance
+
+
 
         return {
             "address": LuxorAddress,
@@ -70,12 +78,14 @@ async function getInfo() {
             "symbol": tokenSymbol,
             "warmup": warmupPeriod,
             "epoch": epoch,
-            "price": tokenPrice,
+            "price": ftmPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
-            "reserveBalance": ftmBalance,
-            "api": "https://api.soulswap.finance/info/tokens/" + LuxorAddress,
+            "reserveBalance": reserveBalance,
+            "stakingBalance": stakingBalance,
+            "warmupBalance": warmupBalance,
+            "api": `https://api.soulswap.finance/info/tokens/${LuxorAddress}`,
             "ftmscan": `https://ftmscan.com/address/${LuxorAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${LuxorAddress}/logo.png`
         }
