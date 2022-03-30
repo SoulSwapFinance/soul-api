@@ -38,6 +38,7 @@ router.get('/users/:userAddress/:id', users.infos)
 
 router.get('/luxor', luxor.infos)
 router.get('/luxor/:id', luxor.bondInfo)
+router.get('/luxor/users/:userAddress', luxor.userInfo)
 
 // router.get('/lending/supply', lending.totalSupply)
 

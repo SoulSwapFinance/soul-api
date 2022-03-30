@@ -61,10 +61,10 @@ async function getInfo() {
     
     const rawLuxorPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LUX).call();
     const luxorPrice = rawLuxorPrice / 1e18
-    const divisor = 10**tokenDecimals
     const marketCap = totalSupply * luxorPrice
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
+    const distribute = await LuxorStakeHelperContract.methods.distribute().call() / 1e9;
     
     const stakingBalance = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9;
     const warmupBalance = await LumensContract.methods.balanceOf(WarmupAddress).call() / 1e9;
@@ -79,6 +79,7 @@ async function getInfo() {
             "symbol": tokenSymbol,
             "warmup": warmupPeriod,
             "epoch": epoch,
+            "distribute": distribute,
             "price": luxorPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
@@ -158,7 +159,7 @@ async function getBondInfo(ctx) {
     const discount = delta > 0 ? (delta / marketPrice) * 100 : 0
 
     return {
-            "address": LuxorAddress,
+            "address": bondAddress,
             "vestingTerm": vestingTerm,
             "status": status,
             "name": tokenName,
@@ -175,6 +176,26 @@ async function getBondInfo(ctx) {
         }
 }
 
+async function getStakeInfo(ctx) {
+
+    // METHOD CALLS //
+    const userAddress = ctx.params.userAddress    
+    const distribute = await LuxorStakeHelperContract.methods.distribute().call() / 1e9;
+    const epochLength = await LuxorStakeHelperContract.methods.epochLength().call();
+    const nextRebase = await LuxorStakeHelperContract.methods.nextRebase().call();
+    const warmupExpiry = await LuxorStakeHelperContract.methods.warmupExpiry(userAddress).call();
+    const warmupValue = await LuxorStakeHelperContract.methods.warmupValue(userAddress).call() / 1e9;
+
+    return {
+            "address": userAddress,
+            "epochLength": epochLength,
+            "nextRebase": nextRebase,
+            "distribute": distribute,
+            "warmupValue": warmupValue,
+            "warmupExpiry": warmupExpiry,
+    }
+}
+
 async function infos(ctx) {
     ctx.body = (await getInfo(ctx))
 }
@@ -183,8 +204,8 @@ async function bondInfo(ctx) {
     ctx.body = (await getBondInfo(ctx))
 }
 
-// async function treasuryInfo(ctx) {
-//     ctx.body = (await getTreasuryInfo(ctx))
-// }
+async function userInfo(ctx) {
+    ctx.body = (await getStakeInfo(ctx))
+}
 
-module.exports = { bondInfo, infos };
+module.exports = { bondInfo, infos, userInfo };
