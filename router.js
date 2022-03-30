@@ -12,7 +12,8 @@ const pairs = require('./api/pairs');
 const users = require('./api/users');
 const luxor = require('./api/luxor');
 const nftSpider = require('./api/nft/spider');
-// const lending = require('./api/lending');
+const underworld = require('./api/underworld');
+const coffin = require('./api/coffinbox');
 
 router.get('/supply/circulating', supply.circulatingSupply);
 router.get('/supply/circulating-adjusted', supply.circulatingSupplyAdjusted);
@@ -39,6 +40,14 @@ router.get('/users/:userAddress/:id', users.infos)
 router.get('/luxor', luxor.infos)
 router.get('/luxor/:id', luxor.bondInfo)
 router.get('/luxor/users/:userAddress', luxor.userInfo)
+
+// router.get('/underworld', underworld.infos)
+router.get('/underworld/:id', underworld.pairInfo)
+router.get('/underworld/users/:userAddress/:id', underworld.userInfo)
+
+// router.get('/coffin', coffin.infos)
+router.get('/coffin/:id', coffin.coffinInfo)
+router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
 
 // router.get('/lending/supply', lending.totalSupply)
 
