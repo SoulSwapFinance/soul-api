@@ -73,7 +73,7 @@ async function getPairInfo(ctx) {
 
 async function getUserInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
-    const userAddress = web3.utils.toChecksumAddress(ctx.params.id);
+    const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress);
     const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
 
@@ -82,6 +82,7 @@ async function getUserInfo(ctx) {
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
     const pairDecimals = await PairContract.methods.decimals().call();
+    const divisor = 10**pairDecimals
     const exchangeRate = await PairContract.methods.exchangeRate().call();
     const oracleAddress = await PairContract.methods.oracle().call();
     const interestPerSecond = await PairContract.methods.accrueInfo().call()[0];
@@ -113,11 +114,11 @@ async function getUserInfo(ctx) {
     const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
     
     // USER DETAILS //
-    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call();
-    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call();
+    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call() / divisor;
+    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call() / divisor;
  
     if (!("id" in ctx.params))
-        return {"name": "Pairs"};
+        return {"name": "Underworld Pairs"};
     else {
         return {
             "address": pairAddress,
@@ -126,7 +127,7 @@ async function getUserInfo(ctx) {
             "name": pairName,
             "symbol": pairSymbol,
             "decimals": pairDecimals,
-            "supply": totalSupply,
+            "supply": totalSupply / divisor,
             "exchangeRate": exchangeRate,
             "interestPerSecond": interestPerSecond,
             "lastAccrued": lastAccrued,
