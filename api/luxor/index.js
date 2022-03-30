@@ -63,10 +63,10 @@ async function getInfo() {
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
     
-    const stakingBalance = new BN(await LuxorContract.methods.balanceOf(LuxorStakeAddress).call());
-    const warmupBalance = new BN(await LumensContract.methods.balanceOf(WarmupAddress).call());
-    const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call();
-    const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call();
+    const stakingBalance = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9;
+    const warmupBalance = await LumensContract.methods.balanceOf(WarmupAddress).call() / 1e9;
+    const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call() / 1e18;
+    const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call() / 1e18;
     const ftmValue = ftmBalance * ftmPrice
     const reserveBalance = ftmValue + daiBalance
 
