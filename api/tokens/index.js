@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, TREASURY_ADDRESS } = require("../../constants");
+const { FTM_CHAIN_ID, TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -18,7 +18,11 @@ async function getTokenInfo(ctx) {
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
-    const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(ctx.params.id).call();
+    const rawPrice 
+        = tokenAddress === LUM ? 0 
+            : tokenAddress === SOR ? 0 
+            : await PriceFetcherContract.methods
+                .currentTokenUsdcPrice(ctx.params.id).call() ?? 0;
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
