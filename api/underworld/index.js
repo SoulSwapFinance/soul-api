@@ -25,23 +25,27 @@ async function getPairInfo(ctx) {
     const assetAddress = await PairContract.methods.asset().call();
     const AssetContract = new web3.eth.Contract(ERC20ContractABI, assetAddress);
     const assetTicker = await AssetContract.methods.symbol().call();
-    const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call()
-    const totalAssetElastic = await PairContract.methods.totalAsset().call().results[0];
-    const totalAssetBase = await PairContract.methods.totalAsset().call().results[1];
+    const assetDecimals = await AssetContract.methods.decimals().call();
+    const assetDivisor = 10**assetDecimals;
+    const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1e18;
+    const totalAssetElastic = await PairContract.methods.totalAsset().call()[0];
+    const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
     
     // COLLATERAL DETAILS //
     const collateralAddress = await PairContract.methods.collateral().call();
-    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, assetAddress);
+    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, collateralAddress);
     const collateralTicker = await CollateralContract.methods.symbol().call();
-    const collateralPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call()
+    const collateralDecimals = await CollateralContract.methods.decimals().call();
+    const collateralDivisor = 10**collateralDecimals;
+    const collateralPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1e18;
 
     // BORROW DETAILS
-    const totalBorrowElastic = await PairContract.methods.totalBorrow().call().results[0];
-    const totalBorrowBase = await PairContract.methods.totalBorrow().call().results[1];
+    const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0];
+    const totalBorrowBase = await PairContract.methods.totalBorrow().call()[1];
     
  
     if (!("id" in ctx.params))
-        return {"name": "Tokens"};
+        return {"name": "Underworld Pairs"};
     else {
         return {
             "address": pairAddress,
@@ -54,11 +58,13 @@ async function getPairInfo(ctx) {
             "assetTicker": assetTicker,
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
+            "assetDecimals": assetDecimals,
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
-
+            
             "collateralTicker": collateralTicker,
             "collateralAddress": collateralAddress,
+            "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
             "collateralAddress": collateralAddress,
 
