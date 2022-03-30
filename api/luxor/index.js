@@ -51,15 +51,18 @@ const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddre
 async function getInfo() {
 
     // METHOD CALLS //
-    const totalSupply = await LuxorContract.methods.totalSupply().call();
+    const totalSupply = await LuxorContract.methods.totalSupply().call() / 1e9;
     const tokenSymbol = await LuxorContract.methods.symbol().call();
     const tokenName = await LuxorContract.methods.name().call();
     const tokenDecimals = await LuxorContract.methods.decimals().call();
 
-    const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call();
-    const ftmPrice = rawPrice / 1e18
+    const rawFtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call();
+    const ftmPrice = rawFtmPrice / 1e18
+    
+    const rawLuxorPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LUX).call();
+    const luxorPrice = rawLuxorPrice / 1e18
     const divisor = 10**tokenDecimals
-    const marketCap = totalSupply * ftmPrice / divisor
+    const marketCap = totalSupply * luxorPrice
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
     
@@ -78,7 +81,7 @@ async function getInfo() {
             "symbol": tokenSymbol,
             "warmup": warmupPeriod,
             "epoch": epoch,
-            "price": ftmPrice,
+            "price": luxorPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
