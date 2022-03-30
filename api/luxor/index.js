@@ -11,6 +11,7 @@ const {
 const web3 = web3Factory(FTM_CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
+const LumensContractABI = require('../../abis/LumensContractABI.json');
 const BondHelperABI = require('../../abis/LuxorBondHelperABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
@@ -27,7 +28,7 @@ const TreasuryAddress="0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24";
 
 // CONTRACTS //
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
-const LumensContract = new web3.eth.Contract(ERC20ContractABI, LUM);
+const LumensContract = new web3.eth.Contract(LumensContractABI, LUM);
 
 // Reserves
 const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI);
@@ -69,6 +70,8 @@ async function getInfo() {
     const stakingBalance = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9;
     const warmupBalance = await LumensContract.methods.balanceOf(WarmupAddress).call() / 1e9;
     const ftmBalance = await FtmContract.methods.balanceOf(TreasuryAddress).call() / 1e18;
+    const circulatingLumens = await LumensContract.methods.circulatingSupply().call() / 1e9;
+    const index = await LumensContract.methods.index().call() / 1e9;
     const daiBalance = await DaiContract.methods.balanceOf(TreasuryAddress).call() / 1e18;
     const ftmValue = ftmBalance * ftmPrice
     const reserveBalance = ftmValue + daiBalance
@@ -79,11 +82,13 @@ async function getInfo() {
             "symbol": tokenSymbol,
             "warmup": warmupPeriod,
             "epoch": epoch,
+            "index": index,
             "distribute": distribute,
             "price": luxorPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
+            "circulatingLumens": circulatingLumens,
             "reserveBalance": reserveBalance,
             "stakingBalance": stakingBalance,
             "warmupBalance": warmupBalance,
