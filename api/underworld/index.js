@@ -59,6 +59,7 @@ async function getPairInfo(ctx) {
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddress}/logo.png`,            
 
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
@@ -67,6 +68,7 @@ async function getPairInfo(ctx) {
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddress}/logo.png`,            
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
@@ -123,7 +125,7 @@ async function getUserInfo(ctx) {
     const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call();
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call();
- 
+
     if (!("id" in ctx.params))
         return {"name": "Underworld Pairs"};
     else {
@@ -145,15 +147,15 @@ async function getUserInfo(ctx) {
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
-
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddress}/logo.png`,
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
-
+            
             "collateralTicker": collateralTicker,
             "collateralPrice": collateralPrice,
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
-
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddress}/logo.png`,            
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
