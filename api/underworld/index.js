@@ -59,6 +59,7 @@ async function getPairInfo(ctx) {
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
+
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
             
@@ -66,7 +67,6 @@ async function getPairInfo(ctx) {
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
-            "collateralAddress": collateralAddress,
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
@@ -88,7 +88,7 @@ async function getUserInfo(ctx) {
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
     const pairDecimals = await PairContract.methods.decimals().call();
-    const divisor = 10**pairDecimals
+    const pairDivisor = 10**pairDecimals
     const exchangeRate = await PairContract.methods.exchangeRate().call();
     const oracleAddress = await PairContract.methods.oracle().call();
     const interestPerSecond = await PairContract.methods.accrueInfo().call()[0];
@@ -120,8 +120,9 @@ async function getUserInfo(ctx) {
     const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
     
     // USER DETAILS //
-    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call() / divisor;
-    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call() / divisor;
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
+    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call();
+    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call();
  
     if (!("id" in ctx.params))
         return {"name": "Underworld Pairs"};
@@ -133,7 +134,8 @@ async function getUserInfo(ctx) {
             "name": pairName,
             "symbol": pairSymbol,
             "decimals": pairDecimals,
-            "supply": totalSupply / divisor,
+            "supply": totalSupply / pairDivisor,
+
             "exchangeRate": exchangeRate,
             "interestPerSecond": interestPerSecond,
             "lastAccrued": lastAccrued,
@@ -142,22 +144,25 @@ async function getUserInfo(ctx) {
             "assetTicker": assetTicker,
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
-            "assetTotalBase": totalAssetBase,
-            "assetTotalElastic": totalAssetElastic,
             "assetDecimals": assetDecimals,
 
+            "assetTotalBase": totalAssetBase,
+            "assetTotalElastic": totalAssetElastic,
+
             "collateralTicker": collateralTicker,
-            "collateralAddress": collateralAddress,
             "collateralPrice": collateralPrice,
+            "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
+
+            "userBalance": userBalance,
             "userBorrowPart": userBorrowPart,
             "userCollateralShare": userCollateralShare,
 
-            "api": "https://api.soulswap.finance/info/tokens/" + ctx.params.id,
-            "ftmscan": `https://ftmscan.com/address/${ctx.params.id}#code`,
+            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "ftmscan": `https://ftmscan.com/address/${pairAddress}#code`,
         }
     }
 }
