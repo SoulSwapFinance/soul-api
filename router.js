@@ -35,7 +35,7 @@ router.get('/pairs/:id', pairs.pairInfo);
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
 
-router.get('/users/:userAddress/:id', users.infos)
+router.get('/users/:userAddress/:id', users.tokenInfo)
 
 router.get('/luxor', luxor.infos)
 router.get('/luxor/:id', luxor.bondInfo)

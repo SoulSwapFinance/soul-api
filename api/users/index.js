@@ -8,7 +8,7 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
-async function getInfo(ctx) {
+async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress);
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
@@ -24,7 +24,7 @@ async function getInfo(ctx) {
         = tokenAddress === LUM ? 0 
             : tokenAddress === SOR ? 0 
             : await PriceFetcherContract.methods
-                .currentTokenUsdcPrice(ctx.params.id).call() ?? 0;
+                .currentTokenUsdcPrice(tokenAddress).call() ?? 0;
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const tokenPrice = rawPrice / 1e18
     const marketCap = totalSupply * tokenPrice / divisor    
@@ -35,7 +35,7 @@ async function getInfo(ctx) {
         return {"name": "Users"};
     else {
         return {
-            "address": ctx.params.id,
+            "address": tokenAddress,
             "name": tokenName,
             "symbol": tokenSymbol,
             "balance": tokenBalance,
@@ -44,15 +44,15 @@ async function getInfo(ctx) {
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
-            "api": "https://api.soulswap.finance/info/tokens/" + ctx.params.id,
-            "ftmscan": `https://ftmscan.com/address/${ctx.params.id}#code`,
+            "api": `https://api.soulswap.finance/info/tokens/${tokenAddress}`,
+            "ftmscan": `https://ftmscan.com/address/${tokenAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${ctx.params.id}/logo.png`
         }
     }
 }
 
-async function infos(ctx) {
-    ctx.body = (await getInfo(ctx))
+async function tokenInfo(ctx) {
+    ctx.body = (await getTokenInfo(ctx))
 }
 
-module.exports = {infos};
+module.exports = { tokenInfo };

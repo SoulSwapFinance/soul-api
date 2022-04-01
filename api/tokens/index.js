@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
+const { FTM_CHAIN_ID, LUXOR_TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -22,27 +22,27 @@ async function getTokenInfo(ctx) {
         = tokenAddress === LUM ? 0 
             : tokenAddress === SOR ? 0 
             : await PriceFetcherContract.methods
-                .currentTokenUsdcPrice(ctx.params.id).call() ?? 0;
+                .currentTokenUsdcPrice(tokenAddress).call() ?? 0;
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
-    const treasuryBalance = await TokenContract.methods.balanceOf(TREASURY_ADDRESS).call();
+    const luxorTreasuryBalance = await TokenContract.methods.balanceOf(LUXOR_TREASURY_ADDRESS).call();
 
     if (!("id" in ctx.params))
         return {"name": "Tokens"};
     else {
         return {
-            "address": ctx.params.id,
+            "address": tokenAddress,
             "name": tokenName,
             "symbol": tokenSymbol,
             "price": tokenPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
-            "treasuryBalance": treasuryBalance,
-            "api": "https://api.soulswap.finance/info/tokens/" + ctx.params.id,
-            "ftmscan": `https://ftmscan.com/address/${ctx.params.id}#code`,
-            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${ctx.params.id}/logo.png`
+            "treasuryBalance": luxorTreasuryBalance,
+            "api": `https://api.soulswap.finance/info/tokens/${tokenAddress}`,
+            "ftmscan": `https://ftmscan.com/address/${tokenAddress}#code`,
+            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${tokenAddress}/logo.png`
         }
     }
 }

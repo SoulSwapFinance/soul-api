@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
+const { FTM_CHAIN_ID, LUM, SOR } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -20,19 +20,24 @@ async function getPairInfo(ctx) {
     const pairSymbol = await PairContract.methods.symbol().call();
     const pairDecimals = await PairContract.methods.decimals().call();
     const exchangeRate = await PairContract.methods.exchangeRate().call();
+    const oracle = await PairContract.methods.oracle().call();
 
     // ASSET DETAILS //
     const assetAddress = await PairContract.methods.asset().call();
+    const assetAddressCS = web3.utils.toChecksumAddress(assetAddress);
     const AssetContract = new web3.eth.Contract(ERC20ContractABI, assetAddress);
     const assetTicker = await AssetContract.methods.symbol().call();
     const assetDecimals = await AssetContract.methods.decimals().call();
     const assetDivisor = 10**assetDecimals;
     const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1e18;
-    const totalAssetElastic = await PairContract.methods.totalAsset().call()[0];
-    const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
-    
+    const assetElastic = await PairContract.methods.totalAsset().call();
+    const totalAssetElastic = assetElastic[0];
+    const assetBase = await PairContract.methods.totalAsset().call();
+    const totalAssetBase = assetBase[1];
+        
     // COLLATERAL DETAILS //
     const collateralAddress = await PairContract.methods.collateral().call();
+    const collateralAddressCS = web3.utils.toChecksumAddress(collateralAddress);
     const CollateralContract = new web3.eth.Contract(ERC20ContractABI, collateralAddress);
     const collateralTicker = await CollateralContract.methods.symbol().call();
     const collateralDecimals = await CollateralContract.methods.decimals().call();
@@ -40,8 +45,10 @@ async function getPairInfo(ctx) {
     const collateralPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1e18;
 
     // BORROW DETAILS
-    const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0];
-    const totalBorrowBase = await PairContract.methods.totalBorrow().call()[1];
+    const borrowElastic = await PairContract.methods.totalBorrow().call();
+    const totalBorrowElastic = borrowElastic[0];
+    const borrowBase = await PairContract.methods.totalBorrow().call();
+    const totalBorrowBase = borrowBase[1];
     
  
     if (!("id" in ctx.params))
@@ -54,13 +61,15 @@ async function getPairInfo(ctx) {
             "decimals": pairDecimals,
             "supply": totalSupply,
             "exchangeRate": exchangeRate,
+            "oracle": oracle,
 
             "assetTicker": assetTicker,
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddress}/logo.png`,            
-
+            "assetDivisor": assetDivisor,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddressCS}/logo.png`,            
+            
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
             
@@ -68,13 +77,14 @@ async function getPairInfo(ctx) {
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddress}/logo.png`,            
+            "collateralDivisor": collateralDivisor,
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddressCS}/logo.png`,            
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
-            "api": "https://api.soulswap.finance/info/tokens/" + ctx.params.id,
-            "ftmscan": `https://ftmscan.com/address/${ctx.params.id}#code`,
+            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "ftmscan": `https://ftmscan.com/address/${pairAddress}#code`,
         }
     }
 }

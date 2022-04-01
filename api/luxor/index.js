@@ -3,10 +3,7 @@
 const {web3Factory} = require("../../utils/web3");
 const { 
   FTM_CHAIN_ID,
-  TREASURY_ADDRESS,
-  LUX, DAI, LUM, WFTM, WLUM, FTM_DAI_LP, FTM_WLUM_LP, DAI_LUX_LP, 
-  FTM_LUX_LP, FTM_LEND_DAI, DAI_LEND_FTM,
-
+  LUX, DAI, LUM, WFTM
 } = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
 
