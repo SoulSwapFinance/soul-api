@@ -103,7 +103,7 @@ async function getUserInfo(ctx) {
     const masterContractOf = await CoffinContract.methods.masterContractOf(tokenAddress).call();
     const nonces = await CoffinContract.methods.nonces(tokenAddress).call();
     const pendingStrategy = await CoffinContract.methods.pendingStrategy(tokenAddress).call();
-    const strategy = await CoffinContract.methods.strategy(tokenAddress).call();
+    // const strategy = await CoffinContract.methods.strategy(tokenAddress).call();
     const start = await CoffinContract.methods.strategyData(tokenAddress).call();
     const startDate = start[0];
     const target = await CoffinContract.methods.strategyData(tokenAddress).call();
@@ -132,7 +132,7 @@ async function getUserInfo(ctx) {
             "mcap": marketCap,
             "masterContractOf": masterContractOf,
             "nonces": nonces,
-            "strategy": strategy,
+            // "strategy": strategy,
             "pendingStrategy": pendingStrategy,
             "strategyStartDate": startDate,
             "strategyTargetPercentage": targetPercentage,
