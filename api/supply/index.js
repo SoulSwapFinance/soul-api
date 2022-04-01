@@ -32,7 +32,7 @@ class Cache {
 
     async getMaxSupply() {
         if (!this.cachedMaxSupply) {
-            const maxSupply = 250_000_000 * 10**18; // new BN(await soulContract.methods.maxSupply().call());
+            const maxSupply = 250_000_000 * 10**18;
             const lastRequestTimestamp = Date.now();
             this.cachedMaxSupply = {maxSupply, lastRequestTimestamp}
         }
@@ -49,8 +49,8 @@ class Cache {
                 getBalanceOf("0x124B06C5ce47De7A6e9EFDA71a946717130079E6"),    // SeanceCircle [2]
                 getBalanceOf("0x8f1E15cD3d5a0bb85B8189d5c6B61BB64398E19b"),    // SOUL-SEANCE [3]
                 getBalanceOf("0x1c63c726926197bd3cb75d86bcfb1daebcd87250"),    // DAO [4]
-                getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57"),     // FTM-SOUL [5]
-                getBalanceOf("0x8d3c3f3f3754Fa6cA088E1991616ca74FCfABFf1")      // EXCHANGE LIQ. [6]
+                getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57"),    // FTM-SOUL [5]
+                getBalanceOf("0x8d3c3f3f3754Fa6cA088E1991616ca74FCfABFf1")     // EXCHANGE LIQ. [6]
             ])
 
             // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY

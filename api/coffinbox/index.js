@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
+const { FTM_CHAIN_ID, LUM, SOR } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -30,7 +30,6 @@ async function getCoffinInfo(ctx) {
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
-    const treasuryBalance = await TokenContract.methods.balanceOf(TREASURY_ADDRESS).call();
     const coffinBalance = await TokenContract.methods.balanceOf(CoffinAddress).call();
     const tvl = coffinBalance * tokenPrice;
     
@@ -58,7 +57,6 @@ async function getCoffinInfo(ctx) {
             "mcap": marketCap,
             "tvl": tvl,
             "mcap": marketCap,
-            "treasuryBalance": treasuryBalance,
             "masterContractOf": masterContractOf,
             "nonces": nonces,
             "strategy": strategy,
@@ -94,7 +92,6 @@ async function getUserInfo(ctx) {
     const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
-    const treasuryBalance = await TokenContract.methods.balanceOf(TREASURY_ADDRESS).call() / divisor;
     const coffinBalance = await TokenContract.methods.balanceOf(CoffinAddress).call() / divisor;
     const tvl = coffinBalance * tokenPrice;
 
@@ -107,11 +104,16 @@ async function getUserInfo(ctx) {
     const nonces = await CoffinContract.methods.nonces(tokenAddress).call();
     const pendingStrategy = await CoffinContract.methods.pendingStrategy(tokenAddress).call();
     const strategy = await CoffinContract.methods.strategy(tokenAddress).call();
-    const startDate = await CoffinContract.methods.strategyData(tokenAddress).call()[0];
-    const targetPercentage = await CoffinContract.methods.strategyData(tokenAddress).call()[1];
-    const strategyBalance = await CoffinContract.methods.strategyData(tokenAddress).call()[2];
-    const totalElastic = await CoffinContract.methods.totals(tokenAddress).call()[0];
-    const totalBase = await CoffinContract.methods.totals(tokenAddress).call()[1];
+    const start = await CoffinContract.methods.strategyData(tokenAddress).call();
+    const startDate = start[0];
+    const target = await CoffinContract.methods.strategyData(tokenAddress).call();
+    const targetPercentage = target[1];
+    const strategy = await CoffinContract.methods.strategyData(tokenAddress).call();
+    const strategyBalance = strategy[2];
+    const elastic = await CoffinContract.methods.totals(tokenAddress).call();
+    const totalElastic = elastic[0]
+    const base = await CoffinContract.methods.totals(tokenAddress).call();
+    const totalBase = base[1];
 
     if (!("id" in ctx.params))
         return {"name": "Coffin"};
@@ -128,7 +130,6 @@ async function getUserInfo(ctx) {
             "tvl": tvl,
             "userTvl": userTvl,
             "mcap": marketCap,
-            "treasuryBalance": treasuryBalance,
             "masterContractOf": masterContractOf,
             "nonces": nonces,
             "strategy": strategy,

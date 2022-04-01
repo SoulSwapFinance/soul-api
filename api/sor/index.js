@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { DAI, LUX, FTM_CHAIN_ID, TREASURY_ADDRESS } = require("../../constants");
+const { DAI, LUX, FTM_CHAIN_ID, LUXOR_TREASURY_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -9,7 +9,7 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const BN = require('bn.js');
 
 async function getSorInfo() {
-    const treasuryAddress = TREASURY_ADDRESS;
+    const luxorTreasuryAddress = LUXOR_TREASURY_ADDRESS;
     const luxorAddress = LUX;
     const sorAddress = '0xEFFd4874AcA3Acd19a24dF3281b5cdAdD823801A';
     const masterAddress = '0xfF1157CaCB174c012f68CDb0B7700597aae3D5A8';
@@ -24,7 +24,7 @@ async function getSorInfo() {
     const luxorPrice = rawPrice / 1e18
 
     const totalSupply = await SorContract.methods.totalSupply().call() / 1e18;
-    const treasuryBalance = await SorContract.methods.balanceOf(treasuryAddress).call() / 1e18;
+    const luxorTreasuryBalance = await SorContract.methods.balanceOf(luxorTreasuryAddress).call() / 1e18;
     const sorMasterCollateral = await SorContract.methods.balanceOf(masterAddress).call() / 1e18;
     const daiMasterCollateral = await DaiContract.methods.balanceOf(masterAddress).call() / 1e18;
     const luxorMasterCollateral = await LuxorContract.methods.balanceOf(masterAddress).call();
@@ -37,7 +37,7 @@ async function getSorInfo() {
         return {
             "address": sorAddress,
             "supply": totalSupply,
-            "treasuryBalance": treasuryBalance,
+            "treasuryBalance": luxorTreasuryBalance,
             "sorCollateral": sorMasterCollateral,
             "daiCollateral": daiMasterCollateral,
             "stableCollateral": stableCollateralValue,
