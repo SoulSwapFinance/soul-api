@@ -32,7 +32,7 @@ async function getCoffinInfo(ctx) {
     const marketCap = totalSupply * tokenPrice / divisor
     const coffinBalance = await TokenContract.methods.balanceOf(CoffinAddress).call();
     const tvl = coffinBalance * tokenPrice;
-    
+
     // COFFIN TOKEN DETAILS //
     const masterContractOf = await CoffinContract.methods.masterContractOf(tokenAddress).call();
     const nonces = await CoffinContract.methods.nonces(tokenAddress).call();
