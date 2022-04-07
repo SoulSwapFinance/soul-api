@@ -21,6 +21,10 @@ async function getPairInfo(ctx) {
     const pairDecimals = await PairContract.methods.decimals().call();
     const exchangeRate = await PairContract.methods.exchangeRate().call();
     const oracle = await PairContract.methods.oracle().call();
+    const accrueInfo = await PairContract.methods.accrueInfo().call();
+    const interestPerSecond = accrueInfo[0];
+    const lastAccrued = accrueInfo[1];
+    const feesEarnedFraction = accrueInfo[2];
 
     // ASSET DETAILS //
     const assetAddress = await PairContract.methods.asset().call();
@@ -30,11 +34,11 @@ async function getPairInfo(ctx) {
     const assetDecimals = await AssetContract.methods.decimals().call();
     const assetDivisor = 10**assetDecimals;
     const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1e18;
-    const assetElastic = await PairContract.methods.totalAsset().call();
-    const totalAssetElastic = assetElastic[0];
-    const assetBase = await PairContract.methods.totalAsset().call();
-    const totalAssetBase = assetBase[1];
-        
+
+    const assetCall = await PairContract.methods.totalAsset().call();
+    const totalAssetElastic = assetCall[0];
+    const totalAssetBase = assetCall[1];
+
     // COLLATERAL DETAILS //
     const collateralAddress = await PairContract.methods.collateral().call();
     const collateralAddressCS = web3.utils.toChecksumAddress(collateralAddress);
@@ -62,6 +66,9 @@ async function getPairInfo(ctx) {
             "supply": totalSupply,
             "exchangeRate": exchangeRate,
             "oracle": oracle,
+            "interestPerSecond": interestPerSecond,
+            "lastAccrued": lastAccrued,
+            "feesEarnedFraction": feesEarnedFraction,
 
             "assetTicker": assetTicker,
             "assetPrice": assetPrice,
