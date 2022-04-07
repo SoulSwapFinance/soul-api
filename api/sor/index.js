@@ -37,7 +37,7 @@ async function getSorInfo() {
         return {
             "address": sorAddress,
             "supply": totalSupply,
-            "treasuryBalance": luxorTreasuryBalance,
+            "luxorTreasuryBalance": luxorTreasuryBalance,
             "sorCollateral": sorMasterCollateral,
             "daiCollateral": daiMasterCollateral,
             "stableCollateral": stableCollateralValue,

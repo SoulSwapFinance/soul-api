@@ -26,7 +26,6 @@ router.get('/nft/spider/:id', nftSpider.infos);
 
 router.get('/sor', sor.sorInfo);
 
-router.get('/tokens', tokens.tokenInfo);
 router.get('/tokens/:id', tokens.tokenInfo);
 
 router.get('/pairs', pairs.pairInfo);

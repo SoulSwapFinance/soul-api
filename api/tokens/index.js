@@ -39,7 +39,7 @@ async function getTokenInfo(ctx) {
             "decimals": tokenDecimals,
             "supply": totalSupply,
             "mcap": marketCap,
-            "treasuryBalance": luxorTreasuryBalance,
+            "luxorTreasuryBalance": luxorTreasuryBalance,
             "api": `https://api.soulswap.finance/info/tokens/${tokenAddress}`,
             "ftmscan": `https://ftmscan.com/address/${tokenAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${tokenAddress}/logo.png`
@@ -51,4 +51,4 @@ async function tokenInfo(ctx) {
     ctx.body = (await getTokenInfo(ctx))
 }
 
-module.exports = {tokenInfo};
+module.exports = { tokenInfo };
