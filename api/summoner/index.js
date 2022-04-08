@@ -58,7 +58,10 @@ async function getUserInfo(ctx) {
 
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
     const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
-
+    
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+    
     const pairDecimals = await PairContract.methods.decimals().call()
     const pairDivisor = 10**pairDecimals
     const soulDivisor = 1e18
@@ -69,19 +72,18 @@ async function getUserInfo(ctx) {
         = (pid > 49 && pid < 53 && pid != 50)
             ? 'underworld' : 'farm'
     
-    const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
-
     // Pair Pricing //
-    
     const token0
         = pairType == 'farm'
         ? await PairContract.methods.token0().call()
         : await UnderworldContract.methods.asset().call()
 
     const pendingSoul = await SummonerContract.methods.pendingSoul(pid, userAddress).call() / soulDivisor
+    const pendingValue = pendingSoul * soulPrice
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
     const token0Decimals = await Token0Contract.methods.decimals().call()
     const token0Divisor = 10**(token0Decimals)
+    const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
     const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
     const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
     const stakedBalance = userInfo[0] / pairDivisor
@@ -93,6 +95,8 @@ async function getUserInfo(ctx) {
             : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
+    const stakedValue = lpPrice * stakedBalance
+
     const rewardDebt = userInfo[1] / soulDivisor
     const rewardDebtAtTime = userInfo[2] / soulDivisor
     const lastWithdrawTime = userInfo[3]
@@ -111,9 +115,12 @@ async function getUserInfo(ctx) {
     const currentRate = rateMeow <= 0 ? 0 : rateMeow
 
     return {
-            "address": userAddress,
+            "userAddress": userAddress,
+            "pairAddress": pairAddress,
             "pendingSoul": pendingSoul,
+            "pendingValue": pendingValue,
             "stakedBalance": stakedBalance,
+            "stakedValue": stakedValue,
             "lpPrice": lpPrice,
             "userDelta": userDelta,
             "rewardDebt": rewardDebt,
