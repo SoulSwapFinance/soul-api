@@ -9,6 +9,10 @@ const BN = require('bn.js');
 async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
+    // WIP: LOW-PRIORITY //
+    // const AssetA = await PairContract.methods
+    // const dominantAsset = 
+    // const assetPrice =
     const treasuryAddress = LUXOR_TREASURY_ADDRESS;
     // METHOD CALLS //
     const totalSupply = await PairContract.methods.totalSupply().call();
