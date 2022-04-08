@@ -11,18 +11,15 @@ const sor = require('./api/sor');
 const pairs = require('./api/pairs');
 const users = require('./api/users');
 const luxor = require('./api/luxor');
-const nftSpider = require('./api/nft/spider');
 const underworld = require('./api/underworld');
 const coffin = require('./api/coffinbox');
+const summoner = require('./api/summoner');
 
 router.get('/supply/circulating', supply.circulatingSupply);
 router.get('/supply/circulating-adjusted', supply.circulatingSupplyAdjusted);
 router.get('/supply/total', supply.totalSupply);
 router.get('/supply/total-adjusted', supply.totalSupplyAdjusted);
 router.get('/supply/max', supply.maxSupply);
-
-router.get('/nft/spider', nftSpider.infos);
-router.get('/nft/spider/:id', nftSpider.infos);
 
 router.get('/sor', sor.sorInfo);
 
@@ -47,6 +44,10 @@ router.get('/underworld/users/:userAddress/:id', underworld.userInfo)
 // router.get('/coffin', coffin.infos)
 router.get('/coffin/:id', coffin.coffinInfo)
 router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
+
+router.get('/summoner', summoner.infos)
+router.get('/summoner/:id', summoner.poolInfo)
+router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
 
 // router.get('/lending/supply', lending.totalSupply)
 
