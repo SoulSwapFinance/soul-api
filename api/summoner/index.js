@@ -69,7 +69,7 @@ async function getUserInfo(ctx) {
     const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
     const pairType 
-        = (pid >= 49 && pid <= 53 && pid != 50)
+        = (pid >= 48 && pid <= 53 && pid != 50)
             ? 'underworld' : 'farm'
     
     // Pair Pricing //
@@ -147,7 +147,7 @@ async function getPoolInfo(ctx) {
     const status = allocPoint == 0 ? 'inactive' : 'active'
     // const lendingPids = [48, 49, 51, 52, 53]
     const pairType 
-        = (pid > 49 && pid < 53 && pid != 50)
+        = (pid >= 48 && pid <= 53 && pid != 50)
             ? 'underworld' : 'farm'
 
     // Pair Pricing //
