@@ -160,7 +160,7 @@ async function getPoolInfo(ctx) {
 
     const token1
         = pairType == 'farm'
-        ? await PairContract.methods.token0().call()
+        ? await PairContract.methods.token1().call()
         : await UnderworldContract.methods.collateral().call()
     
     // Create Contracts //
@@ -194,7 +194,9 @@ async function getPoolInfo(ctx) {
 
     const lpValuePaired 
             = pairType == 'farm'
-            ? token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
+            // 2x the value of half the pair.
+            ? token0Price * token0Balance * 2
+            // 100% of the asset token amount * asset token price
             : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
