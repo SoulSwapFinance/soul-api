@@ -86,6 +86,7 @@ async function getInfo() {
             "SeanceFantomBalance": SeanceFantomBalance,
             "UsdcFusdBalance": UsdcFusdBalance,
             "BtcEthBalance": BtcEthBalance,
+
             "api": `https://api.soulswap.finance/info/tokens/${SOUL}`,
             "ftmscan": `https://ftmscan.com/address/${SOUL}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${SOUL}/logo.png`
