@@ -69,7 +69,7 @@ async function getUserInfo(ctx) {
     const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
     const pairType 
-        = (pid >= 49 && pid < 53 && pid != 50)
+        = (pid >= 49 && pid <= 53 && pid != 50)
             ? 'underworld' : 'farm'
     
     // Pair Pricing //
