@@ -27,6 +27,7 @@ router.get('/tokens/:id', tokens.tokenInfo);
 
 router.get('/pairs', pairs.pairInfo);
 router.get('/pairs/:id', pairs.pairInfo);
+router.get('/pairs/:userAddress/:id', pairs.userPairInfo);
 
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
