@@ -28,6 +28,8 @@ async function getInfo() {
     const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
     const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
     const startRate = await SummonerContract.methods.startRate().call() / divisor
+    
+    const poolLength = await SummonerContract.methods.poolLength().call()
 
     const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
     const weight = await SummonerContract.methods.weight().call()
@@ -36,6 +38,7 @@ async function getInfo() {
 
         return {
             "address": SUMMONER_ADDRESS,
+            "poolLength": poolLength,
             "dailySoul": dailySoul,
             "soulPerSecond": soulPerSecond,
             "soulPerYear": dailySoul * 365,
