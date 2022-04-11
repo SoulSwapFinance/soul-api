@@ -82,6 +82,9 @@ async function getPairInfo(ctx) {
             "lpPrice": lpPrice,
             "lpValue": lpValuePaired,
 
+            "token0Address": token0,
+            "token1Address": token1,
+
             "token0Symbol": token0Symbol,
             "token1Symbol": token1Symbol,
 
@@ -143,7 +146,7 @@ async function getUserPairInfo(ctx) {
 
     const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
     const token1Balance = await Token1Contract.methods.balanceOf(pairAddress).call() / token1Divisor;
-    
+
     const token0Symbol = await Token0Contract.methods.symbol().call();
     const token1Symbol = await Token1Contract.methods.symbol().call();
     
@@ -176,8 +179,12 @@ async function getUserPairInfo(ctx) {
             "lpPrice": lpPrice,
             "lpValue": lpValuePaired,
 
+            "token0Address": token0,
+            "token1Address": token1,
+
             "token0Symbol": token0Symbol,
             "token1Symbol": token1Symbol,
+
             "token0Decimals": token0Decimals,
             "token1Decimals": token1Decimals,
 
