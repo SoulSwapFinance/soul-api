@@ -20,9 +20,9 @@ async function getUserInfo(ctx) {
     const ineligiblePower = await AuraContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const totalVotingPower 
         = await AuraContract.methods.totalSupply().call() / 1e18;
-    const eliblePower = totalVotingPower - ineligiblePower;
+    const eligiblePower = totalVotingPower - ineligiblePower;
     const stakedBalance =  await AutoStakeContract.methods.balanceOf(userAddress).call() / 1e18;
-    const protocolOwnership =  votingPower / eliblePower * 100
+    const protocolOwnership =  votingPower / eligiblePower * 100
     if (!("id" in ctx.params))
         return {"name": "Users"};
     else {
@@ -30,7 +30,7 @@ async function getUserInfo(ctx) {
             "address": userAddress,
             "votingPower": votingPower,
             "ineligiblePower": ineligiblePower,
-            "eliblePower": eliblePower,
+            "eligiblePower": eligiblePower,
             "nativeBalance": nativeBalance,
             "stakedBalance": stakedBalance,
             "protocolOwnership": protocolOwnership,
