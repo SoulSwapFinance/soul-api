@@ -25,14 +25,14 @@ router.get('/sor', sor.sorInfo);
 
 router.get('/tokens/:id', tokens.tokenInfo);
 
-router.get('/pairs', pairs.pairInfo);
 router.get('/pairs/:id', pairs.pairInfo);
 router.get('/pairs/:userAddress/:id', pairs.userPairInfo);
 
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
 
-router.get('/users/:userAddress/:id', users.tokenInfo)
+router.get('/users/:id', users.userInfo)
+router.get('/users/:id/:tokenAddress', users.tokenInfo)
 
 router.get('/luxor', luxor.infos)
 router.get('/luxor/:id', luxor.bondInfo)
