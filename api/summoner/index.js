@@ -90,6 +90,7 @@ async function getUserInfo(ctx) {
     const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
     const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
     const stakedBalance = userInfo[0] / pairDivisor
+    const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
 
     const lpValuePaired 
@@ -123,6 +124,7 @@ async function getUserInfo(ctx) {
             "pendingSoul": pendingSoul,
             "pendingValue": pendingValue,
             "stakedBalance": stakedBalance,
+            "walletBalance": walletBalance,
             "stakedValue": stakedValue,
             "lpPrice": lpPrice,
             "userDelta": userDelta,
@@ -138,7 +140,7 @@ async function getUserInfo(ctx) {
 }
 
 async function getPoolInfo(ctx) {
-    
+
     // ABCs //
     const pid = ctx.params.id
     const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
@@ -163,15 +165,15 @@ async function getPoolInfo(ctx) {
 
     const token1
         = pairType == 'farm'
-        ? await PairContract.methods.token1().call()
-        : await UnderworldContract.methods.collateral().call()
-    
+            ? await PairContract.methods.token1().call()
+            : await UnderworldContract.methods.collateral().call()
+
     // Create Contracts //
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
     const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1);
 
     const annualRewardsSummoner = await SummonerContract.methods.dailySoul().call() / 1e18 * 365 
-    const annualRewardsPool = allocShare * annualRewardsSummoner / 100    
+    const annualRewardsPool = allocShare * annualRewardsSummoner / 100
 
     // Abstracta Mathematica //
     const pairDecimals = await PairContract.methods.decimals().call()
