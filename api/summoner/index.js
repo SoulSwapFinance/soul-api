@@ -28,9 +28,24 @@ async function getInfo() {
     const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
     const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
     const startRate = await SummonerContract.methods.startRate().call() / divisor
-    
     const poolLength = await SummonerContract.methods.poolLength().call()
+    let pid = 1
+    let tvl = 0
+    for (pid; pid < Number(poolLength); pid++) {
+        const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
+        const pairAddress = poolInfo[0] // √
+        const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
 
+        const pairDecimals = await PairContract.methods.decimals().call()
+        const pairDivisor = 10**pairDecimals
+        // let lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+    
+        let poolTVL = await PairContract.methods.balanceOf(SUMMONER_ADDRESS).call() / pairDivisor
+            if(poolTVL > 0) {
+            tvl = tvl + poolTVL
+            }
+        }
+    
     const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
     const weight = await SummonerContract.methods.weight().call()
     const weightTotal = await SummonerContract.methods.totalWeight().call()
@@ -38,6 +53,7 @@ async function getInfo() {
 
         return {
             "address": SUMMONER_ADDRESS,
+            "tvl": tvl,
             "poolLength": poolLength,
             "dailySoul": dailySoul,
             "soulPerSecond": soulPerSecond,
