@@ -83,18 +83,15 @@ async function getPairInfo(ctx) {
             "lpValue": lpValuePaired,
 
             "token0Address": token0,
-            "token1Address": token1,
-
             "token0Symbol": token0Symbol,
-            "token1Symbol": token1Symbol,
-
             "token0Decimals": token0Decimals,
-            "token1Decimals": token1Decimals,
-
-            "token0Price": token0Price,
-            "token1Price": token1Price,
-
             "token0Balance": token0Balance,
+            "token0Price": token0Price,
+            
+            "token1Address": token1,
+            "token1Symbol": token1Symbol,
+            "token1Decimals": token1Decimals,
+            "token1Price": token1Price,
             "token1Balance": token1Balance,
 
             "supply": lpSupply,
@@ -160,7 +157,6 @@ async function getUserPairInfo(ctx) {
             : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
-
     const userBalance = await PairContract.methods.balanceOf(userAddress).call();
     const luxorTreasuryBalance = await PairContract.methods.balanceOf(LUXOR_TREASURY_ADDRESS).call();
 
@@ -180,18 +176,15 @@ async function getUserPairInfo(ctx) {
             "lpValue": lpValuePaired,
 
             "token0Address": token0,
-            "token1Address": token1,
-
             "token0Symbol": token0Symbol,
-            "token1Symbol": token1Symbol,
-
             "token0Decimals": token0Decimals,
-            "token1Decimals": token1Decimals,
-
             "token0Price": token0Price,
-            "token1Price": token1Price,
-
             "token0Balance": token0Balance,
+
+            "token1Address": token1,
+            "token1Symbol": token1Symbol,
+            "token1Decimals": token1Decimals,
+            "token1Price": token1Price,
             "token1Balance": token1Balance,
 
             "supply": lpSupply,
