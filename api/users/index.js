@@ -42,7 +42,7 @@ async function getUserInfo(ctx) {
 
 async function getTokenInfo(ctx) {
     const userAddress = web3.utils.toChecksumAddress(ctx.params.id);
-    const address = web3.utils.toChecksumAddress(ctx.params.tokenAddress);
+    const tokenAddress = web3.utils.toChecksumAddress(ctx.params.tokenAddress);
 
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
@@ -68,7 +68,7 @@ async function getTokenInfo(ctx) {
         return {"name": "Users"};
     else {
         return {
-            "address": address,
+            "address": tokenAddress,
             "name": tokenName,
             "symbol": tokenSymbol,
             "balance": tokenBalance,
@@ -78,8 +78,8 @@ async function getTokenInfo(ctx) {
             "supply": totalSupply,
             "mcap": marketCap,
             "api": `https://api.soulswap.finance/info/users/${userAddress}/${tokenAddress}`,
-            "ftmscan": `https://ftmscan.com/address/${address}#code`,
-            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${ctx.params.id}/logo.png`
+            "ftmscan": `https://ftmscan.com/address/${tokenAddress}#code`,
+            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${tokenAddress}/logo.png`
         }
     }
 }
