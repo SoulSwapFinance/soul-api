@@ -1,11 +1,13 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, LUM, SOR } = require("../../constants");
+const { FTM_CHAIN_ID, MULTICALL_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
+const MulticallContractABI = require('../../abis/MulticallContractABI.json');
+
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
@@ -101,6 +103,7 @@ async function getUserInfo(ctx) {
     const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress);
     const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+    const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
 
     // PAIR DETAILS //
     const totalSupply = await PairContract.methods.totalSupply().call();
@@ -139,6 +142,11 @@ async function getUserInfo(ctx) {
     const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
     
     // USER DETAILS //
+    const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18;
+    const userAssetBalance 
+        = assetTicker == 'WFTM' 
+            ? nativeBalance 
+            : await AssetContract.methods.balanceOf(userAddress).call() / pairDivisor;
     const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call();
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call();
@@ -176,6 +184,7 @@ async function getUserInfo(ctx) {
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
+            "userAssetBalance": userAssetBalance,
             "userBalance": userBalance,
             "userBorrowPart": userBorrowPart,
             "userCollateralShare": userCollateralShare,
