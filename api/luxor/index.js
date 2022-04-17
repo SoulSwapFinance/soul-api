@@ -21,7 +21,7 @@ const LuxorAddress = "0x6671E20b83Ba463F270c8c75dAe57e3Cc246cB2b";
 const LuxorStakeHelperAddress = "0x2Dd0D30f525e65641962904470660507e80940e4";
 const LuxorStakeAddress = "0xf3F0BCFd430085e198466cdCA4Db8C2Af47f0802";
 const WarmupAddress = "0x2B6Fe815F3D0b8C13E8F908A2501cdDC23D4Ed48";
-const TreasuryAddress="0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24";
+const TreasuryAddress="0x38FA2E36AEf0A9CBbCffF0E507B0c7584705b78e";
 
 // CONTRACTS //
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
