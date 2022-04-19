@@ -20,7 +20,7 @@ async function getTokenInfo(ctx) {
     const tokenDecimals = await TokenContract.methods.decimals().call();
     const rawPrice 
         = tokenAddress === LUM ? 0 
-            : tokenAddress === SOR ? 0 
+            // : tokenAddress === SOR ? 0 
             : await PriceFetcherContract.methods
                 .currentTokenUsdcPrice(tokenAddress).call() ?? 0;
     const tokenPrice = rawPrice / 1e18
