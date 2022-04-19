@@ -63,6 +63,7 @@ async function getInfo() {
     const warmupPeriod = new BN(await LuxorStakeHelperContract.methods.warmupPeriod().call());
     const epoch = await LuxorStakeHelperContract.methods.epoch().call();
     const distribute = await LuxorStakeHelperContract.methods.distribute().call() / 1e9;
+    const nextRebase = await LuxorStakeHelperContract.methods.nextRebase().call();
     
     const stakingBalance = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9;
     const warmupBalance = await LumensContract.methods.balanceOf(WarmupAddress).call() / 1e9;
@@ -80,6 +81,7 @@ async function getInfo() {
             "warmup": warmupPeriod,
             "epoch": epoch,
             "index": index,
+            "nextRebase": nextRebase,
             "distribute": distribute,
             "price": luxorPrice,
             "decimals": tokenDecimals,
