@@ -6,7 +6,6 @@ const {
   LUX, DAI, LUM, WFTM
 } = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
-
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const LumensContractABI = require('../../abis/LumensContractABI.json');
 const BondHelperABI = require('../../abis/LuxorBondHelperABI.json');
@@ -91,7 +90,7 @@ async function getInfo() {
             "reserveBalance": reserveBalance,
             "stakingBalance": stakingBalance,
             "warmupBalance": warmupBalance,
-            "api": `https://api.soulswap.finance/info/tokens/${LuxorAddress}`,
+            "api": `https://api.soulswap.finance/luxor`,
             "ftmscan": `https://ftmscan.com/address/${LuxorAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${LuxorAddress}/logo.png`
         }

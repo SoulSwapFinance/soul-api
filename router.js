@@ -14,6 +14,7 @@ const luxor = require('./api/luxor');
 const underworld = require('./api/underworld');
 const coffin = require('./api/coffinbox');
 const summoner = require('./api/summoner');
+const soulswap = require('./api/soulswap');
 
 router.get('/supply/circulating', supply.circulatingSupply);
 router.get('/supply/circulating-adjusted', supply.circulatingSupplyAdjusted);
@@ -49,6 +50,8 @@ router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
 router.get('/summoner', summoner.infos)
 router.get('/summoner/:id', summoner.poolInfo)
 router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
+
+router.get('/soulswap', soulswap.infos)
 
 // router.get('/lending/supply', lending.totalSupply)
 
