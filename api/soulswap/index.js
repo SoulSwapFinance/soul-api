@@ -23,58 +23,114 @@ const FantomContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
 // Protocol-Owned Liquidity (POL) //
 const FantomUsdcContract = new web3.eth.Contract(PairContractABI, FTM_USDC_LP);
 const FantomSoulContract = new web3.eth.Contract(PairContractABI, SOUL_FTM_LP);
+const SoulUsdcContract = new web3.eth.Contract(PairContractABI, SOUL_USDC_LP);
 const FantomEthereumContract = new web3.eth.Contract(PairContractABI, FTM_ETH_LP);
 const UsdcDaiContract = new web3.eth.Contract(PairContractABI, USDC_DAI_LP);
 const FantomBitcoinContract = new web3.eth.Contract(PairContractABI, FTM_BTC_LP);
 const FantomDaiContract = new web3.eth.Contract(PairContractABI, FTM_DAI_LP);
 const FantomBinanceContract = new web3.eth.Contract(PairContractABI, FTM_BNB_LP);
-const FantomSeance = new web3.eth.Contract(PairContractABI, SEANCE_FTM_LP);
+const FantomSeanceContract = new web3.eth.Contract(PairContractABI, SEANCE_FTM_LP);
 const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH_LP);
-
-// Helpers //
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+
+async function getPairPrice(pairAddress) {
+// Helpers //
+const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+
+// Abstracta Mathematica //
+const pairDecimals = await PairContract.methods.decimals().call()
+const pairDivisor = 10**(pairDecimals)
+const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor
+const token0 = await PairContract.methods.token0().call()
+const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
+const token0Decimals = await Token0Contract.methods.decimals().call()
+const token0Divisor = 10**(token0Decimals)
+
+// Prices & Value Locked //
+const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
+const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
+const lpPrice = lpValuePaired / lpSupply
+
+return lpPrice
+
+}
 
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
     const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
-    const soulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
-    const marketCap = totalSupply * soulPrice;
+    const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
+    const marketCap = totalSupply * SoulPrice;
     
-    // Balances //
+    // BALANCES //
     const SoulBalance = await SoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const FantomUsdcBalance = await FantomUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const FantomBalance = await FantomContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const FantomUsdcBalance = await FantomUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const SoulFantomBalance = await FantomSoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const SoulUsdcBalance = await SoulUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const FantomEthereumBalance = await FantomEthereumContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const UsdcDaiBalance = await UsdcDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const FantomBitcoinBalance = await FantomBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const FantomDaiBalance = await FantomDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const FantomBinanceBalance = await FantomBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const SeanceFantomBalance = await FantomSeance.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const BtcEthBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const SeanceFantomBalance = await FantomSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+
+    // PRICES //
+    const FantomUsdcPrice = await getPairPrice(FTM_USDC_LP);
+    const SoulFantomPrice = await getPairPrice(SOUL_FTM_LP);
+    const SoulUsdcPrice = await getPairPrice(SOUL_USDC_LP);
+    const FantomEthereumPrice = await getPairPrice(FTM_ETH_LP);
+    const UsdcDaiPrice = await getPairPrice(USDC_DAI_LP);
+    const FantomBitcoinPrice = await getPairPrice(FTM_BTC_LP);
+    const FantomDaiPrice = await getPairPrice(FTM_DAI_LP);
+    const FantomBinancePrice = await getPairPrice(FTM_BNB_LP);
+    const SeanceFantomPrice = await getPairPrice(SEANCE_FTM_LP);
+    const BitcoinEthereumPrice = await getPairPrice(BTC_ETH_LP);
+    
+    // VALUES //
+    const FantomUsdcValue = FantomUsdcPrice * FantomUsdcBalance;
+    const SoulFantomValue = SoulFantomPrice * SoulFantomBalance;
+    const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance;
+    const FantomEthereumValue = FantomEthereumPrice * FantomEthereumBalance;
+    const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
+    const FantomBitcoinValue = FantomBitcoinPrice * FantomBitcoinBalance;
+    const FantomDaiValue = FantomDaiPrice * FantomDaiBalance;
+    const FantomBinanceValue = FantomBinancePrice * FantomBinanceBalance;
+    const SeanceFantomValue = SeanceFantomPrice * SeanceFantomBalance;
+    const BitcoinEthereumValue = BitcoinEthereumPrice * BitcoinEthereumBalance;
+
+    const totalValue = FantomUsdcValue + SoulFantomValue + SoulUsdcValue + FantomEthereumValue + UsdcDaiValue + FantomBitcoinValue + FantomDaiValue + FantomBinanceValue + SeanceFantomValue + BitcoinEthereumValue
+
+    // VALUES //
+
 
         return {
             "address": SOUL,
             "name": "Soul Power",
             "symbol": "SOUL",
             "stakedSoul": stakedSoul,
-            "price": soulPrice,
+            "price": SoulPrice,
             "decimals": 18,
             "supply": totalSupply,
             "mcap": marketCap,
             
             "SoulBalance": SoulBalance,
             "FantomBalance": FantomBalance,
-            "SoulFantomBalance": SoulFantomBalance,
-            "FantomEthereumBalance": FantomEthereumBalance,
-            "UsdcDaiBalance": UsdcDaiBalance,
-            "FantomUsdcBalance": FantomUsdcBalance,
-            "FantomBitcoinBalance": FantomBitcoinBalance,
-            "FantomDaiBalance": FantomDaiBalance,
-            "FantomBinanceBalance": FantomBinanceBalance,
-            "SeanceFantomBalance": SeanceFantomBalance,
-            "BtcEthBalance": BtcEthBalance,
+
+            // VALUE //
+            "SoulFantomValue": SoulFantomValue,
+            "SoulUsdcValue": SoulUsdcValue,
+            "FantomEthereumValue": FantomEthereumValue,
+            "UsdcDaiValue": UsdcDaiValue,
+            "FantomUsdcValue": FantomUsdcValue,
+            "FantomBitcoinValue": FantomBitcoinValue,
+            "FantomDaiValue": FantomDaiValue,
+            "FantomBinanceValue": FantomBinanceValue,
+            "SeanceFantomValue": SeanceFantomValue,
+            "BitcoinEthereumValue": BitcoinEthereumValue,
+            "totalValue": totalValue,
 
             "api": `https://api.soulswap.finance/info/tokens/${SOUL}`,
             "ftmscan": `https://ftmscan.com/address/${SOUL}#code`,
