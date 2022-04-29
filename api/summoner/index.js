@@ -117,23 +117,6 @@ async function getUserInfo(ctx) {
     const lpPrice = lpValuePaired / lpSupply
     const stakedValue = lpPrice * stakedBalance
 
-    const rewardDebt = userInfo[1] / soulDivisor
-    const rewardDebtAtTime = userInfo[2] / soulDivisor
-    const lastWithdrawTime = userInfo[3]
-    const firstDepositTime = userInfo[4]
-    const timeDelta = userInfo[5]
-    const lastDepositTime = userInfo[6]
-
-    // Fee: Rate & Time Remaining //
-    const feeDays = await SummonerContract.methods.startRate().call() / 1e18
-    const feeSeconds = feeDays * 86_400
-    const remainingSeconds = feeSeconds - userDelta
-    const secondsRemaining = remainingSeconds <= 0 ? 0 : remainingSeconds
-    const daysRemaining = secondsRemaining / 86_400
-    const daysPast = feeDays - daysRemaining
-    const rateMeow = feeDays - daysPast
-    const currentRate = rateMeow <= 0 ? 0 : rateMeow
-
     return {
             "userAddress": userAddress,
             "pairAddress": pairAddress,
@@ -152,6 +135,64 @@ async function getUserInfo(ctx) {
             "lastDepositTime": lastDepositTime,
             "secondsRemaining": secondsRemaining,
             "currentRate": currentRate
+    }
+}
+
+async function getUserTVL(ctx) {
+
+    const userAddress = ctx.params.userAddress
+    const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
+    const pairAddress = poolInfo[0] // √
+
+    // CONTRACTS //
+    const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+    const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
+    
+    const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+
+    const pairType 
+        = (pid >= 48 && pid <= 53 && pid != 50)
+            ? 'underworld' : 'farm'
+    
+    // PRICING //
+    const token0
+        = pairType == 'farm'
+        ? await PairContract.methods.token0().call()
+        : await UnderworldContract.methods.asset().call()
+
+    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
+    const token0Decimals = await Token0Contract.methods.decimals().call()
+    const token0Divisor = 10**(token0Decimals)
+    const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
+    const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
+    const stakedBalance = userInfo[0] / pairDivisor
+    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+
+    const lpValuePaired 
+            = pairType == 'farm'
+            ? token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
+            : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+
+    let pid = 1
+    let userTvl = 0
+    for (pid; pid < Number(poolLength); pid++) {
+        const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
+        const stakedBalance = userInfo[0] / pairDivisor
+        const lpPrice = lpValuePaired / lpSupply
+        const stakedValue = lpPrice * stakedBalance
+        const pairDecimals = await PairContract.methods.decimals().call()
+        const pairDivisor = 10**pairDecimals
+        // let lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+    
+        let poolTVL = await SummonerContract.methods.balanceOf(SUMMONER_ADDRESS).call() / pairDivisor
+            if(poolTVL > 0) {
+            userTvl = userTvl + poolTVL
+            }
+        }
+
+    return {
+            "userAddress": userAddress,
+            "pairAddress": pairAddress,
     }
 }
 
@@ -254,6 +295,10 @@ async function infos(ctx) {
 
 async function userInfo(ctx) {
     ctx.body = (await getUserInfo(ctx))
+}
+
+async function userTVL(ctx) {
+    ctx.body = (await getUserTVL(ctx))
 }
 
 async function poolInfo(ctx) {

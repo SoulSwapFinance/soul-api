@@ -146,7 +146,7 @@ async function getInfo(ctx) {
             "totalLiquidityValue": totalLiquidityValue,
             "totalValue": totalReserveValue + totalLiquidityValue,
 
-            "api": `https://api.soulswap.finance/info/tokens/${SOUL}`,
+            "api": `https://api.soulswap.finance/soulswap`,
             "ftmscan": `https://ftmscan.com/address/${SOUL}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${SOUL}/logo.png`
         }
