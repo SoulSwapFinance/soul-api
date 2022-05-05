@@ -56,6 +56,7 @@ router.get('/soulswap', soulswap.infos)
 
 router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
+router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
 
 // router.get('/lending/supply', lending.totalSupply)
 
