@@ -214,6 +214,7 @@ async function getUserInfo(ctx) {
     const marketCap = pairPrice * pairSupply
 
     // VALUES //
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
     const stakedBalance = userInfo[0] / pairDivisor
     const userTVL = stakedBalance * pairPrice
     const pairTVL = await getPoolTvl(pairAddress)
@@ -235,6 +236,7 @@ async function getUserInfo(ctx) {
             "tvl": pairTVL,
 
             // USER VALUES
+            "userBalance": userBalance,
             "stakedBalance": stakedBalance,
             "pendingSoul": pendingSoul,
             "userTvl": userTVL,
