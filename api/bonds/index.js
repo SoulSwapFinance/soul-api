@@ -2,7 +2,7 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  FTM_CHAIN_ID, SOUL_DAO, SOUL_FTM_LP, FTM_ETH_LP, USDC_DAI_LP, 
+  FTM_CHAIN_ID, SOUL, SOUL_DAO, SOUL_FTM_LP, FTM_ETH_LP, USDC_DAI_LP, 
   FTM_BTC_LP, SOUL_USDC_LP, FTM_USDC_LP, FTM_DAI_LP, SOUL_BOND,
   FTM_BNB_LP, SEANCE_FTM_LP, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
@@ -147,68 +147,20 @@ async function getBondInfo(ctx) {
 
     const pairPrice = await getPairPrice(pairAddress)
     const marketCap = pairPrice * pairSupply
-
-    // VALUES //
-    const pairTVL = await getPoolTvl(pairAddress)
-
-    // VALUES //
-        return {
-            "address": pairAddress,
-            "name": pairName,
-            "symbol": pairSymbol,
-            "token0": token0Address,
-            "token1": token1Address,
-            "token0Symbol": token0Symbol,
-            "token1Symbol": token1Symbol,
-
-            "decimals": pairDecimals,
-            "supply": pairSupply,
-            "mcap": marketCap,
-            "tvl": pairTVL,
-
-            "api": `https://api.soulswap.finance/bonds/${pid}`,
-        }
-}
-
-async function getUserInfo(ctx) {
-    // BOND PAIR INFO //
-    const pid = ctx.params.pid
-    const poolInfo = await BondContract.methods.poolInfo(pid).call()
-    const pairAddress = poolInfo[0]
-    const allocPoint = poolInfo[1]
-    // console.log('pairAddress: %s', pairAddress)
-    const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
-    const pairName = await PairContract.methods.name().call();
-    const pairSymbol = await PairContract.methods.symbol().call();
     
-    const token0Address = await PairContract.methods.token0().call();
-    const token1Address = await PairContract.methods.token1().call();
-
-    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0Address)
-    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1Address)
-
-    const token0Symbol = await Token0Contract.methods.symbol().call();
-    const token1Symbol = await Token1Contract.methods.symbol().call();
-
-    const pairDecimals = await PairContract.methods.decimals().call();
-    const pairDivisor = 10**pairDecimals
-    const pairSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
-
-    const pairPrice = await getPairPrice(pairAddress)
-    const marketCap = pairPrice * pairSupply
-
-    const totalAllocPoint = await BondContract.methods.totalAllocPoint().call()
-    const allocShare = allocPoint / totalAllocPoint * 100
-
+    // VALUES //
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsSummoner = await BondContract.methods.dailySoul().call() / 1e18 * 365 
+    
+    const allocPoint = poolInfo[1]
+    const totalAllocPoint = await BondContract.methods.totalAllocPoint().call()
+    const allocShare = allocPoint / totalAllocPoint * 100
     const annualRewardsPool = allocShare * annualRewardsSummoner / 100
 
-    // VALUES //
     const annualRewardsValue = soulPrice * annualRewardsPool
-    const apr = annualRewardsValue / pairTVL * 100
     const pairTVL = await getPoolTvl(pairAddress)
+    const apr = annualRewardsValue / pairTVL * 100
 
     // VALUES //
         return {
@@ -229,6 +181,7 @@ async function getUserInfo(ctx) {
             "api": `https://api.soulswap.finance/bonds/${pid}`,
         }
 }
+
 async function getUserInfo(ctx) {
     // BOND PAIR INFO //
     const pid = ctx.params.pid
