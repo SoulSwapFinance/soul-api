@@ -52,6 +52,64 @@ async function getInfo() {
         }
 }
 
+async function getStakeInfo(ctx) {
+
+    const divisor = 1e18
+    const userAddress = ctx.params.userAddress
+    const poolInfo = await SummonerContract.methods.poolInfo(0).call()
+    const pairAddress = poolInfo[0] // √
+    const allocPoint = poolInfo[1]
+    const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
+    const allocShare = allocPoint / totalAllocPoint * 100
+
+    const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
+    const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
+    const startRate = await SummonerContract.methods.startRate().call() / divisor
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+
+    const poolLength = await SummonerContract.methods.poolLength().call()
+
+    const weight = await SummonerContract.methods.weight().call()
+    const weightTotal = await SummonerContract.methods.totalWeight().call()
+    const weightShare = weight / weightTotal * 100
+
+    // USER DETAILS
+    const pendingSoul = await SummonerContract.methods.pendingSoul(0, userAddress).call() / 1e18
+    const pendingValue = pendingSoul * soulPrice
+
+    // STAKE DETAILS
+    const SoulContract = new web3.eth.Contract(ERC20ContractABI, pairAddress);
+    const annualRewardsSummoner = await SummonerContract.methods.dailySoul().call() / 1e18 * 365 
+    const annualRewardsPool = allocShare * annualRewardsSummoner / 100
+
+    const annualRewardsValue = soulPrice * annualRewardsPool
+
+    const soulBalance = await SoulContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18;
+    const poolTVL = soulPrice * soulBalance
+    const apr = annualRewardsValue / poolTVL * 100
+
+
+        return {
+            "address": SUMMONER_ADDRESS,
+            "pendingSoul": pendingSoul,
+            "pendingValue": pendingValue,
+            "poolLength": poolLength,
+            "dailySoul": dailySoul,
+            "apr": apr,
+            "tvl": poolTVL,
+            "soulPerSecond": soulPerSecond,
+            "soulPerYear": dailySoul * 365,
+            "startRate": startRate,
+            "totalAllocPoint": totalAllocPoint,
+            "weight": weight,
+            "weightTotal": weightTotal,
+            "weightShare": weightShare,
+            "api": `https://api.soulswap.finance/summoner`,
+            "ftmscan": `https://ftmscan.com/address/${SUMMONER_ADDRESS}#code`,
+        }
+}
+
 async function getUserInfo(ctx) {
 
     const pid = ctx.params.id
@@ -240,8 +298,12 @@ async function userInfo(ctx) {
     ctx.body = (await getUserInfo(ctx))
 }
 
+async function stakeInfo(ctx) {
+    ctx.body = (await getStakeInfo(ctx))
+}
+
 async function poolInfo(ctx) {
     ctx.body = (await getPoolInfo(ctx))
 }
 
-module.exports = { infos, poolInfo, userInfo };
+module.exports = { infos, poolInfo, stakeInfo, userInfo };

@@ -49,6 +49,7 @@ router.get('/coffin/:id', coffin.coffinInfo)
 router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
 
 router.get('/summoner', summoner.infos)
+router.get('/summoner/stake/users/:userAddress', summoner.stakeInfo)
 router.get('/summoner/:id', summoner.poolInfo)
 router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
 
