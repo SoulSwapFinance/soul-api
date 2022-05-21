@@ -80,8 +80,15 @@ async function getStakeInfo(ctx) {
 
     // STAKE DETAILS
     const SoulContract = new web3.eth.Contract(ERC20ContractABI, pairAddress);
+    const SeanceContract = new web3.eth.Contract(ERC20ContractABI, SEANCE);
     const annualRewardsSummoner = await SummonerContract.methods.dailySoul().call() / 1e18 * 365 
     const annualRewardsPool = allocShare * annualRewardsSummoner / 100
+
+    const userInfo = await SummonerContract.methods.userInfo(0, userAddress).call()
+    const stakedBalance = userInfo[0] / 1e18
+    const stakedValue = stakedBalance * soulPrice
+    const walletBalance =  await SoulContract.methods.balanceOf(userAddress).call() / 1e18
+    const seanceBalance =  await SeanceContract.methods.balanceOf(userAddress).call() / 1e18
 
     const annualRewardsValue = soulPrice * annualRewardsPool
 
@@ -92,6 +99,11 @@ async function getStakeInfo(ctx) {
 
         return {
             "address": SUMMONER_ADDRESS,
+            "stakedBalance": stakedBalance,
+            "stakedValue": stakedValue,
+            "walletBalance": walletBalance,
+            "seanceBalance": seanceBalance,
+
             "pendingSoul": pendingSoul,
             "pendingValue": pendingValue,
             "poolLength": poolLength,
