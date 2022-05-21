@@ -2,7 +2,7 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  FTM_CHAIN_ID, SUMMONER_ADDRESS,
+  FTM_CHAIN_ID, SUMMONER_ADDRESS, SEANCE,
   SOUL, DAI, WFTM, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
