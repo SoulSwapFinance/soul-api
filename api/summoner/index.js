@@ -222,8 +222,11 @@ async function getPoolInfo(ctx) {
     const status = allocPoint == 0 ? 'inactive' : 'active'
     // const lendingPids = [48, 49, 51, 52, 53]
     const pairType 
-        = (pid >= 48 && pid <= 53 && pid != 50)
-            ? 'underworld' : 'farm'
+        = (pid >= 48 && pid <= 53 && pid != 50) 
+              ? 'underworld' 
+            : pid == 56 
+              ? 'underworld' 
+            : 'farm'
 
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
