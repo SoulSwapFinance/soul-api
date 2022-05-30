@@ -202,11 +202,12 @@ async function getVaultInfo() {
     // METHOD CALLS //
     const harvestRewards = await AutoStakeContract.methods.calculateHarvestSoulRewards().call() / 1e18;
     const totalSupply = await AutoStakeContract.methods.totalSupply().call() / 1e18;
+    const available = await AutoStakeContract.methods.available().call() / 1e18;
     const pendingSoulRewards = await AutoStakeContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
     const soulTvl = await AutoStakeContract.methods.soulBalanceOf().call() / 1e18;
     const tvl = soulTvl * soulPrice
 
-    const callFee = await AutoStakeContract.methods.callFee().call();
+    const callFee = await AutoStakeContract.methods.callFee().call() * available / 10_000 / 1e18;
     const performanceFee = await AutoStakeContract.methods.performanceFee().call();
     const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
     const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
@@ -215,6 +216,7 @@ async function getVaultInfo() {
 
     return {
             "totalSupply": totalSupply,
+            "available": available,
             "harvestRewards": harvestRewards,
             "soulTvl": soulTvl,
             "tvl": tvl,
