@@ -228,7 +228,58 @@ async function getVaultInfo() {
             "performanceFee": performanceFee,
             "withdrawFee": withdrawFee,
             "withdrawFeePeriod": withdrawFeePeriod,
-            "withdrawFeeHours": withdrawFeeHours
+            "withdrawFeeHours": withdrawFeeHours,
+            "soulPrice": soulPrice
+    }
+}
+
+async function getUserVaultInfo(ctx) {
+    const userAddress = ctx.params.userAddress    
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+
+    // METHOD CALLS //
+    const userBalance = await AutoStakeContract.methods.balanceOf(userAddress).call() / 1e18;
+    const totalSupply = await AutoStakeContract.methods.totalSupply().call() / 1e18;
+    const available = await AutoStakeContract.methods.available().call() / 1e18;
+    const harvestRewards = await AutoStakeContract.methods.calculateHarvestSoulRewards().call() / 1e18;
+    const pendingSoulRewards = await AutoStakeContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
+    const soulTvl = await AutoStakeContract.methods.soulBalanceOf().call() / 1e18;
+    const tvl = soulTvl * soulPrice
+
+    const userInfo = await AutoStakeContract.methods.userInfo(userAddress).call()
+
+    const lastDepositedTime = userInfo[0]
+    const soulAtLastUserAction = userInfo[1] / 1e18
+    const lastUserActionTime = userInfo[2]
+
+    const callFee = await AutoStakeContract.methods.callFee().call();
+    const bounty = callFee * available / 10_000;
+    const performanceFee = await AutoStakeContract.methods.performanceFee().call();
+    const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
+    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
+    const withdrawFeeHours = withdrawFeePeriod / 3_600;
+
+    return {
+            "totalSupply": totalSupply,
+            "userBalance": userBalance,
+            "lastDepositedTime": lastDepositedTime,
+            "soulAtLastUserAction": soulAtLastUserAction,
+            "lastUserActionTime": lastUserActionTime,
+            "available": available,
+            "harvestRewards": harvestRewards,
+            "soulTvl": soulTvl,
+            "tvl": tvl,
+            "pendingSoulRewards": pendingSoulRewards,
+            "pricePerShare": pricePerShare,
+            "callFee": callFee,
+            "bounty": bounty,
+            "performanceFee": performanceFee,
+            "withdrawFee": withdrawFee,
+            "withdrawFeePeriod": withdrawFeePeriod,
+            "withdrawFeeHours": withdrawFeeHours,
+            "soulPrice": soulPrice
     }
 }
 
@@ -240,6 +291,10 @@ async function vaultInfo(ctx) {
     ctx.body = (await getVaultInfo(ctx))
 }
 
+async function userVaultInfo(ctx) {
+    ctx.body = (await getUserVaultInfo(ctx))
+}
+
 // async function bondInfo(ctx) {
 //     ctx.body = (await getBondInfo(ctx))
 // }
@@ -248,4 +303,4 @@ async function vaultInfo(ctx) {
 //     ctx.body = (await getStakeInfo(ctx))
 // }
 
-module.exports = { infos, vaultInfo };
+module.exports = { infos, userVaultInfo, vaultInfo };

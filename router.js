@@ -55,6 +55,7 @@ router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
 
 router.get('/soulswap', soulswap.infos)
 router.get('/soulswap/vault', soulswap.vaultInfo)
+router.get('/soulswap/vault/users/:userAddress', soulswap.userVaultInfo)
 
 router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
