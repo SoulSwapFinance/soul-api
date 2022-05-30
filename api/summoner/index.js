@@ -141,10 +141,15 @@ async function getUserInfo(ctx) {
 
     const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
-    const pairType 
-        = (pid >= 48 && pid <= 53 && pid != 50)
-            ? 'underworld' : 'farm'
+    // const lendingPids = [48, 49, 51, 52, 53, 56]
     
+    const pairType 
+        = (pid >= 48 && pid <= 53 && pid != 50) 
+              ? 'underworld' 
+            : pid == 56 
+              ? 'underworld' 
+            : 'farm'
+  
     // Pair Pricing //
     const token0
         = pairType == 'farm'
@@ -220,10 +225,13 @@ async function getPoolInfo(ctx) {
     const allocShare = allocPoint / totalAllocPoint * 100
 
     const status = allocPoint == 0 ? 'inactive' : 'active'
-    // const lendingPids = [48, 49, 51, 52, 53]
+    // const lendingPids = [48, 49, 51, 52, 53, 56]
     const pairType 
-        = (pid >= 48 && pid <= 53 && pid != 50)
-            ? 'underworld' : 'farm'
+        = (pid >= 48 && pid <= 53 && pid != 50) 
+              ? 'underworld' 
+            : pid == 56 
+              ? 'underworld' 
+            : 'farm'
 
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
