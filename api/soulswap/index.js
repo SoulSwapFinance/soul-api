@@ -4,7 +4,7 @@ const {web3Factory} = require("../../utils/web3");
 const { 
   FTM_CHAIN_ID, SOUL_DAO, WFTM, SOUL, SEANCE, SOUL_FTM_LP, FTM_ETH_LP, USDC_DAI_LP, 
   FTM_BTC_LP, SOUL_USDC_LP, FTM_USDC_LP, FTM_DAI_LP, MULTICALL_ADDRESS,
-  FTM_BNB_LP, SEANCE_FTM_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS
+  FTM_BNB_LP, SEANCE_FTM_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
 
@@ -14,11 +14,12 @@ const PairContractABI = require('../../abis/PairContractABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
-
-const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
-const AutoStakeContract = new web3.eth.Contract(AutoStakeContractABI, AUTOSTAKE_ADDRESS);
+const SummonerContractABI = require('../../abis/SummonerContractABI.json');
 
 // CONTRACTS //
+const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
+const AutoStakeContract = new web3.eth.Contract(AutoStakeContractABI, AUTOSTAKE_ADDRESS);
+const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADDRESS);
 
 // Reserves //
 const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
@@ -194,6 +195,7 @@ async function getInfo(ctx) {
 //         }
 // }
 
+
 async function getVaultInfo() {
 
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
@@ -215,8 +217,75 @@ async function getVaultInfo() {
     const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
     const withdrawFeeHours = withdrawFeePeriod / 3_600;
 
+    const poolInfo = await SummonerContract.methods.poolInfo(0).call()
+    const allocPoint = poolInfo[1]
+    const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
+    const allocShare = allocPoint / totalAllocPoint * 100
+    const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
+    const annualRewardsSummoner = await SummonerContract.methods.dailySoul().call() / 1e18 * 365 
+    const annualRewardsPool = allocShare * annualRewardsSummoner / 100
+    const annualRewardsValue = soulPrice * annualRewardsPool
+    const soulBalance = await SoulContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18;
+    const poolTVL = soulPrice * soulBalance
+
+    const apr = annualRewardsValue / poolTVL * 100
+    const frequency = 1.75 // once every 16hrs
+    const apy = ((1 + apr / 100) ** (1 / frequency)) * frequency * 100
+
     return {
             "totalSupply": totalSupply,
+            "available": available,
+            "harvestRewards": harvestRewards,
+            "soulTvl": soulTvl,
+            "tvl": tvl,
+            "apy": apy,
+            "apr": apr,
+            "pendingSoulRewards": pendingSoulRewards,
+            "pricePerShare": pricePerShare,
+            "callFee": callFee,
+            "bounty": bounty,
+            "performanceFee": performanceFee,
+            "withdrawFee": withdrawFee,
+            "withdrawFeePeriod": withdrawFeePeriod,
+            "withdrawFeeHours": withdrawFeeHours,
+            "soulPrice": soulPrice
+    }
+}
+
+async function getUserVaultInfo(ctx) {
+    const userAddress = ctx.params.userAddress    
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+
+    // METHOD CALLS //
+    const userBalance = await AutoStakeContract.methods.balanceOf(userAddress).call() / 1e18;
+    const totalSupply = await AutoStakeContract.methods.totalSupply().call() / 1e18;
+    const available = await AutoStakeContract.methods.available().call() / 1e18;
+    const harvestRewards = await AutoStakeContract.methods.calculateHarvestSoulRewards().call() / 1e18;
+    const pendingSoulRewards = await AutoStakeContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
+    const soulTvl = await AutoStakeContract.methods.soulBalanceOf().call() / 1e18;
+    const tvl = soulTvl * soulPrice
+
+    const userInfo = await AutoStakeContract.methods.userInfo(userAddress).call()
+
+    const lastDepositedTime = userInfo[0]
+    const soulAtLastUserAction = userInfo[1] / 1e18
+    const lastUserActionTime = userInfo[2]
+
+    const callFee = await AutoStakeContract.methods.callFee().call();
+    const bounty = callFee * available / 10_000;
+    const performanceFee = await AutoStakeContract.methods.performanceFee().call();
+    const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
+    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
+    const withdrawFeeHours = withdrawFeePeriod / 3_600;
+
+    return {
+            "totalSupply": totalSupply,
+            "userBalance": userBalance,
+            "lastDepositedTime": lastDepositedTime,
+            "soulAtLastUserAction": soulAtLastUserAction,
+            "lastUserActionTime": lastUserActionTime,
             "available": available,
             "harvestRewards": harvestRewards,
             "soulTvl": soulTvl,
@@ -228,7 +297,8 @@ async function getVaultInfo() {
             "performanceFee": performanceFee,
             "withdrawFee": withdrawFee,
             "withdrawFeePeriod": withdrawFeePeriod,
-            "withdrawFeeHours": withdrawFeeHours
+            "withdrawFeeHours": withdrawFeeHours,
+            "soulPrice": soulPrice
     }
 }
 
@@ -240,6 +310,10 @@ async function vaultInfo(ctx) {
     ctx.body = (await getVaultInfo(ctx))
 }
 
+async function userVaultInfo(ctx) {
+    ctx.body = (await getUserVaultInfo(ctx))
+}
+
 // async function bondInfo(ctx) {
 //     ctx.body = (await getBondInfo(ctx))
 // }
@@ -248,4 +322,4 @@ async function vaultInfo(ctx) {
 //     ctx.body = (await getStakeInfo(ctx))
 // }
 
-module.exports = { infos, vaultInfo };
+module.exports = { infos, userVaultInfo, vaultInfo };
