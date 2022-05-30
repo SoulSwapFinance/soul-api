@@ -13,10 +13,10 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
-const AutostakeABI = require('../../abis/AutostakeABI.json');
+const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
 
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
-const AutoStakeContract = new web3.eth.Contract(AutostakeABI, AUTOSTAKE_ADDRESS);
+const AutoStakeContract = new web3.eth.Contract(AutoStakeContractABI, AUTOSTAKE_ADDRESS);
 
 // CONTRACTS //
 
@@ -200,17 +200,17 @@ async function getVaultInfo() {
     const soulPrice = rawSoulPrice / 1e18
 
     // METHOD CALLS //
-    const harvestRewards = await StakeHelperContract.methods.calculateHarvestSoulRewards().call() / 1e18;
-    const totalSupply = await StakeHelperContract.methods.totalSupply().call() / 1e18;
-    const pendingSoulRewards = await StakeHelperContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
-    const soulTvl = await StakeHelperContract.methods.soulBalanceOf().call() / 1e18;
+    const harvestRewards = await AutoStakeContract.methods.calculateHarvestSoulRewards().call() / 1e18;
+    const totalSupply = await AutoStakeContract.methods.totalSupply().call() / 1e18;
+    const pendingSoulRewards = await AutoStakeContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
+    const soulTvl = await AutoStakeContract.methods.soulBalanceOf().call() / 1e18;
     const tvl = soulTvl * soulPrice
 
-    const callFee = await StakeHelperContract.methods.callFee().call();
-    const performanceFee = await StakeHelperContract.methods.performanceFee().call();
-    const pricePerShare = await StakeHelperContract.methods.getPricePerFullShare().call() / 1e18;
-    const withdrawFee = await StakeHelperContract.methods.withdrawFee().call() / 10_000;
-    const withdrawFeePeriod = await StakeHelperContract.methods.withdrawFeePeriod().call();
+    const callFee = await AutoStakeContract.methods.callFee().call();
+    const performanceFee = await AutoStakeContract.methods.performanceFee().call();
+    const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
+    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
     const withdrawFeeHours = withdrawFeePeriod / 3_600;
 
     return {
