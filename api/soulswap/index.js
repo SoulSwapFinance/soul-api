@@ -4,7 +4,7 @@ const {web3Factory} = require("../../utils/web3");
 const { 
   FTM_CHAIN_ID, SOUL_DAO, WFTM, SOUL, SEANCE, SOUL_FTM_LP, FTM_ETH_LP, USDC_DAI_LP, 
   FTM_BTC_LP, SOUL_USDC_LP, FTM_USDC_LP, FTM_DAI_LP, MULTICALL_ADDRESS,
-  FTM_BNB_LP, SEANCE_FTM_LP, BTC_ETH_LP
+  FTM_BNB_LP, SEANCE_FTM_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(FTM_CHAIN_ID);
 
@@ -13,8 +13,10 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
 const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
+const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
 
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
+const AutoStakeContract = new web3.eth.Contract(AutoStakeContractABI, AUTOSTAKE_ADDRESS);
 
 // CONTRACTS //
 
@@ -192,28 +194,46 @@ async function getInfo(ctx) {
 //         }
 // }
 
-// async function getStakeInfo(ctx) {
+async function getVaultInfo() {
 
-//     // METHOD CALLS //
-//     const userAddress = ctx.params.userAddress    
-//     const distribute = await StakeHelperContract.methods.distribute().call() / 1e9;
-//     const epochLength = await StakeHelperContract.methods.epochLength().call();
-//     const nextRebase = await StakeHelperContract.methods.nextRebase().call();
-//     const warmupExpiry = await StakeHelperContract.methods.warmupExpiry(userAddress).call();
-//     const warmupValue = await StakeHelperContract.methods.warmupValue(userAddress).call() / 1e9;
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
 
-//     return {
-//             "address": userAddress,
-//             "epochLength": epochLength,
-//             "nextRebase": nextRebase,
-//             "distribute": distribute,
-//             "warmupValue": warmupValue,
-//             "warmupExpiry": warmupExpiry,
-//     }
-// }
+    // METHOD CALLS //
+    const harvestRewards = await AutoStakeContract.methods.calculateHarvestSoulRewards().call() / 1e18;
+    const totalSupply = await AutoStakeContract.methods.totalSupply().call() / 1e18;
+    const pendingSoulRewards = await AutoStakeContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
+    const soulTvl = await AutoStakeContract.methods.soulBalanceOf().call() / 1e18;
+    const tvl = soulTvl * soulPrice
+
+    const callFee = await AutoStakeContract.methods.callFee().call();
+    const performanceFee = await AutoStakeContract.methods.performanceFee().call();
+    const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
+    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
+    const withdrawFeeHours = withdrawFeePeriod / 3_600;
+
+    return {
+            "totalSupply": totalSupply,
+            "harvestRewards": harvestRewards,
+            "soulTvl": soulTvl,
+            "tvl": tvl,
+            "pendingSoulRewards": pendingSoulRewards,
+            "pricePerShare": pricePerShare,
+            "callFee": callFee,
+            "performanceFee": performanceFee,
+            "withdrawFee": withdrawFee,
+            "withdrawFeePeriod": withdrawFeePeriod,
+            "withdrawFeeHours": withdrawFeeHours
+    }
+}
 
 async function infos(ctx) {
     ctx.body = (await getInfo(ctx))
+}
+
+async function vaultInfo(ctx) {
+    ctx.body = (await getVaultInfo(ctx))
 }
 
 // async function bondInfo(ctx) {
@@ -224,4 +244,4 @@ async function infos(ctx) {
 //     ctx.body = (await getStakeInfo(ctx))
 // }
 
-module.exports = { infos };
+module.exports = { infos, vaultInfo };
