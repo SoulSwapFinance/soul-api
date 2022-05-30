@@ -208,7 +208,7 @@ async function getVaultInfo() {
     const tvl = soulTvl * soulPrice
 
     const callFee = await AutoStakeContract.methods.callFee().call();
-    const bounty = callFeeRate * available / 10_000;
+    const bounty = callFee * available / 10_000;
     const performanceFee = await AutoStakeContract.methods.performanceFee().call();
     const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
     const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
