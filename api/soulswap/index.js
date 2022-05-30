@@ -196,15 +196,35 @@ async function getInfo(ctx) {
 
 async function getVaultInfo() {
 
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+
     // METHOD CALLS //
-    const harvestRewards = await StakeHelperContract.methods.calculateHarvestSoulRewards().call() / 1e9;
-    const soulTvl = await StakeHelperContract.methods.soulBalanceOf().call() / 1e9;
-    // const tvl = soulTvl * soulPrice
+    const harvestRewards = await StakeHelperContract.methods.calculateHarvestSoulRewards().call() / 1e18;
+    const totalSupply = await StakeHelperContract.methods.totalSupply().call() / 1e18;
+    const pendingSoulRewards = await StakeHelperContract.methods.calculateTotalPendingSoulRewards().call() / 1e18;
+    const soulTvl = await StakeHelperContract.methods.soulBalanceOf().call() / 1e18;
+    const tvl = soulTvl * soulPrice
+
+    const callFee = await StakeHelperContract.methods.callFee().call();
+    const performanceFee = await StakeHelperContract.methods.performanceFee().call();
+    const pricePerShare = await StakeHelperContract.methods.getPricePerFullShare().call() / 1e18;
+    const withdrawFee = await StakeHelperContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFeePeriod = await StakeHelperContract.methods.withdrawFeePeriod().call();
+    const withdrawFeeHours = withdrawFeePeriod / 3_600;
 
     return {
-            "epochLength": harvestRewards,
+            "totalSupply": totalSupply,
+            "harvestRewards": harvestRewards,
             "soulTvl": soulTvl,
-            // "tvl": tvl,
+            "tvl": tvl,
+            "pendingSoulRewards": pendingSoulRewards,
+            "pricePerShare": pricePerShare,
+            "callFee": callFee,
+            "performanceFee": performanceFee,
+            "withdrawFee": withdrawFee,
+            "withdrawFeePeriod": withdrawFeePeriod,
+            "withdrawFeeHours": withdrawFeeHours
     }
 }
 
