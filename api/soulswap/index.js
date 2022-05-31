@@ -276,6 +276,8 @@ async function getUserVaultInfo(ctx) {
     const bounty = callFee * available / 10_000;
     const performanceFee = await AutoStakeContract.methods.performanceFee().call();
     const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
+    const stakedBalance = userBalance * pricePerShare
+
     const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
     const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
     const withdrawFeeHours = withdrawFeePeriod / 3_600;
@@ -283,6 +285,7 @@ async function getUserVaultInfo(ctx) {
     return {
             "totalSupply": totalSupply,
             "userBalance": userBalance,
+            "stakedBalance": stakedBalance,
             "lastDepositedTime": lastDepositedTime,
             "soulAtLastUserAction": soulAtLastUserAction,
             "lastUserActionTime": lastUserActionTime,
