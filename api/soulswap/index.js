@@ -229,7 +229,7 @@ async function getVaultInfo() {
     const poolTVL = soulPrice * soulBalance
 
     const apr = annualRewardsValue / poolTVL * 100
-    const frequency = 1.5 // once every 16hrs
+    const frequency = 1.25 // once every 18hra
     const apy = ((1 + apr / 100) ** (1 / frequency)) * frequency * 100
 
     return {
