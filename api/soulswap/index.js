@@ -231,7 +231,7 @@ async function getVaultInfo() {
     const apr = annualRewardsValue / poolTVL * 100
     const f = 1 // daily frequency(1x : 24H)
     const n = 365 // compound periods (daily, annualized)
-    const apy = [apr + (apr * 100 / n)]
+    const apy = apr + (apr * 100 / n)
     
     return {
             "totalSupply": totalSupply,
