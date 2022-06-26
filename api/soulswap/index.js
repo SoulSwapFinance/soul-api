@@ -229,11 +229,10 @@ async function getVaultInfo() {
     const poolTVL = soulPrice * soulBalance
 
     const apr = annualRewardsValue / poolTVL * 100
-    const f = 1 // once every 24H
+    const f = 1 // daily frequency(1x : 24H)
     const n = 365 // compound periods (daily, annualized)
-    // const apy = ((1 + apr / 100))) * frequency * 100
-    // const apy=[(1+apr/100/365/f)^(365 * f)-1]*100
-    const apy = (1 + apr/n)^n - 1
+    const apy = ([apr + (apr * 100 / n)]
+    
     return {
             "totalSupply": totalSupply,
             "available": available,
