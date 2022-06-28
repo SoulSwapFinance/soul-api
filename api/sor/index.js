@@ -47,6 +47,7 @@ s
             "daiCollateral": daiMasterCollateral,
             "stableCollateral": stableCollateralValue,
             "luxorCollateral": luxorMasterCollateral,
+            "wlumCollateral": wlumMasterCollateral,
             "luxorCollateralValue": luxorCollateralValue,
             "wlumCollateralValue": wlumCollateralValue,
             "collateralValue": collateralValue,
