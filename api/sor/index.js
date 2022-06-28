@@ -38,7 +38,7 @@ async function getSorInfo() {
     const wlumCollateralValue = wlumMasterCollateral * wlumPrice
     const collateralValue = luxorCollateralValue + stableCollateralValue
     const collateralization = collateralValue / totalSupply
-s
+
         return {
             "address": sorAddress,
             "supply": totalSupply,
