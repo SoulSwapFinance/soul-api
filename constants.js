@@ -1,7 +1,8 @@
 const BN = require("bn.js")
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 const FTM_CHAIN_ID = 250
-const FTM_RPC = process.env.FTM_RPC || 'https://rpc.ftm.tools'
+const FTM_RPC = process.env.FTM_RPC || 'https://rpc.ankr.com/fantom'
+// || 'https://rpc.ftm.tools'
 
 // const LUXOR_TREASURY_ADDRESS = "0x38FA2E36AEf0A9CBbCffF0E507B0c7584705b78e"
 const LUXOR_TREASURY_ADDRESS = "0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24"
