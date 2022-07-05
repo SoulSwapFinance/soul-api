@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, LUM, SOR, AURA, MULTICALL_ADDRESS, SOUL_DAO, AUTOSTAKE_ADDRESS } = require("../../constants");
+const { FTM_CHAIN_ID, LUM, SOR, AURA, MULTICALL_ADDRESS, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( FTM_CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -17,7 +17,10 @@ async function getUserInfo(ctx) {
     const userAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18;
     const votingPower =  await AuraContract.methods.balanceOf(userAddress).call() / 1e18;
-    const ineligiblePower = await AuraContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const daoPower = await AuraContract.methods.balanceOf(SOUL_DAO).call() / 1e18
+    const summonerPower = await AuraContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18
+    const seancePower = await AuraContract.methods.balanceOf(SEANCE).call() / 1e18
+    const ineligiblePower = daoPower + summonerPower + seancePower;
     const totalVotingPower 
         = await AuraContract.methods.totalSupply().call() / 1e18;
     const eligiblePower = totalVotingPower - ineligiblePower;
