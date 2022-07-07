@@ -14,25 +14,24 @@ async function getItemInfo(ctx) {
     const totalSupply = await CollectionContract.methods.totalSupply().call();
     const ipfsUrl = await CollectionContract.methods.tokenURI(item).call();
     const owner = await CollectionContract.methods.ownerOf(item).call();
-    const walletOfOwner 
-        = await CollectionContract.methods.walletOfOwner(owner) != null
-            ? await CollectionContract.methods.walletOfOwner(owner).call()
-            : 'unknown';
+    // const walletOfOwner 
+    //     = await CollectionContract.methods.walletOfOwner(owner) != null
+    //         ? await CollectionContract.methods.walletOfOwner(owner).call()
+    //         : 'unknown';
     
         return {
             "collection": collectionAddress,
             "id": item,
             "supply": totalSupply,
             "owner": owner,
-            "ownerNfts": walletOfOwner,
-            "api": `https://api.soulswap.finance/enjoyoor/nft/${collectionAddress}/${item}`,
+            // "ownerNfts": walletOfOwner,
+            "api": `https://api.soulswap.finance/enjoyooor/nft/${collectionAddress}/${item}`,
             "name": `ID: ${item}`,
             "ipfsUrl": ipfsUrl
         }
 }
 
 async function getCollectionInfo(ctx) {
-
     const collectionAddress = ctx.params.collection
     const CollectionContract = new web3.eth.Contract(ERC721ContractABI, collectionAddress);
 
@@ -41,10 +40,10 @@ async function getCollectionInfo(ctx) {
     const owner = await CollectionContract.methods.owner().call();
     const name = await CollectionContract.methods.name().call();
     const symbol = await CollectionContract.methods.symbol().call();
-    const maxSupply 
-        = await CollectionContract.methods.maxSupply() != null 
-            ? await CollectionContract.methods.maxSupply().call() 
-            : 0;
+    // const maxSupply 
+    //     = await CollectionContract.methods.maxSupply()?.call() != null 
+    //         ? await CollectionContract.methods.maxSupply().call() 
+    //         : 0;
 
     if (!("collection" in ctx.params))
         return {"name": "Enjoyooor NFT"};
@@ -55,8 +54,8 @@ async function getCollectionInfo(ctx) {
             "symbol": symbol,
             "owner": owner,
             "supply": totalSupply,
-            "maxSupply": maxSupply,
-            "api": `https://api.soulswap.finance/enjoyoor/nft/${collectionAddress}`,
+            // "maxSupply": maxSupply,
+            "api": `https://api.soulswap.finance/enjoyooor/nft/${collectionAddress}`,
         }
     }
 }
