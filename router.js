@@ -9,6 +9,7 @@ const price = require('./api/price');
 const tokens = require('./api/tokens');
 const sor = require('./api/sor');
 const nft = require('./api/nft');
+const enjoyooor = require('./api/enjoyooor');
 const pairs = require('./api/pairs');
 const users = require('./api/users');
 const luxor = require('./api/luxor');
@@ -27,6 +28,9 @@ router.get('/supply/max', supply.maxSupply);
 router.get('/sor', sor.sorInfo);
 
 router.get('/nft/pop/circulating', nft.circulatingSupply);
+
+router.get('/enjoyooor/nft/:collection', enjoyooor.collectionInfo)
+router.get('/enjoyooor/nft/:collection/:id', enjoyooor.itemInfo);
 
 router.get('/tokens/:id', tokens.tokenInfo);
 
