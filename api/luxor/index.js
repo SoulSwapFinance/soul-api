@@ -191,16 +191,15 @@ async function getStakeInfo(ctx) {
     
     const totalStaked = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9
     
-    const userStaked = await LumensContract.methods.balanceOf(userAddress).call() / 1e9
- 
-    const userShare = userStaked / totalStaked
-
-    const nextReward = userShare * nextDistribution
-    
     const epochLength = await LuxorStakeHelperContract.methods.epochLength().call();
     const nextRebase = await LuxorStakeHelperContract.methods.nextRebase().call();
     const warmupExpiry = await LuxorStakeHelperContract.methods.warmupExpiry(userAddress).call();
     const warmupValue = await LuxorStakeHelperContract.methods.warmupValue(userAddress).call() / 1e9;
+    
+    const userStaked = await LumensContract.methods.balanceOf(userAddress).call() / 1e9 
+    const userShare = (userStaked + warmupValue) / totalStaked
+
+    const nextReward = userShare * nextDistribution
 
     return {
             "address": userAddress,
