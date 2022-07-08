@@ -152,7 +152,6 @@ async function getBondInfo(ctx) {
 
     const marketPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LuxorAddress).call();
     const bondPrice = await BondHelperContract.methods.bondPriceUsd(bondAddress).call();
-    
     const minimumPrice = await BondHelperContract.methods.minimumPrice(bondAddress).call();
     const pendingPayout = await BondHelperContract.methods.pendingPayout(bondAddress).call();
     const maximumPayout = await BondHelperContract.methods.maximumPayout(bondAddress).call();
@@ -188,8 +187,16 @@ async function getStakeInfo(ctx) {
     // METHOD CALLS //
     const userAddress = ctx.params.userAddress    
     const distribute = await LuxorStakeHelperContract.methods.distribute().call() / 1e9;
-    const nextReward = await DistributorContract.methods.nextRewardFor(userAddress).call() / 1e9;
+    const nextDistribution = await DistributorContract.methods.nextRewardFor(LuxorStakeAddress).call() / 1e9;
+    
+    const totalStaked = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9
+    
+    const userStaked = await LumensContract.methods.balanceOf(userAddress).call() / 1e9
  
+    const userShare = userStaked / totalStaked
+
+    const nextReward = userShare * nextDistribution
+    
     const epochLength = await LuxorStakeHelperContract.methods.epochLength().call();
     const nextRebase = await LuxorStakeHelperContract.methods.nextRebase().call();
     const warmupExpiry = await LuxorStakeHelperContract.methods.warmupExpiry(userAddress).call();
@@ -200,6 +207,7 @@ async function getStakeInfo(ctx) {
             "epochLength": epochLength,
             "nextRebase": nextRebase,
             "nextReward": nextReward,
+            "userStaked": userStaked,
             "distribute": distribute,
             "warmupValue": warmupValue,
             "warmupExpiry": warmupExpiry,
