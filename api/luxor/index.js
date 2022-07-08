@@ -15,16 +15,20 @@ const BN = require('bn.js');
 
 const StakeHelperABI = require('../../abis/StakeHelperABI.json');
 
+const DistributorContractABI = require('../../abis/DistributorContractABI.json');
+
 const BondHelperAddress = "0xdC7Bd8bA29ba99A250da6F0820ad9A1a285fE82a";
 const LuxorAddress = "0x6671E20b83Ba463F270c8c75dAe57e3Cc246cB2b";
 const LuxorStakeHelperAddress = "0x2Dd0D30f525e65641962904470660507e80940e4";
 const LuxorStakeAddress = "0xf3F0BCFd430085e198466cdCA4Db8C2Af47f0802";
 const WarmupAddress = "0x2B6Fe815F3D0b8C13E8F908A2501cdDC23D4Ed48";
 const TreasuryAddress="0x38FA2E36AEf0A9CBbCffF0E507B0c7584705b78e";
+const DistributorAddress="0x032f6db264E78885E156F04564344F4c1C59101f";
 
 // CONTRACTS //
 const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX);
 const LumensContract = new web3.eth.Contract(LumensContractABI, LUM);
+const DistributorContract = new web3.eth.Contract(DistributorContractABI, DistributorAddress);
 
 // Reserves
 const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI);
@@ -148,7 +152,6 @@ async function getBondInfo(ctx) {
 
     const marketPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LuxorAddress).call();
     const bondPrice = await BondHelperContract.methods.bondPriceUsd(bondAddress).call();
-    
     const minimumPrice = await BondHelperContract.methods.minimumPrice(bondAddress).call();
     const pendingPayout = await BondHelperContract.methods.pendingPayout(bondAddress).call();
     const maximumPayout = await BondHelperContract.methods.maximumPayout(bondAddress).call();
@@ -184,15 +187,26 @@ async function getStakeInfo(ctx) {
     // METHOD CALLS //
     const userAddress = ctx.params.userAddress    
     const distribute = await LuxorStakeHelperContract.methods.distribute().call() / 1e9;
+    const nextDistribution = await DistributorContract.methods.nextRewardFor(LuxorStakeAddress).call() / 1e9;
+    
+    const totalStaked = await LuxorContract.methods.balanceOf(LuxorStakeAddress).call() / 1e9
+    
     const epochLength = await LuxorStakeHelperContract.methods.epochLength().call();
     const nextRebase = await LuxorStakeHelperContract.methods.nextRebase().call();
     const warmupExpiry = await LuxorStakeHelperContract.methods.warmupExpiry(userAddress).call();
     const warmupValue = await LuxorStakeHelperContract.methods.warmupValue(userAddress).call() / 1e9;
+    
+    const userStaked = await LumensContract.methods.balanceOf(userAddress).call() / 1e9 
+    const userShare = (userStaked + warmupValue) / totalStaked
+
+    const nextReward = userShare * nextDistribution
 
     return {
             "address": userAddress,
             "epochLength": epochLength,
             "nextRebase": nextRebase,
+            "nextReward": nextReward,
+            "userStaked": userStaked,
             "distribute": distribute,
             "warmupValue": warmupValue,
             "warmupExpiry": warmupExpiry,
