@@ -36,7 +36,8 @@ async function getSorInfo() {
     const stableCollateralValue = sorMasterCollateral + daiMasterCollateral
     const luxorCollateralValue = luxorMasterCollateral * luxorPrice
     const wlumCollateralValue = wlumMasterCollateral * wlumPrice
-    const collateralValue = luxorCollateralValue + stableCollateralValue
+    const luxCollateralValue = luxorCollateralValue + wlumCollateralValue
+    const collateralValue = luxCollateralValue + stableCollateralValue
     const collateralization = collateralValue / totalSupply
 
         return {
