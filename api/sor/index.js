@@ -58,7 +58,7 @@ async function getSorInfo() {
             "luxorCollateral": luxorMasterCollateral,
             "wlumCollateral": wlumMasterCollateral,
             "wftmCollateralValue": wftmCollateralValue, 
-            "sorFtmCollateralValue": wftmCollateralValue
+            "sorFtmCollateralValue": wftmCollateralValue,
             "luxorCollateralValue": luxorCollateralValue,
             "wlumCollateralValue": wlumCollateralValue,
             "collateralValue": collateralValue,
