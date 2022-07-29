@@ -213,7 +213,7 @@ async function getVaultInfo() {
     const bounty = callFee * available / 10_000;
     const performanceFee = await AutoStakeContract.methods.performanceFee().call();
     const pricePerShare = await AutoStakeContract.methods.getPricePerFullShare().call() / 1e18;
-    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 10_000;
+    const withdrawFee = await AutoStakeContract.methods.withdrawFee().call() / 100
     const withdrawFeePeriod = await AutoStakeContract.methods.withdrawFeePeriod().call();
     const withdrawFeeHours = withdrawFeePeriod / 3_600;
 
