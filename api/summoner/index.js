@@ -283,7 +283,11 @@ async function getPoolInfo(ctx) {
             : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
-    const poolTVL = lpPrice * lpBalance
+    const poolTVL 
+      = pid == 8 
+        ? 2 * lpPrice * lpBalance
+        : lpPrice * lpBalance
+      
     const apr = annualRewardsValue / poolTVL * 100
 
     return {
