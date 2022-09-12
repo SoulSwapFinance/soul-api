@@ -188,7 +188,7 @@ async function getUserInfo(ctx) {
     // Fee: Rate & Time Remaining //
     const feeDays = await SummonerContract.methods.startRate().call() / 1e18
     const feeSeconds = feeDays * 86_400
-    const remainingSeconds = feeSeconds - firstDepositTime
+    const remainingSeconds = feeSeconds - userDelta
     const secondsRemaining = remainingSeconds <= 0 ? 0 : remainingSeconds
     const daysRemaining = secondsRemaining / 86_400
     const daysPast = feeDays - daysRemaining
