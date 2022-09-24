@@ -1,22 +1,22 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
+const { CHAIN_ID } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
-const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
+// const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 
-const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
+// const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
+// const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
 async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
 
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
-    const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
+    // const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
     
     const name = await PairContract.methods.name().call()
     const symbol = await PairContract.methods.symbol().call()
@@ -26,15 +26,17 @@ async function getPairInfo(ctx) {
             ? 'swap' 
             : 'underworld'
 
-    const token0
-        = pairType == 'swap'
-            ? await PairContract.methods.token0().call()
-            : await UnderworldContract.methods.asset().call()
+    // todo: update when lending activates
+    const token0 =  await PairContract.methods.token0().call()
+        // = pairType == 'swap'
+        //     ? await PairContract.methods.token0().call()
+        //     : await UnderworldContract.methods.asset().call()
 
-    const token1
-        = pairType == 'swap'
-            ? await PairContract.methods.token1().call()
-            : await UnderworldContract.methods.collateral().call()
+    // todo: update when lending activates
+    const token1 = await PairContract.methods.token1().call()
+        // = pairType == 'swap'
+        //     ? await PairContract.methods.token1().call()
+        //     : await UnderworldContract.methods.collateral().call()
     
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
     const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1);
@@ -57,17 +59,13 @@ async function getPairInfo(ctx) {
     const token1Symbol = await Token1Contract.methods.symbol().call();
 
     // Prices & Value Locked //
-    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
-    const token1Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
 
-    const lpValuePaired 
-        = pairType == 'farm'
-            ? token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
-            : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+    // todo: update
+    // const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+    // const token1Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
 
-    const lpPrice = lpValuePaired / lpSupply
-
-    const luxorTreasuryBalance = await PairContract.methods.balanceOf(LUXOR_TREASURY_ADDRESS).call();
+    // const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
+    // const lpPrice = lpValuePaired / lpSupply
 
     if (!("id" in ctx.params))
         return {"name": "Pairs"};
@@ -79,24 +77,24 @@ async function getPairInfo(ctx) {
             "pairDecimals": pairDecimals,
             "pairType": pairType,
 
-            "lpPrice": lpPrice,
-            "lpValue": lpValuePaired,
+            "lpPrice": 0,
+            "lpValue": 0,
 
             "token0Address": token0,
             "token0Symbol": token0Symbol,
             "token0Decimals": token0Decimals,
             "token0Balance": token0Balance,
-            "token0Price": token0Price,
+            "token0Price": 0,
             
             "token1Address": token1,
             "token1Symbol": token1Symbol,
             "token1Decimals": token1Decimals,
-            "token1Price": token1Price,
+            "token1Price": 0,
             "token1Balance": token1Balance,
 
             "supply": lpSupply,
-            "luxorTreasuryBalance": luxorTreasuryBalance,
-            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "luxorTreasuryBalance": 0,
+            "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
         }
     }
 }
@@ -158,7 +156,6 @@ async function getUserPairInfo(ctx) {
 
     const lpPrice = lpValuePaired / lpSupply
     const userBalance = await PairContract.methods.balanceOf(userAddress).call();
-    const luxorTreasuryBalance = await PairContract.methods.balanceOf(LUXOR_TREASURY_ADDRESS).call();
 
     if (!("id" in ctx.params))
         return {"name": "Pairs"};
@@ -188,8 +185,8 @@ async function getUserPairInfo(ctx) {
             "token1Balance": token1Balance,
 
             "supply": lpSupply,
-            "luxorTreasuryBalance": luxorTreasuryBalance,
-            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "luxorTreasuryBalance": 0,
+            "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
         }
     }
 }

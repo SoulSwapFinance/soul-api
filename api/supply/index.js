@@ -2,12 +2,11 @@
 
 const {web3Factory} = require("../../utils/web3");
 const SoulContractABI = require('../../abis/SoulContractABI.json');
-const {_1E18, CHAIN_ID} = require("../../constants");
-const SOUL_ADDRESS = "0xe2fb177009FF39F52C0134E8007FA0e4BaAcBd07";
+const {_1E18, CHAIN_ID, SOUL, SOUL_DAO } = require("../../constants"); // SOUL_SUMMONER
 const BN = require('bn.js');
 
 const web3 = web3Factory(CHAIN_ID);
-const soulContract = new web3.eth.Contract(SoulContractABI, SOUL_ADDRESS);
+const soulContract = new web3.eth.Contract(SoulContractABI, SOUL);
 
 class Cache {
     minElapsedTimeInMs = 10000; // 10 seconds
@@ -45,10 +44,10 @@ class Cache {
         ) {
             const results = await Promise.all([
                 this.getTotalSupply(), // total supply [0]
-                getBalanceOf("0xce6ccbB1EdAD497B4d53d829DF491aF70065AB5B"),    // SoulSummoner [1]
-                getBalanceOf("0x124B06C5ce47De7A6e9EFDA71a946717130079E6"),    // SeanceCircle [2]
-                getBalanceOf("0x8f1E15cD3d5a0bb85B8189d5c6B61BB64398E19b"),    // SOUL-SEANCE [3]
-                getBalanceOf("0x1c63c726926197bd3cb75d86bcfb1daebcd87250"),    // DAO [4]
+                // getBalanceOf(SOUL_SUMMONER),    // SoulSummoner [1]
+                getBalanceOf(SEANCE),    // SeanceCircle [2]
+                // getBalanceOf(SOUL_SEANCE),    // SOUL-SEANCE [3]
+                getBalanceOf(SOUL_DAO),    // DAO [4]
                 getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57"),    // NATIVE-SOUL [5]
                 getBalanceOf("0x8d3c3f3f3754Fa6cA088E1991616ca74FCfABFf1")     // EXCHANGE LIQ. [6]
             ])
