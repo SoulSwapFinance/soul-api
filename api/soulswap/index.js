@@ -2,119 +2,118 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-    SOUL, CHAIN_ID,
-//  SOUL_DAO, WNATIVE, 
-//   SEANCE, NATIVE_SOUL, NATIVE_ETH, USDC_DAI, 
-//   NATIVE_BTC, SOUL_USDC, NATIVE_USDC, NATIVE_DAI, MULTICALL_ADDRESS,
-//   NATIVE_BNB, NATIVE_SEANCE, BTC_ETH, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
+    SOUL, CHAIN_ID, NATIVE_SOUL, NATIVE_USDC, SOUL_USDC, NATIVE_BTC, NATIVE_ETH,
+    USDC_DAI, SOUL_DAO, SEANCE, MULTICALL_ADDRESS
+    //   NATIVE_DAI, NATIVE_BNB, NATIVE_SEANCE, BTC_ETH, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
-// const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
-// const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-// const PairContractABI = require('../../abis/PairContractABI.json');
-// const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
-// const MulticallContractABI = require('../../abis/MulticallContractABI.json');
+const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
+const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
+const PairContractABI = require('../../abis/PairContractABI.json');
+const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 // const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
 // const SummonerContractABI = require('../../abis/SummonerContractABI.json');
 
 // CONTRACTS //
-// const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
+const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
 // const AutoStakeContract = new web3.eth.Contract(AutoStakeContractABI, AUTOSTAKE_ADDRESS);
 // const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADDRESS);
 
 // Reserves //
-// const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
-// const SeanceContract = new web3.eth.Contract(ERC20ContractABI, SEANCE);
-// const FantomContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE);
+const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
+const SeanceContract = new web3.eth.Contract(ERC20ContractABI, SEANCE);
 
 // Protocol-Owned Liquidity (POL) //
-// const NativeUsdcContract = new web3.eth.Contract(PairContractABI, NATIVE_USDC);
-// const NativeSoulContract = new web3.eth.Contract(PairContractABI, NATIVE_SOUL);
-// const SoulUsdcContract = new web3.eth.Contract(PairContractABI, SOUL_USDC);
-// const NativeEthereumContract = new web3.eth.Contract(PairContractABI, NATIVE_ETH);
-// const UsdcDaiContract = new web3.eth.Contract(PairContractABI, USDC_DAI);
-// const NativeBitcoinContract = new web3.eth.Contract(PairContractABI, NATIVE_BTC);
+const NativeUsdcContract = new web3.eth.Contract(PairContractABI, NATIVE_USDC);
+const NativeSoulContract = new web3.eth.Contract(PairContractABI, NATIVE_SOUL);
+const SoulUsdcContract = new web3.eth.Contract(PairContractABI, SOUL_USDC);
+const NativeEthereumContract = new web3.eth.Contract(PairContractABI, NATIVE_ETH);
+const UsdcDaiContract = new web3.eth.Contract(PairContractABI, USDC_DAI);
+const NativeBitcoinContract = new web3.eth.Contract(PairContractABI, NATIVE_BTC);
 // const NativeDaiContract = new web3.eth.Contract(PairContractABI, NATIVE_DAI);
 // const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB);
 // const NativeSeanceContract = new web3.eth.Contract(PairContractABI, NATIVE_SEANCE);
 // const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH);
-// const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
 
-// async function getPairPrice(pairAddress) {
-// // Helpers //
-// const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+async function getPairPrice(pairAddress) {
+// Helpers //
+const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
 
-// // Abstracta Mathematica //
-// const pairDecimals = await PairContract.methods.decimals().call()
-// const pairDivisor = 10**(pairDecimals)
-// const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor
-// const token0 = await PairContract.methods.token0().call()
-// const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
-// const token0Decimals = await Token0Contract.methods.decimals().call()
-// const token0Divisor = 10**(token0Decimals)
+// Abstracta Mathematica //
+const pairDecimals = await PairContract.methods.decimals().call()
+const pairDivisor = 10**(pairDecimals)
+const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor
+const token0 = await PairContract.methods.token0().call()
+const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
+const token0Decimals = await Token0Contract.methods.decimals().call()
+const token0Divisor = 10**(token0Decimals)
 
-// // Prices & Value Locked //
-// const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
-// const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
-// const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
-// const lpPrice = lpValuePaired / lpSupply
+// Prices & Value Locked //
+const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
+const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
+const lpPrice = lpValuePaired / lpSupply
 
-// return lpPrice
+return lpPrice
 
-// }
+}
 
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
-    // const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
-    // const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
-    // const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
-    // const NativePrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
-    // const marketCap = totalSupply * SoulPrice;
+    const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
+    const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
+    const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
+    const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
+    const marketCap = totalSupply * SoulPrice;
     
-    // // BALANCES //
-    // const SoulBalance = await SoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeBalance = await MulticallContract.methods.getEthBalance(SOUL_DAO).call() / 1e18;
-    // const NativeUsdcBalance = await NativeUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeSoulBalance = await NativeSoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const SoulUsdcBalance = await SoulUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeEthereumBalance = await NativeEthereumContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const UsdcDaiBalance = await UsdcDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeBitcoinBalance = await NativeBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    // BALANCES //
+    const SoulBalance = await SoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeBalance = await MulticallContract.methods.getEthBalance(SOUL_DAO).call() / 1e18;
+    const NativeUsdcBalance = await NativeUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeSoulBalance = await NativeSoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const SoulUsdcBalance = await SoulUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeEthereumBalance = await NativeEthereumContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const UsdcDaiBalance = await UsdcDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeBitcoinBalance = await NativeBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     // const NativeDaiBalance = await NativeDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     // const NativeBinanceBalance = await NativeBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     // const NativeSeanceBalance = await NativeSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     // const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
 
-    // // PRICES //
-    // const NativeUsdcPrice = await getPairPrice(NATIVE_USDC);
-    // const NativeSoulPrice = await getPairPrice(NATIVE_SOUL);
-    // const SoulUsdcPrice = await getPairPrice(SOUL_USDC);
-    // const NativeEthereumPrice = await getPairPrice(NATIVE_ETH);
-    // const UsdcDaiPrice = await getPairPrice(USDC_DAI);
-    // const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC);
-    // const NativeDaiPrice = await getPairPrice(NATIVE_DAI);
-    // const NativeBinancePrice = await getPairPrice(NATIVE_BNB);
-    // const NativeSeancePrice = await getPairPrice(NATIVE_SEANCE);
-    // const BitcoinEthereumPrice = await getPairPrice(BTC_ETH);
+    // PRICES //
+    const NativeUsdcPrice = await getPairPrice(NATIVE_USDC);
+    const NativeSoulPrice = await getPairPrice(NATIVE_SOUL);
+    const SoulUsdcPrice = await getPairPrice(SOUL_USDC_LP);
+    const NativeEthereumPrice = await getPairPrice(NATIVE_ETH);
+    const UsdcDaiPrice = await getPairPrice(USDC_DAI_LP);
+    const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC);
+    // const NativeDaiPrice = await getPairPrice(NATIVE_DAI_LP);
+    // const NativeBinancePrice = await getPairPrice(NATIVE_BNB_LP);
+    // const NativeSeancePrice = await getPairPrice(NATIVE_SEANCE_LP);
+    // const BitcoinEthereumPrice = await getPairPrice(BTC_ETH_LP);
 
-    // // VALUES //
-    // const NativeValue = FtmPrice * NativeBalance
-    // const SoulValue = SoulPrice * SoulBalance
+    // VALUES //
+    const NativeValue = FtmPrice * NativeBalance
+    const SoulValue = SoulPrice * SoulBalance
 
-    // const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance;
-    // const NativeSoulValue = NativeSoulPrice * NativeSoulBalance;
-    // const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance;
-    // const NativeEthereumValue = NativeEthereumPrice * NativeEthereumBalance;
-    // const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
-    // const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance;
+    const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance;
+    const NativeSoulValue = NativeSoulPrice * NativeSoulBalance;
+    const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance;
+    const NativeEthereumValue = NativeEthereumPrice * NativeEthereumBalance;
+    const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
+    const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance;
     // const NativeDaiValue = NativeDaiPrice * NativeDaiBalance;
     // const NativeBinanceValue = NativeBinancePrice * NativeBinanceBalance;
     // const NativeSeanceValue = NativeSeancePrice * NativeSeanceBalance;
     // const BitcoinEthereumValue = BitcoinEthereumPrice * BitcoinEthereumBalance;
     
-    // const totalReserveValue = NativeValue + SoulValue
-    // const totalLiquidityValue = NativeUsdcValue + NativeSoulValue + SoulUsdcValue + NativeEthereumValue + UsdcDaiValue + NativeBitcoinValue + NativeDaiValue + NativeBinanceValue + NativeSeanceValue + BitcoinEthereumValue
+    const totalReserveValue = NativeValue + SoulValue
+    // todo: update below
+    const totalLiquidityValue = NativeUsdcValue + NativeSoulValue 
+        + SoulUsdcValue + UsdcDaiValue + NativeEthereumValue + NativeBitcoinValue
+        // =  NativeDaiValue + NativeBinanceValue + NativeSeanceValue + BitcoinEthereumValue
 
     // VALUES //
 
@@ -123,46 +122,45 @@ async function getInfo(ctx) {
             "address": SOUL,
             "name": "Soul Power",
             "symbol": "SOUL",
-            "stakedSoul": 0,
+            "stakedSoul": stakedSoul,
+            "price": SoulPrice,
             "decimals": 18,
-            "supply": 0,
-            "mcap": 0,
-
-            // "stakedSoul": stakedSoul,
-            // "price": SoulPrice,
-            // "supply": totalSupply,
-            // "mcap": marketCap,
+            "supply": totalSupply,
+            "mcap": marketCap,
             
-            // "SoulBalance": SoulBalance,
-            // "NativeBalance": NativeBalance,
-            "SoulBalance": 0,
-            "NativeBalance": 0,
+            "SoulBalance": SoulBalance,
+            "NativeBalance": NativeBalance,
 
             // VALUE //
-            "NativeValue": 0,
-            "SoulValue": 0,
+            "NativeValue": NativeValue,
+            "SoulValue": SoulValue,
 
-            "NativeSoulValue": 0,
-            "SoulUsdcValue": 0,
-            "NativeEthereumValue": 0,
-            "UsdcDaiValue": 0,
-            "NativeUsdcValue": 0,
-            "NativeBitcoinValue": 0,
+            "NativeSoulValue": NativeSoulValue,
+            "SoulUsdcValue": SoulUsdcValue,
+            "NativeEthereumValue": NativeEthereumValue,
+            "UsdcDaiValue": UsdcDaiValue,
+            "NativeUsdcValue": NativeUsdcValue,
+            "NativeBitcoinValue": NativeBitcoinValue,
             "NativeDaiValue": 0,
             "NativeBinanceValue": 0,
             "NativeSeanceValue": 0,
             "BitcoinEthereumValue": 0,
 
-            "totalReserveValue": 0,
-            "totalLiquidityValue": 0,
-            // "totalValue": totalReserveValue + totalLiquidityValue,
-            "totalValue": 0,
+            // "NativeDaiValue": NativeDaiValue,
+            // "NativeBinanceValue": NativeBinanceValue,
+            // "NativeSeanceValue": NativeSeanceValue,
+            // "BitcoinEthereumValue": BitcoinEthereumValue,
 
-            "api": `https://avax-api.soulswap.finance/soulswap`,
-            "ftmscan": `https://snowtrace.io/address/${SOUL}#code`,
-            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/avalanche/assets/${SOUL}/logo.png`
+            "totalReserveValue": totalReserveValue,
+            "totalLiquidityValue": totalLiquidityValue,
+            "totalValue": totalReserveValue + totalLiquidityValue,
+
+            "api": `https://api.soulswap.finance/soulswap`,
+            "ftmscan": `https://ftmscan.com/address/${SOUL}#code`,
+            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${SOUL}/logo.png`
         }
 }
+
 
 // async function getVaultInfo() {
 

@@ -2,7 +2,7 @@
 
 const {web3Factory} = require("../../utils/web3");
 const SoulContractABI = require('../../abis/SoulContractABI.json');
-const {_1E18, CHAIN_ID, SOUL, SOUL_DAO } = require("../../constants"); // SOUL_SUMMONER
+const {_1E18, CHAIN_ID, SOUL, NATIVE_SOUL, SOUL_DAO } = require("../../constants"); // SOUL_SUMMONER
 const BN = require('bn.js');
 
 const web3 = web3Factory(CHAIN_ID);
@@ -48,12 +48,11 @@ class Cache {
                 getBalanceOf(SEANCE),    // SeanceCircle [2]
                 // getBalanceOf(SOUL_SEANCE),    // SOUL-SEANCE [3]
                 getBalanceOf(SOUL_DAO),    // DAO [4]
-                getBalanceOf("0xa2527Af9DABf3E3B4979d7E0493b5e2C6e63dC57"),    // NATIVE-SOUL [5]
-                getBalanceOf("0x8d3c3f3f3754Fa6cA088E1991616ca74FCfABFf1")     // EXCHANGE LIQ. [6]
+                getBalanceOf(NATIVE_SOUL),    // NATIVE-SOUL [5]
             ])
 
             // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY
-            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4])).sub(new BN(results[6]))
+            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4]))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}
