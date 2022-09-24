@@ -1,8 +1,8 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, MULTICALL_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MULTICALL_ADDRESS } = require("../../constants");
 
-const web3 = web3Factory( FTM_CHAIN_ID );
+const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
@@ -144,7 +144,7 @@ async function getUserInfo(ctx) {
     // USER DETAILS //
     const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18;
     const userAssetBalance 
-        = assetTicker == 'WFTM' 
+        = assetTicker == 'WNATIVE' 
             ? nativeBalance 
             : await AssetContract.methods.balanceOf(userAddress).call() / pairDivisor;
     const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;

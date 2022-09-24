@@ -2,10 +2,10 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  FTM_CHAIN_ID,
-  LUX, DAI, LUM, WFTM
+  CHAIN_ID,
+  LUX, DAI, LUM, WNATIVE
 } = require("../../constants");
-const web3 = web3Factory(FTM_CHAIN_ID);
+const web3 = web3Factory(CHAIN_ID);
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const LumensContractABI = require('../../abis/LumensContractABI.json');
 const BondHelperABI = require('../../abis/LuxorBondHelperABI.json');
@@ -32,17 +32,17 @@ const DistributorContract = new web3.eth.Contract(DistributorContractABI, Distri
 
 // Reserves
 const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI);
-const FtmContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
+const FtmContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE);
 
 // Liquidity
-// const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, FTM_LUX_LP);
+// const FtmLuxContract = new web3.eth.Contract(ERC20ContractABI, NATIVE_LUX_LP);
 // const DaiLuxContract = new web3.eth.Contract(ERC20ContractABI, DAI_LUX_LP);
 
 // Investments
-// const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_DAI_LP);
-// const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, FTM_WLUM_LP);
-// const DaiLendFtmContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_FTM);
-// const FtmLendDaiContract = new web3.eth.Contract(ERC20ContractABI, FTM_LEND_DAI);
+// const FtmDaiContract = new web3.eth.Contract(ERC20ContractABI, NATIVE_DAI_LP);
+// const FtmWlumContract = new web3.eth.Contract(ERC20ContractABI, NATIVE_WLUM_LP);
+// const DaiLendFtmContract = new web3.eth.Contract(ERC20ContractABI, DAI_LEND_NATIVE);
+// const FtmLendDaiContract = new web3.eth.Contract(ERC20ContractABI, NATIVE_LEND_DAI);
 
 // Helpers
 const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
@@ -57,7 +57,7 @@ async function getInfo() {
     const tokenName = await LuxorContract.methods.name().call();
     const tokenDecimals = await LuxorContract.methods.decimals().call();
 
-    const rawFtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call();
+    const rawFtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call();
     const ftmPrice = rawFtmPrice / 1e18
     
     const rawLuxorPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LUX).call();

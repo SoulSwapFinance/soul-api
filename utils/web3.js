@@ -1,13 +1,13 @@
 const Web3 = require('web3');
-const { FTM_RPC } = require("../constants");
+const { RPC } = require("../constants");
 
 const {
-  FTM_CHAIN_ID,
+  CHAIN_ID,
 } = require('../constants');
 
 const clients = {ftm: []};
 
-clients.ftm.push(new Web3(FTM_RPC));
+clients.ftm.push(new Web3(RPC));
 
 const ftmRandomClient = () => clients.ftm[~~(clients.ftm.length * Math.random())];
 
@@ -18,7 +18,7 @@ module.exports = {
 
   web3Factory: chainId => {
     switch (chainId) {
-      case FTM_CHAIN_ID:
+      case CHAIN_ID:
         return ftmRandomClient();
     }
   },
