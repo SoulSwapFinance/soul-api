@@ -5,14 +5,14 @@ const {
   CHAIN_ID,
 } = require('../constants');
 
-const clients = {ftm: []};
+const clients = {avax: []};
 
-clients.ftm.push(new Web3(RPC));
+clients.avax.push(new Web3(RPC));
 
-const randomClient = () => clients.ftm[~~(clients.ftm.length * Math.random())];
+const randomClient = () => clients.avax[~~(clients.avax.length * Math.random())];
 
 module.exports = {
-  get ftmWeb3() {
+  get avaxWeb3() {
     return randomClient();
   },
 

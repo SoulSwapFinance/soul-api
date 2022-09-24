@@ -24,6 +24,6 @@ yarn start
 #### **/supply/max**: Used by [Coingecko](https://coingecko.com) to display SOUL's max supply.
 
 
-#### **/priceftm/token**: Used to display current derived price of token. **token** needs to be an address or the symbol of a token with enough liquidity.
+#### **/priceNative/token**: Used to display current derived price of token. **token** needs to be an address or the symbol of a token with enough liquidity.
 
 #### **/priceusd/token**: Used to display current price in usdt of token. **token** needs to be an address or the symbol of a token with enough liquidity.
