@@ -3,7 +3,7 @@
 const {web3Factory} = require("../../utils/web3");
 const { 
     SOUL, CHAIN_ID, NATIVE_SOUL, NATIVE_USDC, SOUL_USDC, NATIVE_BTC, NATIVE_ETH,
-    USDC_DAI, SOUL_DAO, SEANCE, MULTICALL_ADDRESS
+    USDC_DAI, SOUL_DAO, SEANCE, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS
     //   NATIVE_DAI, NATIVE_BNB, NATIVE_SEANCE, BTC_ETH, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
@@ -35,7 +35,7 @@ const NativeBitcoinContract = new web3.eth.Contract(PairContractABI, NATIVE_BTC)
 // const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB);
 // const NativeSeanceContract = new web3.eth.Contract(PairContractABI, NATIVE_SEANCE);
 // const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH);
-const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
 async function getPairPrice(pairAddress) {
 // Helpers //
