@@ -1,8 +1,8 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID, LUXOR_TREASURY_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
+const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
 
-const web3 = web3Factory( FTM_CHAIN_ID );
+const web3 = web3Factory( CHAIN_ID );
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');

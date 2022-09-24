@@ -1,8 +1,8 @@
 'use strict';
 
 const {web3Factory} = require("../../../utils/web3");
-const { FTM_CHAIN_ID } = require("../../../constants");
-const web3 = web3Factory(FTM_CHAIN_ID);
+const { CHAIN_ID } = require("../../../constants");
+const web3 = web3Factory(CHAIN_ID);
 const ERC721ContractABI = require('../../../abis/ERC721ContractABI.json');
 
 async function getItemInfo(ctx) {

@@ -2,10 +2,10 @@
 
 const {web3Factory} = require("../../utils/web3");
 const TotalSupplyAndBorrowABI = require('../../abis/TotalSupplyAndBorrowABI.json');
-const { FTM_CHAIN_ID } = require("../../constants");
+const { CHAIN_ID } = require("../../constants");
 const TotalSupplyAndBorrowAddress = "0x8E94d4C235bb07301A07956ddd50aa7f13be2b53"; // TODO
 
-const web3 = web3Factory( FTM_CHAIN_ID );
+const web3 = web3Factory( CHAIN_ID );
 const TotalSupplyAndBorrow = new web3.eth.Contract(TotalSupplyAndBorrowABI, TotalSupplyAndBorrowAddress);
 
 class Cache {

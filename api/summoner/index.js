@@ -2,18 +2,16 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  FTM_CHAIN_ID, SUMMONER_ADDRESS, SEANCE,
-  SOUL, DAI, WFTM, PRICE_FETCHER_ADDRESS
+  CHAIN_ID, SUMMONER_ADDRESS, SEANCE,
+  SOUL, DAI, WNATIVE, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
-const web3 = web3Factory(FTM_CHAIN_ID);
+const web3 = web3Factory(CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const SummonerContractABI = require('../../abis/SummonerContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-
-const BN = require('bn.js');
 
 // CONTRACTS //
 const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADDRESS);
@@ -24,13 +22,11 @@ const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHE
 async function getInfo() {
 
     const divisor = 1e18
-
     const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
     const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
     const startRate = await SummonerContract.methods.startRate().call() / divisor
     
     const poolLength = await SummonerContract.methods.poolLength().call()
-
     const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
     const weight = await SummonerContract.methods.weight().call()
     const weightTotal = await SummonerContract.methods.totalWeight().call()

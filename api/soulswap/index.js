@@ -2,11 +2,11 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  FTM_CHAIN_ID, SOUL_DAO, WFTM, SOUL, SEANCE, SOUL_FTM_LP, FTM_ETH_LP, USDC_DAI_LP, 
-  FTM_BTC_LP, SOUL_USDC_LP, FTM_USDC_LP, FTM_DAI_LP, MULTICALL_ADDRESS,
-  FTM_BNB_LP, SEANCE_FTM_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
+  CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, 
+  NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS,
+  NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
 } = require("../../constants");
-const web3 = web3Factory(FTM_CHAIN_ID);
+const web3 = web3Factory(CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
@@ -24,18 +24,18 @@ const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADD
 // Reserves //
 const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
 const SeanceContract = new web3.eth.Contract(ERC20ContractABI, SEANCE);
-// const FantomContract = new web3.eth.Contract(ERC20ContractABI, WFTM);
+// const FantomContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE);
 
 // Protocol-Owned Liquidity (POL) //
-const FantomUsdcContract = new web3.eth.Contract(PairContractABI, FTM_USDC_LP);
-const FantomSoulContract = new web3.eth.Contract(PairContractABI, SOUL_FTM_LP);
+const NativeUsdcContract = new web3.eth.Contract(PairContractABI, NATIVE_USDC_LP);
+const NativeSoulContract = new web3.eth.Contract(PairContractABI, NATIVE_SOUL_LP);
 const SoulUsdcContract = new web3.eth.Contract(PairContractABI, SOUL_USDC_LP);
-const FantomEthereumContract = new web3.eth.Contract(PairContractABI, FTM_ETH_LP);
+const NativeEthereumContract = new web3.eth.Contract(PairContractABI, NATIVE_ETH_LP);
 const UsdcDaiContract = new web3.eth.Contract(PairContractABI, USDC_DAI_LP);
-const FantomBitcoinContract = new web3.eth.Contract(PairContractABI, FTM_BTC_LP);
-const FantomDaiContract = new web3.eth.Contract(PairContractABI, FTM_DAI_LP);
-const FantomBinanceContract = new web3.eth.Contract(PairContractABI, FTM_BNB_LP);
-const FantomSeanceContract = new web3.eth.Contract(PairContractABI, SEANCE_FTM_LP);
+const NativeBitcoinContract = new web3.eth.Contract(PairContractABI, NATIVE_BTC_LP);
+const NativeDaiContract = new web3.eth.Contract(PairContractABI, NATIVE_DAI_LP);
+const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB_LP);
+const NativeSeanceContract = new web3.eth.Contract(PairContractABI, NATIVE_SEANCE_LP);
 const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH_LP);
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
 
@@ -67,52 +67,52 @@ async function getInfo(ctx) {
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
     const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
-    const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call() / 1e18;
+    const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
     const marketCap = totalSupply * SoulPrice;
     
     // BALANCES //
     const SoulBalance = await SoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const NativeBalance = await MulticallContract.methods.getEthBalance(SOUL_DAO).call() / 1e18;
-    const FantomUsdcBalance = await FantomUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const SoulFantomBalance = await FantomSoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeUsdcBalance = await NativeUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeSoulBalance = await NativeSoulContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const SoulUsdcBalance = await SoulUsdcContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const FantomEthereumBalance = await FantomEthereumContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeEthereumBalance = await NativeEthereumContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const UsdcDaiBalance = await UsdcDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const FantomBitcoinBalance = await FantomBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const FantomDaiBalance = await FantomDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const FantomBinanceBalance = await FantomBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    const SeanceFantomBalance = await FantomSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeBitcoinBalance = await NativeBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeDaiBalance = await NativeDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeBinanceBalance = await NativeBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeSeanceBalance = await NativeSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
 
     // PRICES //
-    const FantomUsdcPrice = await getPairPrice(FTM_USDC_LP);
-    const SoulFantomPrice = await getPairPrice(SOUL_FTM_LP);
+    const NativeUsdcPrice = await getPairPrice(NATIVE_USDC_LP);
+    const NativeSoulPrice = await getPairPrice(NATIVE_SOUL_LP);
     const SoulUsdcPrice = await getPairPrice(SOUL_USDC_LP);
-    const FantomEthereumPrice = await getPairPrice(FTM_ETH_LP);
+    const NativeEthereumPrice = await getPairPrice(NATIVE_ETH_LP);
     const UsdcDaiPrice = await getPairPrice(USDC_DAI_LP);
-    const FantomBitcoinPrice = await getPairPrice(FTM_BTC_LP);
-    const FantomDaiPrice = await getPairPrice(FTM_DAI_LP);
-    const FantomBinancePrice = await getPairPrice(FTM_BNB_LP);
-    const SeanceFantomPrice = await getPairPrice(SEANCE_FTM_LP);
+    const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC_LP);
+    const NativeDaiPrice = await getPairPrice(NATIVE_DAI_LP);
+    const NativeBinancePrice = await getPairPrice(NATIVE_BNB_LP);
+    const NativeSeancePrice = await getPairPrice(NATIVE_SEANCE_LP);
     const BitcoinEthereumPrice = await getPairPrice(BTC_ETH_LP);
 
     // VALUES //
     const NativeValue = FtmPrice * NativeBalance
     const SoulValue = SoulPrice * SoulBalance
 
-    const FantomUsdcValue = FantomUsdcPrice * FantomUsdcBalance;
-    const SoulFantomValue = SoulFantomPrice * SoulFantomBalance;
+    const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance;
+    const NativeSoulValue = NativeSoulPrice * NativeSoulBalance;
     const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance;
-    const FantomEthereumValue = FantomEthereumPrice * FantomEthereumBalance;
+    const NativeEthereumValue = NativeEthereumPrice * NativeEthereumBalance;
     const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
-    const FantomBitcoinValue = FantomBitcoinPrice * FantomBitcoinBalance;
-    const FantomDaiValue = FantomDaiPrice * FantomDaiBalance;
-    const FantomBinanceValue = FantomBinancePrice * FantomBinanceBalance;
-    const SeanceFantomValue = SeanceFantomPrice * SeanceFantomBalance;
+    const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance;
+    const NativeDaiValue = NativeDaiPrice * NativeDaiBalance;
+    const NativeBinanceValue = NativeBinancePrice * NativeBinanceBalance;
+    const NativeSeanceValue = NativeSeancePrice * NativeSeanceBalance;
     const BitcoinEthereumValue = BitcoinEthereumPrice * BitcoinEthereumBalance;
     
     const totalReserveValue = NativeValue + SoulValue
-    const totalLiquidityValue = FantomUsdcValue + SoulFantomValue + SoulUsdcValue + FantomEthereumValue + UsdcDaiValue + FantomBitcoinValue + FantomDaiValue + FantomBinanceValue + SeanceFantomValue + BitcoinEthereumValue
+    const totalLiquidityValue = NativeUsdcValue + NativeSoulValue + SoulUsdcValue + NativeEthereumValue + UsdcDaiValue + NativeBitcoinValue + NativeDaiValue + NativeBinanceValue + NativeSeanceValue + BitcoinEthereumValue
 
     // VALUES //
 
@@ -134,15 +134,15 @@ async function getInfo(ctx) {
             "NativeValue": NativeValue,
             "SoulValue": SoulValue,
 
-            "SoulFantomValue": SoulFantomValue,
+            "NativeSoulValue": NativeSoulValue,
             "SoulUsdcValue": SoulUsdcValue,
-            "FantomEthereumValue": FantomEthereumValue,
+            "NativeEthereumValue": NativeEthereumValue,
             "UsdcDaiValue": UsdcDaiValue,
-            "FantomUsdcValue": FantomUsdcValue,
-            "FantomBitcoinValue": FantomBitcoinValue,
-            "FantomDaiValue": FantomDaiValue,
-            "FantomBinanceValue": FantomBinanceValue,
-            "SeanceFantomValue": SeanceFantomValue,
+            "NativeUsdcValue": NativeUsdcValue,
+            "NativeBitcoinValue": NativeBitcoinValue,
+            "NativeDaiValue": NativeDaiValue,
+            "NativeBinanceValue": NativeBinanceValue,
+            "NativeSeanceValue": NativeSeanceValue,
             "BitcoinEthereumValue": BitcoinEthereumValue,
 
             "totalReserveValue": totalReserveValue,
@@ -232,7 +232,7 @@ async function getVaultInfo() {
     const f = 1 // daily frequency(1x : 24H)
     const n = 365 // compound periods (daily, annualized)
     const apy = apr + (apr * 100 / n)
-    
+
     return {
             "totalSupply": totalSupply,
             "available": available,

@@ -1,9 +1,9 @@
 'use strict';
 
 const { web3Factory } = require("../../utils/web3");
-const { _1E18, FTM_CHAIN_ID, POP_NFT } = require("../../constants");
+const { _1E18, CHAIN_ID, POP_NFT } = require("../../constants");
 const BN = require('bn.js');
-const web3 = web3Factory(FTM_CHAIN_ID);
+const web3 = web3Factory(CHAIN_ID);
 const PopContractABI = require('../../abis/PopContractABI.json');
 const PopContract = new web3.eth.Contract(PopContractABI, POP_NFT);
 

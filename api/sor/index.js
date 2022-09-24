@@ -1,8 +1,8 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { DAI, LUX, WLUM, WFTM, FTM_CHAIN_ID, LUXOR_TREASURY_ADDRESS } = require("../../constants");
+const { DAI, LUX, WLUM, WNATIVE, CHAIN_ID, LUXOR_TREASURY_ADDRESS } = require("../../constants");
 
-const web3 = web3Factory( FTM_CHAIN_ID );
+const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 
@@ -17,14 +17,14 @@ async function getSorInfo() {
     const DaiContract = new web3.eth.Contract(ERC20ContractABI, DAI)
     const LuxorContract = new web3.eth.Contract(ERC20ContractABI, LUX)
     const WLumensContract = new web3.eth.Contract(ERC20ContractABI, WLUM)
-    const WrappedFantomContract = new web3.eth.Contract(ERC20ContractABI, WFTM)
+    const WrappedFantomContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE)
     const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E'
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress)
 
     // METHOD CALLS //
     const rawLuxorPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(LUX).call();
     const rawWrappedLumensPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WLUM).call();
-    const rawFantomPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WFTM).call();
+    const rawFantomPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call();
     const luxorPrice = rawLuxorPrice / 1e18
     const wlumPrice = rawWrappedLumensPrice / 1e18
     const ftmPrice = rawFantomPrice / 1e18

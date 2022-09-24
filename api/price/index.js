@@ -1,7 +1,7 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { FTM_CHAIN_ID } = require("../../constants");
-const web3 = web3Factory(FTM_CHAIN_ID);
+const { CHAIN_ID } = require("../../constants");
+const web3 = web3Factory(CHAIN_ID);
 const BN = require('bn.js');
 const tokenList = require('../../utils/tokenList.json')
 
@@ -13,13 +13,13 @@ const FactoryContractABI = require('../../abis/FactoryContractABI.json');
 const FACTORY_ADDRESS = "0x1120e150dA9def6Fe930f4fEDeD18ef57c0CA7eF"
 
 // tokens address
-const WFTM_ADDRESS = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"
+const WNATIVE_ADDRESS = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"
 const USDC_ADDRESS = "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
 const USDT_ADDRESS = "0x049d68029688eabf473097a2fc38ef61633a3c7a"
 
 // pairs address
-const WFTM_USDT_ADDRESS = "0xdC24814AD654986928F8E4aec48D37fa30bBC5BB"
-const WFTM_USDC_ADDRESS = "0x160653F02b6597E7Db00BA8cA826cf43D2f39556"
+const WNATIVE_USDT_ADDRESS = "0xdC24814AD654986928F8E4aec48D37fa30bBC5BB"
+const WNATIVE_USDC_ADDRESS = "0x160653F02b6597E7Db00BA8cA826cf43D2f39556"
 
 // contracts
 const FactoryContract = new web3.eth.Contract(FactoryContractABI, FACTORY_ADDRESS)
@@ -78,15 +78,15 @@ class Cache {
     }
 
     async getFtmPrice() {
-        if (WFTM_ADDRESS in this.cachedPrice) {
-            if (this.cachedPrice[WFTM_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs > Date.now()) {
-                return this.cachedPrice[WFTM_ADDRESS].lastResult
+        if (WNATIVE_ADDRESS in this.cachedPrice) {
+            if (this.cachedPrice[WNATIVE_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs > Date.now()) {
+                return this.cachedPrice[WNATIVE_ADDRESS].lastResult
             }
         }
 
         const result = await Promise.all([
-            getReserves(WFTM_ADDRESS, USDC_ADDRESS, WFTM_USDC_ADDRESS),
-            getReserves(WFTM_ADDRESS, USDT_ADDRESS, WFTM_USDT_ADDRESS)
+            getReserves(WNATIVE_ADDRESS, USDC_ADDRESS, WNATIVE_USDC_ADDRESS),
+            getReserves(WNATIVE_ADDRESS, USDT_ADDRESS, WNATIVE_USDT_ADDRESS)
         ])
 
         const priceUSDC = result[0].reserveToken1.mul(E18).div(result[0].reserveToken0)
@@ -96,7 +96,7 @@ class Cache {
 
         const lastRequestTimestamp = Date.now()
         const lastResult = ftmPrice
-        this.cachedPrice[WFTM_ADDRESS] = {lastRequestTimestamp, lastResult}
+        this.cachedPrice[WNATIVE_ADDRESS] = {lastRequestTimestamp, lastResult}
 
         return ftmPrice
     }
@@ -108,14 +108,14 @@ class Cache {
             const pairAddress = await cache.getPair(tokenAddress)
 
             if (pairAddress === zeroAddress) {
-                throw 'Error: Given address "' + tokenAddress + '" isn\'t paired with WFTM on SoulSwap.'
+                throw 'Error: Given address "' + tokenAddress + '" isn\'t paired with WNATIVE on SoulSwap.'
             }
 
             const reserves = derived ?
                 await Promise.all([
-                    getReserves(WFTM_ADDRESS, tokenAddress, pairAddress)
+                    getReserves(WNATIVE_ADDRESS, tokenAddress, pairAddress)
                 ]) : await Promise.all([
-                    getReserves(WFTM_ADDRESS, tokenAddress, pairAddress),
+                    getReserves(WNATIVE_ADDRESS, tokenAddress, pairAddress),
                     this.getFtmPrice()
                 ])
             const price = reserves[0].reserveToken0.mul(E18).div(reserves[0].reserveToken1)
@@ -123,15 +123,15 @@ class Cache {
             const lastRequestTimestamp = Date.now()
             const lastResult = price
             this.cachedPrice[tokenAddress] = {lastRequestTimestamp, lastResult}
-        } else if (!(WFTM_ADDRESS in this.cachedPrice) ||
-            this.cachedPrice[WFTM_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs < Date.now()) // check if price needs to be updated)
+        } else if (!(WNATIVE_ADDRESS in this.cachedPrice) ||
+            this.cachedPrice[WNATIVE_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs < Date.now()) // check if price needs to be updated)
         {
             await this.getFtmPrice()
         }
 
         return derived ?
             this.cachedPrice[tokenAddress].lastResult :
-            this.cachedPrice[WFTM_ADDRESS].lastResult.mul(this.cachedPrice[tokenAddress].lastResult).div(E18)
+            this.cachedPrice[WNATIVE_ADDRESS].lastResult.mul(this.cachedPrice[tokenAddress].lastResult).div(E18)
     }
 }
 
@@ -157,7 +157,7 @@ function get10PowN(n) {
 }
 
 async function getPrice(tokenAddress, derived) {
-    if (tokenAddress === WFTM_ADDRESS) {
+    if (tokenAddress === WNATIVE_ADDRESS) {
         return await cache.getFtmPrice()
     }
 
@@ -167,9 +167,9 @@ async function getPrice(tokenAddress, derived) {
 async function getPairAddress(tokenAddress) {
     return (
         tokenAddress ?
-            (tokenAddress > WFTM_ADDRESS) ?
-                await FactoryContract.methods.getPair(tokenAddress, WFTM_ADDRESS).call() :
-                await FactoryContract.methods.getPair(WFTM_ADDRESS, tokenAddress).call()
+            (tokenAddress > WNATIVE_ADDRESS) ?
+                await FactoryContract.methods.getPair(tokenAddress, WNATIVE_ADDRESS).call() :
+                await FactoryContract.methods.getPair(WNATIVE_ADDRESS, tokenAddress).call()
             : undefined
     )
 }
@@ -187,7 +187,7 @@ async function logics(ctx, derived) {
             }
 
             derived ?
-                tokenAddress === WFTM_ADDRESS ?
+                tokenAddress === WNATIVE_ADDRESS ?
                     ctx.body = E18.toString() :
                     ctx.body = (await getPrice(tokenAddress, derived)).toString() :
                 ctx.body = (await getPrice(tokenAddress, derived)).toString()
