@@ -183,8 +183,10 @@ async function getUserInfo(ctx) {
     const userInfo = await BondContract.methods.userInfo(pid, userAddress).call()
 
     const pendingSoul = await BondContract.methods.pendingSoul(pid, userAddress).call()
+ 
     const pairAddress = poolInfo[0]
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+    
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
     
