@@ -40,9 +40,10 @@ return lpPrice
 
 }
 
+
 async function getPoolTvl(pid) {
     const poolInfo = await BondContract.methods.poolInfo(pid).call()
-    const PairBalance = poolInfo[4]
+    const PairBalance = poolInfo[4] / 1e18
     const pairAddress = poolInfo[0]
     const PairPrice = await getPairPrice(pairAddress)
     const pairTVL = PairPrice * PairBalance
@@ -50,6 +51,7 @@ async function getPoolTvl(pid) {
     return pairTVL
 
 }
+
 
 async function getInfo(ctx) {
     const nativeSoul = await BondContract.methods.poolInfo(0).call()
