@@ -2,15 +2,14 @@
 const {web3Factory} = require("../../utils/web3");
 const { CHAIN_ID, MULTICALL_ADDRESS, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
 
-const isReady = false; // todo: update when ready <3
-
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
-// const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-// const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
+const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const AutoStakeContract = new web3.eth.Contract(ERC20ContractABI, AUTOSTAKE_ADDRESS);
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
+
+// const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
 
 const BN = require('bn.js');
 
@@ -56,21 +55,21 @@ async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.tokenAddress);
 
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
-    // const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
     // METHOD CALLS //
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
 
     const tokenDecimals = await TokenContract.methods.decimals().call();
-    // const divisor = 10**tokenDecimals
+    const divisor = 10**tokenDecimals
     
-    // const rawPrice = PriceFetcherContract.currentTokenUsdcPrice(tokenAddress).call() ?? 0;
+    const rawPrice = PriceFetcherContract.currentTokenUsdcPrice(tokenAddress).call() ?? 0;
     const totalSupply = await TokenContract.methods.totalSupply().call();
-    // const tokenPrice = rawPrice / 1e18
-    // const marketCap = totalSupply * tokenPrice / divisor    
+    const tokenPrice = rawPrice / 1e18
+    const marketCap = totalSupply * tokenPrice / divisor    
     const tokenBalance = await TokenContract.methods.balanceOf(userAddress).call();
-    // const tokenValue = tokenPrice * tokenBalance
+    const tokenValue = tokenPrice * tokenBalance
     
     if (!("id" in ctx.params))
         return {"name": "Users"};
@@ -80,11 +79,11 @@ async function getTokenInfo(ctx) {
             "name": tokenName,
             "symbol": tokenSymbol,
             "balance": tokenBalance,
-            "price": 0, // todo
-            "value": 0, // todo
+            "price": tokenPrice,
+            "value": tokenValue,
             "decimals": tokenDecimals,
             "supply": totalSupply,
-            "mcap": 0, // todo
+            "mcap": marketCap,
             "api": `https://avax-api.soulswap.finance/info/users/${userAddress}/${tokenAddress}`,
             "ftmscan": `https://snowtrace.io/address/${tokenAddress}#code`,
             "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/avalanche/assets/${tokenAddress}/logo.png`

@@ -61,18 +61,13 @@ async function getInfo(ctx) {
     const nativeEth = await BondContract.methods.poolInfo(4).call()
     const usdcDai = await BondContract.methods.poolInfo(5).call()
 
-    // BALANCES //
-    const NativeSoulBalance = nativeSoul[4] // lpSupply
-
-    const SoulUsdcBalance = usdcSoul[4] // lpSupply
-
-    const NativeUsdcBalance = nativeUsdc[4] // lpSupply
-
-    const NativeBitcoinBalance = nativeBtc[4] // lpSupply
-    
-    const NativeEthereumBalance = nativeEth[4] // lpSupply
-    
-    const UsdcDaiBalance = usdcDai[4] // lpSupply
+    // BALANCES // 4: poolInfo[lpSupply]
+    const NativeSoulBalance = nativeSoul[4]
+    const SoulUsdcBalance = usdcSoul[4]
+    const NativeUsdcBalance = nativeUsdc[4]
+    const NativeBitcoinBalance = nativeBtc[4]
+    const NativeEthereumBalance = nativeEth[4]
+    const UsdcDaiBalance = usdcDai[4]
 
     // PRICES //
     const NativeSoulPrice = await getPairPrice(NATIVE_SOUL);
@@ -120,7 +115,7 @@ async function getBondInfo(ctx) {
     const pid = ctx.params.pid
     const poolInfo = await BondContract.methods.poolInfo(pid).call()
     const pairAddress = poolInfo[0]
-    // console.log('pairAddress: %s', pairAddress)
+
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
