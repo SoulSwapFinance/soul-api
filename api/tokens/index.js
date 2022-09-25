@@ -4,13 +4,12 @@ const { CHAIN_ID } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
-// const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const BN = require('bn.js');
+const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 
 async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
-    // const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
     // METHOD CALLS //
     const totalSupply = await TokenContract.methods.totalSupply().call();
@@ -18,11 +17,10 @@ async function getTokenInfo(ctx) {
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
 
-    // todo: update lines below
-    // const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() ?? 0;
-    // const tokenPrice = rawPrice / 1e18
-    // const divisor = 10**tokenDecimals
-    // const marketCap = totalSupply * tokenPrice / divisor
+    const rawPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() ?? 0;
+    const tokenPrice = rawPrice / 1e18
+    const divisor = 10**tokenDecimals
+    const marketCap = totalSupply * tokenPrice / divisor
 
     if (!("id" in ctx.params))
         return {"name": "Tokens"};
@@ -31,10 +29,10 @@ async function getTokenInfo(ctx) {
             "address": tokenAddress,
             "name": tokenName,
             "symbol": tokenSymbol,
-            "price": 0,
+            "price": tokenPrice,
             "decimals": tokenDecimals,
             "supply": totalSupply,
-            "mcap": 0,
+            "mcap": marketCap,
             "luxorTreasuryBalance": 0,
             "api": `https://avax-api.soulswap.finance/info/tokens/${tokenAddress}`,
             "ftmscan": `https://snowtrace.io/address/${tokenAddress}#code`,
