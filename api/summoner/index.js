@@ -113,7 +113,7 @@ async function getStakeInfo(ctx) {
             "weightTotal": weightTotal,
             "weightShare": weightShare,
             "api": `https://api.soulswap.finance/summoner`,
-            "ftmscan": `https://ftmscan.com/address/${SUMMONER_ADDRESS}#code`,
+            "ftmscan": `https://snowtrace.io/address/${SUMMONER_ADDRESS}#code`,
         }
 }
 

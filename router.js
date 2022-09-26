@@ -38,14 +38,12 @@ router.get('/summoner/:id', summoner.poolInfo)
 router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
 
 router.get('/soulswap', soulswap.infos)
-// router.get('/soulswap/vault', soulswap.vaultInfo)
-// router.get('/soulswap/vault/users/:userAddress', soulswap.userVaultInfo)
+router.get('/soulswap/vault', soulswap.vaultInfo)
+router.get('/soulswap/vault/users/:userAddress', soulswap.userVaultInfo)
 
 router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
 router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
-
-// router.get('/lending/supply', lending.totalSupply)
 
 router.get('/', noop);
 
