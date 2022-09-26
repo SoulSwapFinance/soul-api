@@ -89,7 +89,7 @@ async function getStakeInfo(ctx) {
 
     const soulBalance = await SoulContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18;
     const poolTVL = soulPrice * soulBalance
-    const apr = annualRewardsValue / poolTVL * 100
+    const apr = poolTVL == 0 ? poolTVL : annualRewardsValue / poolTVL * 100
 
 
         return {
@@ -289,8 +289,8 @@ async function getPoolInfo(ctx) {
        /* = pid == 8 // force fix for btc pools
         ? 2 * lpPrice * lpBalance
         : lpPrice * lpBalance */
-      
-    const apr = annualRewardsValue / poolTVL * 100
+
+    const apr = poolTVL == 0 ? 0 : annualRewardsValue / poolTVL * 100
 
     return {
         "pid": pid,
