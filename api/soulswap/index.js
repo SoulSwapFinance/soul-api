@@ -64,7 +64,7 @@ async function getInfo(ctx) {
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
     const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
-    const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
+    const NativePrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
     const marketCap = totalSupply * SoulPrice;
     
     // BALANCES //
@@ -92,7 +92,7 @@ async function getInfo(ctx) {
     const BitcoinEthereumPrice = await getPairPrice(BTC_ETH);
 
     // VALUES //
-    const NativeValue = FtmPrice * NativeBalance
+    const NativeValue = NativePrice * NativeBalance
     const SoulValue = SoulPrice * SoulBalance
 
     const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance;

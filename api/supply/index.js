@@ -2,7 +2,7 @@
 
 const {web3Factory} = require("../../utils/web3");
 const SoulContractABI = require('../../abis/SoulContractABI.json');
-const {_1E18, CHAIN_ID, SOUL, NATIVE_SOUL, SOUL_DAO } = require("../../constants"); // SOUL_SUMMONER
+const {_1E18, CHAIN_ID, SOUL, SOUL_DAO, NATIVE_SOUL } = require("../../constants");
 const BN = require('bn.js');
 
 const web3 = web3Factory(CHAIN_ID);
@@ -44,15 +44,14 @@ class Cache {
         ) {
             const results = await Promise.all([
                 this.getTotalSupply(), // total supply [0]
-                // getBalanceOf(SOUL_SUMMONER),    // SoulSummoner [1]
+                getBalanceOf(SOUL_SUMMONER),    // SoulSummoner [1]
                 getBalanceOf(SEANCE),    // SeanceCircle [2]
-                // getBalanceOf(SOUL_SEANCE),    // SOUL-SEANCE [3]
-                getBalanceOf(SOUL_DAO),    // DAO [4]
-                getBalanceOf(NATIVE_SOUL),    // NATIVE-SOUL [5]
+                getBalanceOf(SOUL_DAO),    // DAO [3]
+                getBalanceOf(NATIVE_SOUL),    // NATIVE-SOUL [4]
             ])
 
             // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY
-            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4]))
+            const circulatingSupply = new BN(results[0]).sub(new BN(results[1])).sub(new BN(results[2])).sub(new BN(results[3])).sub(new BN(results[4]))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}

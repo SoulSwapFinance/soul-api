@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, MULTICALL_ADDRESS, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS, AURA, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -8,8 +8,7 @@ const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const AutoStakeContract = new web3.eth.Contract(ERC20ContractABI, AUTOSTAKE_ADDRESS);
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
-
-// const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
+const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
 
 const BN = require('bn.js');
 
@@ -17,18 +16,14 @@ async function getUserInfo(ctx) {
     const userAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18;
 
-    // todo: update
-    const votingPower =  0 
-    // await AuraContract.methods.balanceOf(userAddress).call() / 1e18;
+    const votingPower = await AuraContract.methods.balanceOf(userAddress).call() / 1e18;
 
     const daoPower = await AuraContract.methods.balanceOf(SOUL_DAO).call() / 1e18
     const summonerPower = await AuraContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18
     const seancePower = await AuraContract.methods.balanceOf(SEANCE).call() / 1e18
     const ineligiblePower = daoPower + summonerPower + seancePower;
     
-    // todo: update
-    const totalVotingPower = 0
-    // = await AuraContract.methods.totalSupply().call() / 1e18;
+    const totalVotingPower = await AuraContract.methods.totalSupply().call() / 1e18;
 
     const eligiblePower = totalVotingPower - ineligiblePower;
     const stakedBalance =  await AutoStakeContract.methods.balanceOf(userAddress).call() / 1e18;
@@ -64,9 +59,8 @@ async function getTokenInfo(ctx) {
     const tokenDecimals = await TokenContract.methods.decimals().call();
     const divisor = 10**tokenDecimals
     
-    const rawPrice = PriceFetcherContract.currentTokenUsdcPrice(tokenAddress).call() ?? 0;
+    const tokenPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1e18
     const totalSupply = await TokenContract.methods.totalSupply().call();
-    const tokenPrice = rawPrice / 1e18
     const marketCap = totalSupply * tokenPrice / divisor    
     const tokenBalance = await TokenContract.methods.balanceOf(userAddress).call();
     const tokenValue = tokenPrice * tokenBalance
