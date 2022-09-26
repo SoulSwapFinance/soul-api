@@ -4,7 +4,7 @@ const {web3Factory} = require("../../utils/web3");
 const { 
     SOUL, CHAIN_ID, WNATIVE, NATIVE_SOUL, NATIVE_USDC, SOUL_USDC, NATIVE_BTC, NATIVE_ETH, SUMMONER_ADDRESS,
     USDC_DAI, SOUL_DAO, SEANCE, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS, AUTOSTAKE_ADDRESS,
-    NATIVE_DAI //, NATIVE_BNB, NATIVE_SEANCE, BTC_ETH, 
+    NATIVE_DAI, NATIVE_BNB, BTC_ETH 
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -33,9 +33,8 @@ const NativeEthereumContract = new web3.eth.Contract(PairContractABI, NATIVE_ETH
 const UsdcDaiContract = new web3.eth.Contract(PairContractABI, USDC_DAI);
 const NativeBitcoinContract = new web3.eth.Contract(PairContractABI, NATIVE_BTC);
 const NativeDaiContract = new web3.eth.Contract(PairContractABI, NATIVE_DAI);
-// const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB);
-// const NativeSeanceContract = new web3.eth.Contract(PairContractABI, NATIVE_SEANCE);
-// const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH);
+const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB);
+const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH);
 
 async function getPairPrice(pairAddress) {
 // Helpers //
@@ -78,9 +77,8 @@ async function getInfo(ctx) {
     const UsdcDaiBalance = await UsdcDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const NativeBitcoinBalance = await NativeBitcoinContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const NativeDaiBalance = await NativeDaiContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeBinanceBalance = await NativeBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const NativeSeanceBalance = await NativeSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
-    // const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const NativeBinanceBalance = await NativeBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+    const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
 
     // PRICES //
     const NativeUsdcPrice = await getPairPrice(NATIVE_USDC);
@@ -90,9 +88,8 @@ async function getInfo(ctx) {
     const UsdcDaiPrice = await getPairPrice(USDC_DAI);
     const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC);
     const NativeDaiPrice = await getPairPrice(NATIVE_DAI);
-    // const NativeBinancePrice = await getPairPrice(NATIVE_BNB);
-    // const NativeSeancePrice = await getPairPrice(NATIVE_SEANCE);
-    // const BitcoinEthereumPrice = await getPairPrice(BTC_ETH);
+    const NativeBinancePrice = await getPairPrice(NATIVE_BNB);
+    const BitcoinEthereumPrice = await getPairPrice(BTC_ETH);
 
     // VALUES //
     const NativeValue = FtmPrice * NativeBalance
@@ -105,16 +102,14 @@ async function getInfo(ctx) {
     const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
     const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance;
     const NativeDaiValue = NativeDaiPrice * NativeDaiBalance;
-    // const NativeBinanceValue = NativeBinancePrice * NativeBinanceBalance;
-    // const NativeSeanceValue = NativeSeancePrice * NativeSeanceBalance;
-    // const BitcoinEthereumValue = BitcoinEthereumPrice * BitcoinEthereumBalance;
+    const NativeBinanceValue = NativeBinancePrice * NativeBinanceBalance;
+    const BitcoinEthereumValue = BitcoinEthereumPrice * BitcoinEthereumBalance;
     
     const totalReserveValue = NativeValue + SoulValue
     // todo: update below
     const totalLiquidityValue = NativeUsdcValue + NativeSoulValue 
         + SoulUsdcValue + UsdcDaiValue + NativeEthereumValue 
-        + NativeBitcoinValue + NativeDaiValue
-        // =  NativeBinanceValue + NativeSeanceValue + BitcoinEthereumValue
+        + NativeBitcoinValue + NativeDaiValue + NativeBinanceValue + BitcoinEthereumValue
 
     // VALUES //
 

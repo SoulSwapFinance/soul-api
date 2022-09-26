@@ -137,7 +137,7 @@ async function getBondInfo(ctx) {
     const marketCap = pairPrice * pairSupply
     
     // VALUES //
-    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();  // todo: update   
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsSummoner = await BondContract.methods.dailySoul().call() / 1e18 * 365 
     
