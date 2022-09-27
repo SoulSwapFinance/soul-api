@@ -1,8 +1,7 @@
 'use strict';
 
 const {web3Factory} = require("../../utils/web3");
-const { 
-  CHAIN_ID, NATIVE_SOUL, NATIVE_ETH, USDC_DAI, SOUL, 
+const { CHAIN_ID, NATIVE_SOUL, NATIVE_ETH, USDC_DAI, SOUL, 
   NATIVE_BTC, SOUL_USDC, NATIVE_USDC, SOUL_BOND, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
@@ -36,10 +35,9 @@ async function getPairPrice(pairAddress) {
     const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
     const lpPrice = lpValuePaired / lpSupply
 
-return lpPrice
+    return lpPrice
 
 }
-
 
 async function getPoolTvl(pid) {
     const poolInfo = await BondContract.methods.poolInfo(pid).call()
@@ -49,46 +47,43 @@ async function getPoolTvl(pid) {
     const pairTVL = PairPrice * PairBalance
 
     return pairTVL
-
 }
 
-
-async function getInfo(ctx) {
+async function getInfo() {
     const nativeSoul = await BondContract.methods.poolInfo(0).call()
     const usdcSoul = await BondContract.methods.poolInfo(1).call()
     const nativeUsdc = await BondContract.methods.poolInfo(2).call()
-    const nativeBtc = await BondContract.methods.poolInfo(3).call()
-    const nativeEth = await BondContract.methods.poolInfo(4).call()
+    const nativeEth = await BondContract.methods.poolInfo(3).call()
+    const nativeBtc = await BondContract.methods.poolInfo(4).call()
     const usdcDai = await BondContract.methods.poolInfo(5).call()
 
-    // BALANCES // 4: poolInfo[lpSupply]
-    const NativeSoulBalance = nativeSoul[4]
-    const SoulUsdcBalance = usdcSoul[4]
-    const NativeUsdcBalance = nativeUsdc[4]
-    const NativeBitcoinBalance = nativeBtc[4]
-    const NativeEthereumBalance = nativeEth[4]
-    const UsdcDaiBalance = usdcDai[4]
+    // BALANCES // [4]: poolInfo[lpSupply]
+    const NativeSoulBalance = nativeSoul[4] / 1e18
+    const SoulUsdcBalance = usdcSoul[4] / 1e18
+    const NativeUsdcBalance = nativeUsdc[4] / 1e18
+    const NativeEthereumBalance = nativeEth[4] / 1e18
+    const NativeBitcoinBalance = nativeBtc[4] / 1e18
+    const UsdcDaiBalance = usdcDai[4] / 1e18
 
     // PRICES //
-    const NativeSoulPrice = await getPairPrice(NATIVE_SOUL);
-    const SoulUsdcPrice = await getPairPrice(SOUL_USDC);
-    const NativeUsdcPrice = await getPairPrice(NATIVE_USDC);
-    const NativeEthereumPrice = await getPairPrice(NATIVE_ETH);
-    const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC);
-    const UsdcDaiPrice = await getPairPrice(USDC_DAI);
+    const NativeSoulPrice = await getPairPrice(NATIVE_SOUL)
+    const SoulUsdcPrice = await getPairPrice(SOUL_USDC)
+    const NativeUsdcPrice = await getPairPrice(NATIVE_USDC)
+    const NativeEthereumPrice = await getPairPrice(NATIVE_ETH)
+    const NativeBitcoinPrice = await getPairPrice(NATIVE_BTC)
+    const UsdcDaiPrice = await getPairPrice(USDC_DAI)
 
     // VALUES //
+    const NativeSoulValue = NativeSoulPrice * NativeSoulBalance
+    const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance
+    const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance
+    const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance
+    const NativeEthereumValue = NativeEthereumPrice * NativeEthereumBalance
+    const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance
 
-    const NativeSoulValue = NativeSoulPrice * NativeSoulBalance;
-    const SoulUsdcValue = SoulUsdcPrice * SoulUsdcBalance;
-    const NativeUsdcValue = NativeUsdcPrice * NativeUsdcBalance;
-    const NativeEthereumValue = NativeEthereumPrice * NativeEthereumBalance;
-    const NativeBitcoinValue = NativeBitcoinPrice * NativeBitcoinBalance;
-    const UsdcDaiValue = UsdcDaiPrice * UsdcDaiBalance;
-    
     const totalLiquidityValue 
-        = NativeSoulValue + SoulUsdcValue + NativeUsdcValue 
-        + NativeEthereumValue + NativeBitcoinValue + UsdcDaiValue
+        = NativeSoulValue + SoulUsdcValue + NativeUsdcValue + NativeBitcoinValue
+        + NativeEthereumValue + UsdcDaiValue
 
     // VALUES //
         return {
