@@ -162,7 +162,8 @@ async function getUserInfo(ctx) {
     // const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
     const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
       //  [0] amount, [1] rewardDebt, [3] lastWithdrawTime, [4] firstDepositTime, [5] timeDelta
-    const userDelta = userInfo[5]
+    const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
+    // const userDelta = userInfo[5]
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
