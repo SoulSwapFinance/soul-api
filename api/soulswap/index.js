@@ -138,7 +138,7 @@ async function getInfo(ctx) {
             "NativeUsdcValue": NativeUsdcValue,
             "NativeBitcoinValue": NativeBitcoinValue,
             "NativeDaiValue": NativeDaiValue,
-            "NativeBinanceValue": NativeDaiValue,
+            "NativeBinanceValue": NativeBinanceValue,
             "NativeSeanceValue": 0,
             "BitcoinEthereumValue": BitcoinEthereumValue,
 
