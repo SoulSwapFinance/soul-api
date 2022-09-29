@@ -138,14 +138,9 @@ async function getInfo(ctx) {
             "NativeUsdcValue": NativeUsdcValue,
             "NativeBitcoinValue": NativeBitcoinValue,
             "NativeDaiValue": NativeDaiValue,
-            "NativeBinanceValue": 0,
+            "NativeBinanceValue": NativeDaiValue,
             "NativeSeanceValue": 0,
-            "BitcoinEthereumValue": 0,
-
-            // "NativeDaiValue": NativeDaiValue,
-            // "NativeBinanceValue": NativeBinanceValue,
-            // "NativeSeanceValue": NativeSeanceValue,
-            // "BitcoinEthereumValue": BitcoinEthereumValue,
+            "BitcoinEthereumValue": BitcoinEthereumValue,
 
             "totalReserveValue": totalReserveValue,
             "totalLiquidityValue": totalLiquidityValue,
@@ -153,7 +148,7 @@ async function getInfo(ctx) {
 
             "api": `https://api.soulswap.finance/soulswap`,
             "ftmscan": `https://snowtrace.io/address/${SOUL}#code`,
-            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/fantom/assets/${SOUL}/logo.png`
+            "image": `https://raw.githubusercontent.com/soulswapfinance/assets/master/blockchains/avalanche/assets/${SOUL}/logo.png`
         }
 }
 
