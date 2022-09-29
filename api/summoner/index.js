@@ -124,6 +124,7 @@ async function getUserInfo(ctx) {
     
     const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
     const pairAddress = poolInfo[0] // √
+    const feeDays = poolInfo[4] / 1e18
 
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
     const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
@@ -159,11 +160,11 @@ async function getUserInfo(ctx) {
     const token0Decimals = await Token0Contract.methods.decimals().call()
     const token0Divisor = 10**(token0Decimals)
     const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
-    // const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
+    
+    //  [0] amount, [1] rewardDebt, [2] withdrawalTime, [3] depositTime, [4] timeDelta // [5] deltaDays
     const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
-      //  [0] amount, [1] rewardDebt, [3] lastWithdrawTime, [4] firstDepositTime, [5] timeDelta
-    const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
-    // const userDelta = userInfo[5]
+    
+    const userDelta = await SummonerContract.methods.getUserDelta(pid, userAddress).call()
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
@@ -177,22 +178,18 @@ async function getUserInfo(ctx) {
     const stakedValue = lpPrice * stakedBalance
 
     const rewardDebt = userInfo[1] / soulDivisor
-    const rewardDebtAtTime = userInfo[2] / soulDivisor
-    const lastWithdrawTime = userInfo[3]
-    const firstDepositTime = userInfo[4]
-    const timeDelta = userInfo[5]
-    const lastDepositTime = userInfo[6]
+    const withdrawTime = userInfo[2]
+    const depositTime = userInfo[3]
+    const timeDelta = userInfo[4]
 
     // Fee: Rate & Time Remaining //
-    // todo: verify before production //
-    const feeDays = poolInfo[4] / 1e18
     const feeSeconds = feeDays * 86_400
-    const remainingSeconds = feeSeconds - userDelta
+    const remainingSeconds = userDelta >= feeSeconds ? 0 : feeSeconds - userDelta
     const secondsRemaining = remainingSeconds <= 0 ? 0 : remainingSeconds
     const daysRemaining = secondsRemaining / 86_400
     const daysPast = feeDays - daysRemaining
     const rateMeow = feeDays - daysPast
-    const currentRate = rateMeow <= 0 ? 0 : rateMeow
+    const currentRate = rateMeow == 0 ? 0 : rateMeow
 
     return {
             "userAddress": userAddress,
@@ -205,11 +202,11 @@ async function getUserInfo(ctx) {
             "lpPrice": lpPrice,
             "userDelta": userDelta,
             "rewardDebt": rewardDebt,
-            "rewardDebtAtTime": rewardDebtAtTime,
-            "lastWithdrawTime": lastWithdrawTime,
-            "firstDepositTime": firstDepositTime,
-            "timeDelta": timeDelta,
-            "lastDepositTime": lastDepositTime,
+            "rewardDebtAtTime": 0,
+            "lastWithdrawTime": withdrawTime,
+            "firstDepositTime": depositTime,
+            "timeDelta": userDelta,
+            "lastDepositTime": 0,
             "secondsRemaining": secondsRemaining,
             "currentRate": currentRate
     }
