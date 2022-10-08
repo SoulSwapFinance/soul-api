@@ -10,6 +10,7 @@ const tokens = require('./api/tokens');
 
 const pairs = require('./api/pairs');
 const users = require('./api/users');
+const underworld = require('./api/underworld');
 
 const summoner = require('./api/summoner');
 const soulswap = require('./api/soulswap');
@@ -44,6 +45,9 @@ router.get('/soulswap/vault/users/:userAddress', soulswap.userVaultInfo)
 router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
 router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
+
+router.get('/underworld', underworld.userInfo)
+router.get('/underworld/:id', underworld.pairInfo)
 
 router.get('/', noop);
 
