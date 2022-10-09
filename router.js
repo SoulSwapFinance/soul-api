@@ -46,8 +46,13 @@ router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
 router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
 
-router.get('/underworld', underworld.userInfo)
+// router.get('/underworld', underworld.infos)
 router.get('/underworld/:id', underworld.pairInfo)
+router.get('/underworld/users/:userAddress/:id', underworld.userInfo)
+
+// router.get('/coffin', coffin.infos)
+// router.get('/coffin/:id', coffin.coffinInfo)
+// router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
 
 router.get('/', noop);
 
