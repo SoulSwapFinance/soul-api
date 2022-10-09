@@ -7,6 +7,7 @@ const BN = require('bn.js');
 
 const web3 = web3Factory(CHAIN_ID);
 const soulContract = new web3.eth.Contract(SoulContractABI, SOUL);
+const MAX_SUPPLY = 250_000_000 * 10**18
 
 class Cache {
     minElapsedTimeInMs = 10000; // 10 seconds
@@ -31,7 +32,7 @@ class Cache {
 
     async getMaxSupply() {
         if (!this.cachedMaxSupply) {
-            const maxSupply = 250_000_000 * 10**18;
+            const maxSupply = MAX_SUPPLY;
             const lastRequestTimestamp = Date.now();
             this.cachedMaxSupply = {maxSupply, lastRequestTimestamp}
         }
@@ -43,11 +44,11 @@ class Cache {
             this.cachedCirculatingSupply.lastRequestTimestamp + this.minElapsedTimeInMs < Date.now() // check if supply needs to be updated
         ) {
             const results = await Promise.all([
-                this.getTotalSupply(), // total supply [0]
+                this.getTotalSupply(),          // total supply [0]
                 getBalanceOf(SOUL_SUMMONER),    // SoulSummoner [1]
-                getBalanceOf(SEANCE),    // SeanceCircle [2]
-                getBalanceOf(SOUL_DAO),    // DAO [3]
-                getBalanceOf(NATIVE_SOUL),    // NATIVE-SOUL [4]
+                getBalanceOf(SEANCE),           // SeanceCircle [2]
+                getBalanceOf(SOUL_DAO),         // DAO [3]
+                getBalanceOf(NATIVE_SOUL),      // NATIVE-SOUL [4]
             ])
 
             // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY
