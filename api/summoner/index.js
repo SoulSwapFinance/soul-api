@@ -24,8 +24,7 @@ async function getInfo() {
     const divisor = 1e18
     const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
     const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
-    const startRate = await SummonerContract.methods.startRate().call() / divisor
-    
+
     const poolLength = await SummonerContract.methods.poolLength().call()
     const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
     const weight = await SummonerContract.methods.weight().call()
@@ -38,7 +37,7 @@ async function getInfo() {
             "dailySoul": dailySoul,
             "soulPerSecond": soulPerSecond,
             "soulPerYear": dailySoul * 365,
-            "startRate": startRate,
+            "startRate": 0,
             "totalAllocPoint": totalAllocPoint,
             "weight": weight,
             "weightTotal": weightTotal,
@@ -60,7 +59,7 @@ async function getStakeInfo(ctx) {
 
     const dailySoul = await SummonerContract.methods.dailySoul().call() / divisor
     const soulPerSecond = await SummonerContract.methods.soulPerSecond().call() / divisor
-    const startRate = await SummonerContract.methods.startRate().call() / divisor
+    
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
     const soulPrice = rawSoulPrice / 1e18
 
@@ -90,7 +89,7 @@ async function getStakeInfo(ctx) {
 
     const soulBalance = await SoulContract.methods.balanceOf(SUMMONER_ADDRESS).call() / 1e18;
     const poolTVL = soulPrice * soulBalance
-    const apr = annualRewardsValue / poolTVL * 100
+    const apr = poolTVL == 0 ? poolTVL : annualRewardsValue / poolTVL * 100
 
 
         return {
@@ -108,7 +107,7 @@ async function getStakeInfo(ctx) {
             "tvl": poolTVL,
             "soulPerSecond": soulPerSecond,
             "soulPerYear": dailySoul * 365,
-            "startRate": startRate,
+            "startRate": 0,
             "totalAllocPoint": totalAllocPoint,
             "weight": weight,
             "weightTotal": weightTotal,
@@ -122,8 +121,10 @@ async function getUserInfo(ctx) {
 
     const pid = ctx.params.id
     const userAddress = ctx.params.userAddress
+    
     const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
     const pairAddress = poolInfo[0] // √
+    const feeDays = poolInfo[4] / 1e18
 
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
     const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
@@ -137,14 +138,12 @@ async function getUserInfo(ctx) {
 
     const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
-    // const lendingPids = [48, 49, 51, 52, 53, 56]
+    // const lendingPids = []
     
-    const pairType 
-        = (pid >= 48 && pid <= 53 && pid != 50) 
-              ? 'underworld' 
-            : pid == 56 
-              ? 'underworld' 
-            : 'farm'
+    const pairType = 'farm'
+        // = (pid >= 8 && pid <= 11) 
+            //   ? 'underworld' 
+            // : 'farm'
   
     // Pair Pricing //
     const token0
@@ -158,10 +157,11 @@ async function getUserInfo(ctx) {
     const token0Decimals = await Token0Contract.methods.decimals().call()
     const token0Divisor = 10**(token0Decimals)
     const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
-    // const userDelta = await SummonerContract.methods.userDelta(pid, userAddress).call()
+    
+    //  [0] amount, [1] rewardDebt, [2] withdrawalTime, [3] depositTime, [4] timeDelta // [5] deltaDays
     const userInfo = await SummonerContract.methods.userInfo(pid, userAddress).call()
-      //  [0] amount, [1] rewardDebt, [3] lastWithdrawTime, [4] firstDepositTime, [5] timeDelta
-    const userDelta = userInfo[5]
+    
+    const userDelta = await SummonerContract.methods.getUserDelta(pid, userAddress).call()
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
@@ -175,21 +175,18 @@ async function getUserInfo(ctx) {
     const stakedValue = lpPrice * stakedBalance
 
     const rewardDebt = userInfo[1] / soulDivisor
-    const rewardDebtAtTime = userInfo[2] / soulDivisor
-    const lastWithdrawTime = userInfo[3]
-    const firstDepositTime = userInfo[4]
-    const timeDelta = userInfo[5]
-    const lastDepositTime = userInfo[6]
+    const withdrawTime = userInfo[2]
+    const depositTime = userInfo[3]
+    const timeDelta = userInfo[4]
 
     // Fee: Rate & Time Remaining //
-    const feeDays = await SummonerContract.methods.startRate().call() / 1e18
     const feeSeconds = feeDays * 86_400
-    const remainingSeconds = feeSeconds - userDelta
+    const remainingSeconds = userDelta >= feeSeconds ? 0 : feeSeconds - userDelta
     const secondsRemaining = remainingSeconds <= 0 ? 0 : remainingSeconds
     const daysRemaining = secondsRemaining / 86_400
     const daysPast = feeDays - daysRemaining
     const rateMeow = feeDays - daysPast
-    const currentRate = rateMeow <= 0 ? 0 : rateMeow
+    const currentRate = rateMeow == 0 ? 0 : rateMeow
 
     return {
             "userAddress": userAddress,
@@ -202,11 +199,11 @@ async function getUserInfo(ctx) {
             "lpPrice": lpPrice,
             "userDelta": userDelta,
             "rewardDebt": rewardDebt,
-            "rewardDebtAtTime": rewardDebtAtTime,
-            "lastWithdrawTime": lastWithdrawTime,
-            "firstDepositTime": firstDepositTime,
-            "timeDelta": timeDelta,
-            "lastDepositTime": lastDepositTime,
+            "rewardDebtAtTime": 0,
+            "lastWithdrawTime": withdrawTime,
+            "firstDepositTime": depositTime,
+            "timeDelta": userDelta,
+            "lastDepositTime": 0,
             "secondsRemaining": secondsRemaining,
             "currentRate": currentRate
     }
@@ -217,19 +214,20 @@ async function getPoolInfo(ctx) {
     // ABCs //
     const pid = ctx.params.id
     const poolInfo = await SummonerContract.methods.poolInfo(pid).call()
+ 
     const pairAddress = poolInfo[0] // √
     const allocPoint = poolInfo[1]
+ 
     const totalAllocPoint = await SummonerContract.methods.totalAllocPoint().call()
     const allocShare = allocPoint / totalAllocPoint * 100
 
     const status = allocPoint == 0 ? 'inactive' : 'active'
-    // const lendingPids = [48, 49, 51, 52, 53, 56]
-    const pairType 
-        = (pid >= 48 && pid <= 53 && pid != 50) 
-              ? 'underworld' 
-            : pid == 56 
-              ? 'underworld' 
-            : 'farm'
+    // const lendingPids = []
+    
+    const pairType = 'farm'
+        // = (pid >= 8 && pid <= 11) 
+            //   ? 'underworld' 
+            // : 'farm'
 
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress);
@@ -281,12 +279,12 @@ async function getPoolInfo(ctx) {
             : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
-    const poolTVL 
-      = pid == 8 
+    const poolTVL = lpPrice * lpBalance
+       /* = pid == 8 // force fix for btc pools
         ? 2 * lpPrice * lpBalance
-        : lpPrice * lpBalance
-      
-    const apr = annualRewardsValue / poolTVL * 100
+        : lpPrice * lpBalance */
+
+    const apr = poolTVL == 0 ? 0 : annualRewardsValue / poolTVL * 100
 
     return {
         "pid": pid,
