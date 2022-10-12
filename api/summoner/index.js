@@ -140,7 +140,7 @@ async function getUserInfo(ctx) {
 
     const lendingPids = [13, 14, 15, 17, 18]
     
-    const pairType = 'farm'
+    const pairType
         = (pid >= 13 && pid <= 18 && pid != 16) 
               ? 'underworld' 
             : 'farm'
@@ -224,7 +224,7 @@ async function getPoolInfo(ctx) {
     const status = allocPoint == 0 ? 'inactive' : 'active'
     const lendingPids = [13, 14, 15, 17, 18]
     
-    const pairType = 'farm'
+    const pairType
         = (pid >= 13 && pid <= 18 && pid != 16) 
               ? 'underworld' 
             : 'farm'
