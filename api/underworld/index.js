@@ -1,15 +1,16 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MULTICALL_ADDRESS, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, BTC } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 const fetcherAddress = PRICE_FETCHER_ADDRESS
-const BN = require('bn.js');
 
 async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
@@ -35,7 +36,10 @@ async function getPairInfo(ctx) {
     const assetTicker = await AssetContract.methods.symbol().call();
     const assetDecimals = await AssetContract.methods.decimals().call();
     const assetDivisor = 10**assetDecimals;
-    const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1e18;
+    const assetPrice
+        = assetAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1E18
 
     const assetCall = await PairContract.methods.totalAsset().call();
     const totalAssetElastic = assetCall[0];
@@ -48,7 +52,10 @@ async function getPairInfo(ctx) {
     const collateralTicker = await CollateralContract.methods.symbol().call();
     const collateralDecimals = await CollateralContract.methods.decimals().call();
     const collateralDivisor = 10**collateralDecimals;
-    const collateralPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1e18;
+    const collateralPrice
+        = collateralAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1E18
 
     // BORROW DETAILS
     const borrowElastic = await PairContract.methods.totalBorrow().call();

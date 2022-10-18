@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, FACTORY_ADDRESS, NATIVE_USDC, ZERO_ADDDRESS, NATIVE_DAI, USDC_ADDRESS, DAI_ADDRESS, WNATIVE_ADDRESS } = require("../../constants");
+const { CHAIN_ID, FACTORY_ADDRESS, NATIVE_USDC, ZERO_ADDRESS, NATIVE_DAI, USDC_ADDRESS, DAI_ADDRESS, WNATIVE_ADDRESS } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 const BN = require('bn.js');
 const tokenList = require('../../utils/tokenList.json')
@@ -8,6 +8,7 @@ const tokenList = require('../../utils/tokenList.json')
 // abis
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const FactoryContractABI = require('../../abis/FactoryContractABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
 
 // contracts
 const FactoryContract = new web3.eth.Contract(FactoryContractABI, FACTORY_ADDRESS)

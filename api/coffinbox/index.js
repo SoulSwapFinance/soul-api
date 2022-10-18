@@ -1,12 +1,13 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, LUM, COFFINBOX_ADDRESS, PRICE_FETCHER_ADDRESS, SOR } = require("../../constants");
+const { CHAIN_ID, LUM, BTC_ORACLE_ADDRESS, COFFINBOX_ADDRESS, PRICE_FETCHER_ADDRESS, SOR, BTC } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const CoffinContractABI = require('../../abis/CoffinContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const BN = require('bn.js');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 const CoffinContract = new web3.eth.Contract(CoffinContractABI, COFFINBOX_ADDRESS);
 
@@ -20,12 +21,13 @@ async function getCoffinInfo(ctx) {
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
     const totalSupply = await TokenContract.methods.totalSupply().call();
-    const rawPrice 
+    const tokenPrice 
         = tokenAddress === LUM ? 0 
             : tokenAddress === SOR ? 0 
-            : await PriceFetcherContract.methods
-                .currentTokenUsdcPrice(ctx.params.id).call() ?? 0;
-    const tokenPrice = rawPrice / 1e18
+            : tokenAddress === BTC 
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8 
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(ctx.params.id).call() / 1e18
+            ?? 0
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
     const coffinBalance = await TokenContract.methods.balanceOf(COFFINBOX_ADDRESS).call();
@@ -84,10 +86,12 @@ async function getUserInfo(ctx) {
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const rawPrice 
         = tokenAddress === LUM ? 0 
-            : tokenAddress === SOR ? 0 
-            : await PriceFetcherContract.methods
-                .currentTokenUsdcPrice(ctx.params.id).call() ?? 0;
-    const tokenPrice = rawPrice / 1e18
+            : tokenAddress === SOR ? 0
+            : tokenAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(ctx.params.id).call() / 1E18 
+            ?? 0;
+    const tokenPrice = rawPrice
     const divisor = 10**tokenDecimals
     const marketCap = totalSupply * tokenPrice / divisor
     const coffinBalance = await TokenContract.methods.balanceOf(COFFINBOX_ADDRESS).call() / divisor;
