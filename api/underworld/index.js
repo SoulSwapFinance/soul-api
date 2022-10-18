@@ -77,7 +77,7 @@ async function getPairInfo(ctx) {
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
             "assetDivisor": assetDivisor,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddressCS}/logo.png`,            
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddressCS}/logo.png`,            
             
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
@@ -87,12 +87,12 @@ async function getPairInfo(ctx) {
             "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
             "collateralDivisor": collateralDivisor,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddressCS}/logo.png`,            
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddressCS}/logo.png`,            
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
-            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
             "ftmscan": `https://snowtrace.io/address/${pairAddress}#code`,
         }
     }
@@ -172,7 +172,7 @@ async function getUserInfo(ctx) {
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddress}/logo.png`,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddress}/logo.png`,
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
             
@@ -180,7 +180,7 @@ async function getUserInfo(ctx) {
             "collateralPrice": collateralPrice,
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddress}/logo.png`,            
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddress}/logo.png`,            
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
@@ -190,7 +190,7 @@ async function getUserInfo(ctx) {
             "userCollateralShare": userCollateralShare,
 
             "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
-            "ftmscan": `https://ftmscan.com/address/${pairAddress}#code`,
+            "ftmscan": `https://snowtrace.io/address/${pairAddress}#code`,
         }
     }
 }
