@@ -274,7 +274,7 @@ async function getPoolInfo(ctx) {
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsValue = soulPrice * annualRewardsPool
     const token0Price
-        = token == BTC
+        = token0 == BTC
         ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 
