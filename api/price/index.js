@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID } = require("../../constants");
+const { CHAIN_ID, FACTORY_ADDRESS, NATIVE_USDC, ZERO_ADDRESS, NATIVE_DAI, USDC_ADDRESS, DAI_ADDRESS, WNATIVE_ADDRESS } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 const BN = require('bn.js');
 const tokenList = require('../../utils/tokenList.json')
@@ -8,18 +8,7 @@ const tokenList = require('../../utils/tokenList.json')
 // abis
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const FactoryContractABI = require('../../abis/FactoryContractABI.json');
-
-// contracts address
-const FACTORY_ADDRESS = "0x1120e150dA9def6Fe930f4fEDeD18ef57c0CA7eF"
-
-// tokens address
-const WNATIVE_ADDRESS = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"
-const USDC_ADDRESS = "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
-const USDT_ADDRESS = "0x049d68029688eabf473097a2fc38ef61633a3c7a"
-
-// pairs address
-const WNATIVE_USDT_ADDRESS = "0xdC24814AD654986928F8E4aec48D37fa30bBC5BB"
-const WNATIVE_USDC_ADDRESS = "0x160653F02b6597E7Db00BA8cA826cf43D2f39556"
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
 
 // contracts
 const FactoryContract = new web3.eth.Contract(FactoryContractABI, FACTORY_ADDRESS)
@@ -28,8 +17,6 @@ const FactoryContract = new web3.eth.Contract(FactoryContractABI, FACTORY_ADDRES
 const E18 = new BN("10").pow(new BN("18"))
 const EIGHTEEN = new BN("18")
 const TWO = new BN("2")
-const zeroAddress = "0x0000000000000000000000000000000000000000"
-
 
 class Cache {
     minElapsedTimeInMs = 60000; // 60 seconds
@@ -48,7 +35,7 @@ class Cache {
 
         const pairAddress = await getPairAddress(tokenAddress)
 
-        if (pairAddress === zeroAddress) {
+        if (pairAddress === ZERO_ADDRESS) {
             return pairAddress
         }
 
@@ -77,7 +64,7 @@ class Cache {
         return tokenContract
     }
 
-    async getFtmPrice() {
+    async getNativePrice() {
         if (WNATIVE_ADDRESS in this.cachedPrice) {
             if (this.cachedPrice[WNATIVE_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs > Date.now()) {
                 return this.cachedPrice[WNATIVE_ADDRESS].lastResult
@@ -85,20 +72,23 @@ class Cache {
         }
 
         const result = await Promise.all([
-            getReserves(WNATIVE_ADDRESS, USDC_ADDRESS, WNATIVE_USDC_ADDRESS),
-            getReserves(WNATIVE_ADDRESS, USDT_ADDRESS, WNATIVE_USDT_ADDRESS)
+            getReserves(WNATIVE_ADDRESS, USDC_ADDRESS, NATIVE_USDC),
+            getReserves(WNATIVE_ADDRESS, DAI_ADDRESS, NATIVE_DAI),
         ])
 
-        const priceUSDC = result[0].reserveToken1.mul(E18).div(result[0].reserveToken0)
-        const priceUSDT = result[1].reserveToken1.mul(E18).div(result[1].reserveToken0)
+        // reserveToken0 == WNATIVE, reserveToken1 == USDC
+        const priceUSDC = result[0].reserveToken0.mul(E18).div(result[0].reserveToken1)
 
-        const ftmPrice = priceUSDC.add(priceUSDT).div(TWO)
+        // reserveToken0 == WNATIVE, reserveToken1 == DAI
+        const priceDAI = result[1].reserveToken0.mul(E18).div(result[1].reserveToken1)
+
+        const nativePrice = priceUSDC.add(priceDAI).div(TWO)
 
         const lastRequestTimestamp = Date.now()
-        const lastResult = ftmPrice
+        const lastResult = nativePrice
         this.cachedPrice[WNATIVE_ADDRESS] = {lastRequestTimestamp, lastResult}
 
-        return ftmPrice
+        return nativePrice
     }
 
     async getPrice(tokenAddress, derived) {
@@ -107,7 +97,7 @@ class Cache {
         ) {
             const pairAddress = await cache.getPair(tokenAddress)
 
-            if (pairAddress === zeroAddress) {
+            if (pairAddress === ZERO_ADDRESS) {
                 throw 'Error: Given address "' + tokenAddress + '" isn\'t paired with WNATIVE on SoulSwap.'
             }
 
@@ -116,7 +106,7 @@ class Cache {
                     getReserves(WNATIVE_ADDRESS, tokenAddress, pairAddress)
                 ]) : await Promise.all([
                     getReserves(WNATIVE_ADDRESS, tokenAddress, pairAddress),
-                    this.getFtmPrice()
+                    this.getNativePrice()
                 ])
             const price = reserves[0].reserveToken0.mul(E18).div(reserves[0].reserveToken1)
 
@@ -126,7 +116,7 @@ class Cache {
         } else if (!(WNATIVE_ADDRESS in this.cachedPrice) ||
             this.cachedPrice[WNATIVE_ADDRESS].lastRequestTimestamp + this.minElapsedTimeInMs < Date.now()) // check if price needs to be updated)
         {
-            await this.getFtmPrice()
+            await this.getNativePrice()
         }
 
         return derived ?
@@ -158,7 +148,7 @@ function get10PowN(n) {
 
 async function getPrice(tokenAddress, derived) {
     if (tokenAddress === WNATIVE_ADDRESS) {
-        return await cache.getFtmPrice()
+        return await cache.getNativePrice()
     }
 
     return await cache.getPrice(tokenAddress, derived)

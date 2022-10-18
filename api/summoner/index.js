@@ -2,8 +2,8 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  CHAIN_ID, SUMMONER_ADDRESS, SEANCE,
-  SOUL, DAI, WNATIVE, PRICE_FETCHER_ADDRESS
+  CHAIN_ID, SUMMONER_ADDRESS, SEANCE, BTC, BTC_ORACLE_ADDRESS,
+  SOUL, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -12,6 +12,8 @@ const PairContractABI = require('../../abis/PairContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const SummonerContractABI = require('../../abis/SummonerContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 // CONTRACTS //
 const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADDRESS);
@@ -112,7 +114,7 @@ async function getStakeInfo(ctx) {
             "weight": weight,
             "weightTotal": weightTotal,
             "weightShare": weightShare,
-            "api": `https://api.soulswap.finance/summoner`,
+            "api": `https://avax-api.soulswap.finance/summoner`,
             "ftmscan": `https://snowtrace.io/address/${SUMMONER_ADDRESS}#code`,
         }
 }
@@ -164,7 +166,10 @@ async function getUserInfo(ctx) {
     const userDelta = await SummonerContract.methods.getUserDelta(pid, userAddress).call()
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
-    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+    const token0Price 
+        = token0 == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
 
     const lpValuePaired 
             = pairType == 'farm'
@@ -268,7 +273,10 @@ async function getPoolInfo(ctx) {
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsValue = soulPrice * annualRewardsPool
-    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+    const token0Price
+        = token == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 
     const lpValuePaired 
             = pairType == 'farm'

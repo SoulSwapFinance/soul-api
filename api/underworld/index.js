@@ -1,15 +1,16 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MULTICALL_ADDRESS, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, BTC } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 const fetcherAddress = PRICE_FETCHER_ADDRESS
-const BN = require('bn.js');
 
 async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
@@ -35,7 +36,10 @@ async function getPairInfo(ctx) {
     const assetTicker = await AssetContract.methods.symbol().call();
     const assetDecimals = await AssetContract.methods.decimals().call();
     const assetDivisor = 10**assetDecimals;
-    const assetPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1e18;
+    const assetPrice
+        = assetAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1E18
 
     const assetCall = await PairContract.methods.totalAsset().call();
     const totalAssetElastic = assetCall[0];
@@ -48,7 +52,10 @@ async function getPairInfo(ctx) {
     const collateralTicker = await CollateralContract.methods.symbol().call();
     const collateralDecimals = await CollateralContract.methods.decimals().call();
     const collateralDivisor = 10**collateralDecimals;
-    const collateralPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1e18;
+    const collateralPrice
+        = collateralAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1E18
 
     // BORROW DETAILS
     const borrowElastic = await PairContract.methods.totalBorrow().call();
@@ -77,7 +84,7 @@ async function getPairInfo(ctx) {
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
             "assetDivisor": assetDivisor,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddressCS}/logo.png`,            
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddressCS}/logo.png`,            
             
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
@@ -87,12 +94,12 @@ async function getPairInfo(ctx) {
             "collateralDecimals": collateralDecimals,
             "collateralPrice": collateralPrice,
             "collateralDivisor": collateralDivisor,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddressCS}/logo.png`,            
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddressCS}/logo.png`,            
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
-            "api": `https://api.soulswap.finance/info/tokens/${pairAddress}`,
+            "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
             "ftmscan": `https://snowtrace.io/address/${pairAddress}#code`,
         }
     }
@@ -172,7 +179,7 @@ async function getUserInfo(ctx) {
             "assetPrice": assetPrice,
             "assetAddress": assetAddress,
             "assetDecimals": assetDecimals,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${assetAddress}/logo.png`,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddress}/logo.png`,
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
             
@@ -180,7 +187,7 @@ async function getUserInfo(ctx) {
             "collateralPrice": collateralPrice,
             "collateralAddress": collateralAddress,
             "collateralDecimals": collateralDecimals,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${collateralAddress}/logo.png`,            
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddress}/logo.png`,            
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
@@ -190,7 +197,7 @@ async function getUserInfo(ctx) {
             "userCollateralShare": userCollateralShare,
 
             "api": `https://avax-api.soulswap.finance/info/tokens/${pairAddress}`,
-            "ftmscan": `https://ftmscan.com/address/${pairAddress}#code`,
+            "ftmscan": `https://snowtrace.io/address/${pairAddress}#code`,
         }
     }
 }

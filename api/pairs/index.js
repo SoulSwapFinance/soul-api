@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, PRICE_FETCHER_ADDRESS } = require("../../constants");
+const { CHAIN_ID, BTC, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 
@@ -10,6 +10,9 @@ const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
 
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
+
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 async function getPairInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
@@ -55,9 +58,16 @@ async function getPairInfo(ctx) {
 
     // Prices & Value Locked //
 
-    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
-    const token1Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
-
+    const token0Price   
+        = token0Address == BTC 
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+    
+    const token1Price 
+        = token1Address == BTC 
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1E18
+    
     const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
     const lpPrice = lpValuePaired / lpSupply
 
@@ -140,8 +150,14 @@ async function getUserPairInfo(ctx) {
     const token1Symbol = await Token1Contract.methods.symbol().call();
     
     // Prices & Value Locked //
-    const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
-    const token1Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
+    const token0Price 
+        = token0 == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+    const token1Price 
+        = token1 == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
 
     const lpValuePaired 
         = pairType == 'farm'

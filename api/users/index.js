@@ -1,6 +1,7 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS, AURA, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MULTICALL_ADDRESS, PRICE_FETCHER_ADDRESS, AURA, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS,
+BTC, BTC_ORACLE_ADDRESS} = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -9,6 +10,8 @@ const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const AutoStakeContract = new web3.eth.Contract(ERC20ContractABI, AUTOSTAKE_ADDRESS);
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
 const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
 
 const BN = require('bn.js');
 
@@ -59,7 +62,11 @@ async function getTokenInfo(ctx) {
     const tokenDecimals = await TokenContract.methods.decimals().call();
     const divisor = 10**tokenDecimals
     
-    const tokenPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1e18
+    const tokenPrice 
+        = tokenAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1E18
+
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const marketCap = totalSupply * tokenPrice / divisor    
     const tokenBalance = await TokenContract.methods.balanceOf(userAddress).call();
