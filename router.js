@@ -17,7 +17,9 @@ const underworld = require('./api/underworld');
 const coffin = require('./api/coffinbox');
 const summoner = require('./api/summoner');
 const soulswap = require('./api/soulswap');
+const crosschain = require('./api/crosschain');
 const bonds = require('./api/bonds');
+const aggregator = require('./api/aggregator');
 
 router.get('/supply/circulating', supply.circulatingSupply);
 router.get('/supply/circulating-adjusted', supply.circulatingSupplyAdjusted);
@@ -68,7 +70,10 @@ router.get('/bonds', bonds.infos)
 router.get('/bonds/:pid', bonds.bondInfo)
 router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
 
-// router.get('/lending/supply', lending.totalSupply)
+router.get('/crosschain/:id', crosschain.crossInfo)
+
+router.get('/aggregator/', aggregator.aggregatorInfo)
+router.get('/aggregator/:inputAmount/:fromAddress/:toAddress', aggregator.amountsOut)
 
 router.get('/', noop);
 
