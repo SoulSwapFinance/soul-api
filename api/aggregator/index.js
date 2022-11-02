@@ -36,7 +36,7 @@ async function getAmountsOut(ctx) {
     const SpiritAmountOut = amountsOut[5]
     const OptimalDex 
         = SoulAmountOut >= SpookyAmountOut && SoulAmountOut >= SpiritAmountOut ? 'SoulSwap'
-        : SpookyAmountOut > SoulAmountOut && SpookyAmountOut >= SpiritAmoutOut ? 'SpookySwap'
+        : SpookyAmountOut > SoulAmountOut && SpookyAmountOut >= SpiritAmountOut ? 'SpookySwap'
         : 'SpiritSwap'
 
     return {
