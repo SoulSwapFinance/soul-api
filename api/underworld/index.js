@@ -1,71 +1,71 @@
-'use strict';
-const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, MULTICALL_ADDRESS, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, BTC } = require("../../constants");
+'use strict'
+const { web3Factory } = require("../../utils/web3")
+const { CHAIN_ID, MULTICALL_ADDRESS, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, BTC } = require("../../constants")
 
-const web3 = web3Factory( CHAIN_ID );
-const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
-const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
-const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const MulticallContractABI = require('../../abis/MulticallContractABI.json');
-const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
-const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS);
+const web3 = web3Factory(CHAIN_ID)
+const ERC20ContractABI = require('../../abis/ERC20ContractABI.json')
+const UnderworldContractABI = require('../../abis/UnderworldContractABI.json')
+const PriceFetcherABI = require('../../abis/PriceFetcherABI.json')
+const MulticallContractABI = require('../../abis/MulticallContractABI.json')
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json')
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
 
 const fetcherAddress = PRICE_FETCHER_ADDRESS
 
 async function getPairInfo(ctx) {
-    const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
-    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
-    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+    const pairAddress = web3.utils.toChecksumAddress(ctx.params.id)
+    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress)
 
     // METHOD CALLS //
-    const totalSupply = await PairContract.methods.totalSupply().call();
-    const pairName = await PairContract.methods.name().call();
-    const pairSymbol = await PairContract.methods.symbol().call();
-    const pairDecimals = await PairContract.methods.decimals().call();
-    const exchangeRate = await PairContract.methods.exchangeRate().call();
-    const oracle = await PairContract.methods.oracle().call();
-    const accrueInfo = await PairContract.methods.accrueInfo().call();
-    const interestPerSecond = accrueInfo[0];
-    const lastAccrued = accrueInfo[1];
-    const feesEarnedFraction = accrueInfo[2];
+    const totalSupply = await PairContract.methods.totalSupply().call()
+    const pairName = await PairContract.methods.name().call()
+    const pairSymbol = await PairContract.methods.symbol().call()
+    const pairDecimals = await PairContract.methods.decimals().call()
+    const exchangeRate = await PairContract.methods.exchangeRate().call()
+    const oracle = await PairContract.methods.oracle().call()
+    const accrueInfo = await PairContract.methods.accrueInfo().call()
+    const interestPerSecond = accrueInfo[0]
+    const lastAccrued = accrueInfo[1]
+    const feesEarnedFraction = accrueInfo[2]
 
     // ASSET DETAILS //
-    const assetAddress = await PairContract.methods.asset().call();
-    const assetAddressCS = web3.utils.toChecksumAddress(assetAddress);
-    const AssetContract = new web3.eth.Contract(ERC20ContractABI, assetAddress);
-    const assetTicker = await AssetContract.methods.symbol().call();
-    const assetDecimals = await AssetContract.methods.decimals().call();
-    const assetDivisor = 10**assetDecimals;
-    const assetPrice
-        = assetAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
-        : await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call() / 1E18
+    const aAddress = await PairContract.methods.asset().call()
+    const aAddressCS = web3.utils.toChecksumAddress(aAddress)
+    const AssetContract = new web3.eth.Contract(ERC20ContractABI, aAddress)
+    const aTicker = await AssetContract.methods.symbol().call()
+    const aDecimals = await AssetContract.methods.decimals().call()
+    const aDivisor = 10 ** aDecimals
+    const aPrice
+        = aAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
 
-    const assetCall = await PairContract.methods.totalAsset().call();
-    const totalAssetElastic = assetCall[0];
-    const totalAssetBase = assetCall[1];
+    const assetCall = await PairContract.methods.totalAsset().call()
+    const totalAssetElastic = assetCall[0]
+    const totalAssetBase = assetCall[1]
 
     // COLLATERAL DETAILS //
-    const collateralAddress = await PairContract.methods.collateral().call();
-    const collateralAddressCS = web3.utils.toChecksumAddress(collateralAddress);
-    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, collateralAddress);
-    const collateralTicker = await CollateralContract.methods.symbol().call();
-    const collateralDecimals = await CollateralContract.methods.decimals().call();
-    const collateralDivisor = 10**collateralDecimals;
-    const collateralPrice
-        = collateralAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
-        : await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call() / 1E18
+    const cAddress = await PairContract.methods.collateral().call()
+    const cAddressCS = web3.utils.toChecksumAddress(cAddress)
+    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, cAddress)
+    const cTicker = await CollateralContract.methods.symbol().call()
+    const cDecimals = await CollateralContract.methods.decimals().call()
+    const cDivisor = 10 ** cDecimals
+    const cPrice
+        = cAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // BORROW DETAILS
-    const borrowElastic = await PairContract.methods.totalBorrow().call();
-    const totalBorrowElastic = borrowElastic[0];
-    const borrowBase = await PairContract.methods.totalBorrow().call();
-    const totalBorrowBase = borrowBase[1];
-    
- 
+    const borrowElastic = await PairContract.methods.totalBorrow().call()
+    const totalBorrowElastic = borrowElastic[0]
+    const borrowBase = await PairContract.methods.totalBorrow().call()
+    const totalBorrowBase = borrowBase[1]
+
+
     if (!("id" in ctx.params))
-        return {"name": "Underworld Pairs"};
+        return { "name": "Underworld Pairs" }
     else {
         return {
             "address": pairAddress,
@@ -79,22 +79,22 @@ async function getPairInfo(ctx) {
             "lastAccrued": lastAccrued,
             "feesEarnedFraction": feesEarnedFraction,
 
-            "assetTicker": assetTicker,
-            "assetPrice": assetPrice,
-            "assetAddress": assetAddress,
-            "assetDecimals": assetDecimals,
-            "assetDivisor": assetDivisor,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddressCS}/logo.png`,            
-            
+            "assetTicker": aTicker,
+            "assetPrice": aPrice,
+            "assetAddress": aAddress,
+            "assetDecimals": aDecimals,
+            "assetDivisor": aDivisor,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${aAddressCS}/logo.png`,
+
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
-            
-            "collateralTicker": collateralTicker,
-            "collateralAddress": collateralAddress,
-            "collateralDecimals": collateralDecimals,
-            "collateralPrice": collateralPrice,
-            "collateralDivisor": collateralDivisor,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddressCS}/logo.png`,            
+
+            "collateralTicker": cTicker,
+            "collateralAddress": cAddress,
+            "collateralDecimals": cDecimals,
+            "collateralPrice": cPrice,
+            "collateralDivisor": cDivisor,
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${cAddressCS}/logo.png`,
 
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
@@ -106,60 +106,67 @@ async function getPairInfo(ctx) {
 }
 
 async function getUserInfo(ctx) {
-    const pairAddress = web3.utils.toChecksumAddress(ctx.params.id);
-    const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress);
-    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
-    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
-    const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
+    const pairAddress = web3.utils.toChecksumAddress(ctx.params.id)
+    const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress)
+    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress)
+    const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS)
 
     // PAIR DETAILS //
-    const totalSupply = await PairContract.methods.totalSupply().call();
-    const pairName = await PairContract.methods.name().call();
-    const pairSymbol = await PairContract.methods.symbol().call();
-    const pairDecimals = await PairContract.methods.decimals().call();
-    const pairDivisor = 10**pairDecimals
-    const exchangeRate = await PairContract.methods.exchangeRate().call();
-    const oracleAddress = await PairContract.methods.oracle().call();
-    const interestPerSecond = await PairContract.methods.accrueInfo().call()[0];
-    const lastAccrued = await PairContract.methods.accrueInfo().call()[1];
-    const feesEarnedFraction = await PairContract.methods.accrueInfo().call()[2];
+    const totalSupply = await PairContract.methods.totalSupply().call()
+    const pairName = await PairContract.methods.name().call()
+    const pairSymbol = await PairContract.methods.symbol().call()
+    const pairDecimals = await PairContract.methods.decimals().call()
+    const pairDivisor = 10 ** pairDecimals
+    const exchangeRate = await PairContract.methods.exchangeRate().call()
+    const oracleAddress = await PairContract.methods.oracle().call()
+    const interestPerSecond = await PairContract.methods.accrueInfo().call()[0]
+    const lastAccrued = await PairContract.methods.accrueInfo().call()[1]
+    const feesEarnedFraction = await PairContract.methods.accrueInfo().call()[2]
 
     // ASSET DETAILS //
-    const assetAddress = await PairContract.methods.asset().call();
-    const AssetContract = new web3.eth.Contract(ERC20ContractABI, assetAddress);
-    const assetTicker = await AssetContract.methods.symbol().call();
-    const assetDecimals = await AssetContract.methods.decimals().call();
-    const assetPrice 
-        = await PriceFetcherContract.methods.currentTokenUsdcPrice(assetAddress).call()
-            /  10**assetDecimals;
-    
+    const aAddress = await PairContract.methods.asset().call()
+    const AssetContract = new web3.eth.Contract(ERC20ContractABI, aAddress)
+    const aTicker = await AssetContract.methods.symbol().call()
+    const aDecimals = await AssetContract.methods.decimals().call()
+    const aPrice
+        = aAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
+
     // COLLATERAL DETAILS //
-    const collateralAddress = await PairContract.methods.collateral().call();
-    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, collateralAddress);
-    const collateralTicker = await CollateralContract.methods.symbol().call();
-    const collateralDecimals = await CollateralContract.methods.decimals().call();
-    const collateralPrice 
-        = await PriceFetcherContract.methods.currentTokenUsdcPrice(collateralAddress).call()
-            / 10**collateralDecimals;
+    const cAddress = await PairContract.methods.collateral().call()
+    const CollateralContract = new web3.eth.Contract(ERC20ContractABI, cAddress)
+    const cTicker = await CollateralContract.methods.symbol().call()
+    const cDecimals = await CollateralContract.methods.decimals().call()
+    const cDivisor = 10 ** cDecimals
+    const aDivisor = 10 ** aDecimals
+    const cPrice = cAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // TOTAL DETAILS //
-    const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0];
-    const totalBorrowBase = await PairContract.methods.totalBorrow().call()[1];
-    const totalAssetElastic = await PairContract.methods.totalAsset().call()[0];
-    const totalAssetBase = await PairContract.methods.totalAsset().call()[1];
-    
+    const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0]
+    const totalBorrowBase = await PairContract.methods.totalBorrow().call()[1]
+    const totalAssetElastic = await PairContract.methods.totalAsset().call()[0]
+    const totalAssetBase = await PairContract.methods.totalAsset().call()[1]
+
     // USER DETAILS //
-    const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18;
-    const userAssetBalance 
-        = assetTicker == 'WNATIVE' 
-            ? nativeBalance 
-            : await AssetContract.methods.balanceOf(userAddress).call() / pairDivisor;
-    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
-    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call();
-    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call();
+    const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18
+    const userAssetBalance
+        = aTicker == 'WAVAX'
+            ? nativeBalance
+            : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
+    const userCollateralBalance
+        = cTicker == 'WAVAX'
+            ? nativeBalance
+            : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
+    const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
+    const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
 
     if (!("id" in ctx.params))
-        return {"name": "Underworld Pairs"};
+        return { "name": "Underworld Pairs" }
     else {
         return {
             "address": pairAddress,
@@ -175,23 +182,24 @@ async function getUserInfo(ctx) {
             "lastAccrued": lastAccrued,
             "feesEarnedFraction": feesEarnedFraction,
 
-            "assetTicker": assetTicker,
-            "assetPrice": assetPrice,
-            "assetAddress": assetAddress,
-            "assetDecimals": assetDecimals,
-            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${assetAddress}/logo.png`,
+            "assetTicker": aTicker,
+            "assetPrice": aPrice,
+            "assetAddress": aAddress,
+            "assetDecimals": aDecimals,
+            "assetLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${aAddress}/logo.png`,
             "assetTotalBase": totalAssetBase,
             "assetTotalElastic": totalAssetElastic,
-            
-            "collateralTicker": collateralTicker,
-            "collateralPrice": collateralPrice,
-            "collateralAddress": collateralAddress,
-            "collateralDecimals": collateralDecimals,
-            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${collateralAddress}/logo.png`,            
+
+            "collateralTicker": cTicker,
+            "collateralPrice": cPrice,
+            "collateralAddress": cAddress,
+            "collateralDecimals": cDecimals,
+            "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/avalanche/assets/${cAddress}/logo.png`,
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
 
             "userAssetBalance": userAssetBalance,
+            "userCollateralBalance": userCollateralBalance,
             "userBalance": userBalance,
             "userBorrowPart": userBorrowPart,
             "userCollateralShare": userCollateralShare,
@@ -210,7 +218,7 @@ async function userInfo(ctx) {
     ctx.body = (await getUserInfo(ctx))
 }
 
-module.exports = { pairInfo, userInfo };
+module.exports = { pairInfo, userInfo }
 
 
 // pair.address = currentValue
@@ -237,7 +245,7 @@ module.exports = { pairInfo, userInfo };
 //         pair.marketHealth = pair.totalCollateralAmount.value
 //           .mulDiv(e10(18), maximum(pair.currentExchangeRate, pair.oracleExchangeRate, pair.spotExchangeRate))
 //           .mulDiv(e10(18), pair.currentBorrowAmount.value)
-        
+
 //           // √ ACCURATE
 //         console.log('currentAllAssets:%s', Number(pair.currentAllAssets.value))
 //         console.log('pair.totalCollateralAmount.value:%s', Number(pair.totalCollateralAmount.value))
