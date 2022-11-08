@@ -154,11 +154,11 @@ async function getUserInfo(ctx) {
     // USER DETAILS //
     const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18
     const userAssetBalance
-        = aTicker == 'WNATIVE'
+        = aTicker == 'WAVAX'
             ? nativeBalance
             : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
     const userCollateralBalance
-        = cTicker == 'WNATIVE'
+        = cTicker == 'WAVAX'
             ? nativeBalance
             : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
     const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
