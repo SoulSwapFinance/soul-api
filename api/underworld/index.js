@@ -157,12 +157,12 @@ async function getUserInfo(ctx) {
     const userAssetBalance
         = aTicker == 'WAVAX'
             ? nativeBalance
-            : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
+            : await AssetContract.methods.balanceOf(userAddress).call()
     const userCollateralBalance
         = cTicker == 'WAVAX'
             ? nativeBalance
-            : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
-    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
+            : await CollateralContract.methods.balanceOf(userAddress).call()
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call()
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
 
