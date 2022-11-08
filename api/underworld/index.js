@@ -109,7 +109,6 @@ async function getUserInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id)
     const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress)
     const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
-    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress)
     const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS)
 
