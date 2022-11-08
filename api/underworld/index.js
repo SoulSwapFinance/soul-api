@@ -1,6 +1,6 @@
 'use strict'
 const {web3Factory} = require("../../utils/web3")
-const { CHAIN_ID, BTC_ORACLE_ADDRESS, MULTICALL_ADDRESS } = require("../../constants")
+const { CHAIN_ID, BTC, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, MULTICALL_ADDRESS } = require("../../constants")
 
 const web3 = web3Factory( CHAIN_ID )
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json')
@@ -36,7 +36,10 @@ async function getPairInfo(ctx) {
     const aTicker = await AssetContract.methods.symbol().call()
     const aDecimals = await AssetContract.methods.decimals().call()
     const aDivisor = 10**aDecimals
-    const aPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1e18
+    const aPrice
+        = aAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+            : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
 
     const assetCall = await PairContract.methods.totalAsset().call()
     const totalAssetElastic = assetCall[0]
@@ -48,7 +51,10 @@ async function getPairInfo(ctx) {
     const cTicker = await CollateralContract.methods.symbol().call()
     const cDecimals = await CollateralContract.methods.decimals().call()
     const cDivisor = 10**cDecimals
-    const cPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1e18
+    const cPrice
+        = cAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // BORROW DETAILS
     const borrowElastic = await PairContract.methods.totalBorrow().call()
@@ -122,8 +128,8 @@ async function getUserInfo(ctx) {
     const aDivisor = 10 ** aDecimals
     const aPrice
         = aAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
-            : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
+        ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
     
     // COLLATERAL DETAILS //
     const cAddress = await PairContract.methods.collateral().call()
@@ -133,8 +139,8 @@ async function getUserInfo(ctx) {
     const cDivisor = 10 ** cDecimals
     const cPrice
         = cAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
-            : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
+        ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // TOTAL DETAILS //
     const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0]
@@ -143,16 +149,16 @@ async function getUserInfo(ctx) {
     const totalAssetBase = await PairContract.methods.totalAsset().call()[1]
     
     // USER DETAILS //
-    const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call() / 1e18
+    const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call()
     const userAssetBalance 
         = aTicker == 'WFTM' 
             ? nativeBalance 
-            : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
+            : await AssetContract.methods.balanceOf(userAddress).call()
     const userCollateralBalance 
         = cTicker == 'WFTM' 
             ? nativeBalance
-            : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
-    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
+            : await CollateralContract.methods.balanceOf(userAddress).call()
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call()
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
 
