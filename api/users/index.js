@@ -61,7 +61,7 @@ async function getTokenInfo(ctx) {
     
     const tokenPrice 
         = tokenAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1E18
 
     const totalSupply = await TokenContract.methods.totalSupply().call();

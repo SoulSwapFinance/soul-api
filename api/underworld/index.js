@@ -38,7 +38,7 @@ async function getPairInfo(ctx) {
     const aDivisor = 10 ** aDecimals
     const aPrice
         = aAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
 
     const assetCall = await PairContract.methods.totalAsset().call()
@@ -54,7 +54,7 @@ async function getPairInfo(ctx) {
     const cDivisor = 10 ** cDecimals
     const cPrice
         = cAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            ? await BtcOracleContract.methods.latestAnswer().call() / cDivisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // BORROW DETAILS
@@ -131,7 +131,7 @@ async function getUserInfo(ctx) {
     const aDecimals = await AssetContract.methods.decimals().call()
     const aPrice
         = aAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(aAddress).call() / 1E18
 
     // COLLATERAL DETAILS //
@@ -141,8 +141,9 @@ async function getUserInfo(ctx) {
     const cDecimals = await CollateralContract.methods.decimals().call()
     const cDivisor = 10 ** cDecimals
     const aDivisor = 10 ** aDecimals
-    const cPrice = cAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+    const cPrice 
+        = cAddress == BTC
+            ? await BtcOracleContract.methods.latestAnswer().call() / cDivisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // TOTAL DETAILS //
@@ -156,12 +157,12 @@ async function getUserInfo(ctx) {
     const userAssetBalance
         = aTicker == 'WAVAX'
             ? nativeBalance
-            : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
+            : await AssetContract.methods.balanceOf(userAddress).call()
     const userCollateralBalance
         = cTicker == 'WAVAX'
             ? nativeBalance
-            : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
-    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
+            : await CollateralContract.methods.balanceOf(userAddress).call()
+    const userBalance = await PairContract.methods.balanceOf(userAddress).call()
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
 

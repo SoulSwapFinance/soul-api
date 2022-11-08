@@ -20,12 +20,13 @@ async function getCoffinInfo(ctx) {
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
+    const tokenDivisor = 10**tokenDecimals
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const tokenPrice 
         = tokenAddress === LUM ? 0 
             : tokenAddress === SOR ? 0 
             : tokenAddress === BTC 
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8 
+            ? await BtcOracleContract.methods.latestAnswer().call() / tokenDivisor 
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(ctx.params.id).call() / 1e18
             ?? 0
     const divisor = 10**tokenDecimals
@@ -83,12 +84,13 @@ async function getUserInfo(ctx) {
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
+    const tokenDivisor = 10**tokenDecimals
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const rawPrice 
         = tokenAddress === LUM ? 0 
             : tokenAddress === SOR ? 0
             : tokenAddress == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            ? await BtcOracleContract.methods.latestAnswer().call() / tokenDivisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(ctx.params.id).call() / 1E18 
             ?? 0;
     const tokenPrice = rawPrice

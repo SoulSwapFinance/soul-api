@@ -55,7 +55,7 @@ const token0Divisor = 10**(token0Decimals)
 const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
 const token0Price 
     = token0 == BTC
-    ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+    ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
     : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
 const lpPrice = lpValuePaired / lpSupply
