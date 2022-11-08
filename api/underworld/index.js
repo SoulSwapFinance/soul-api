@@ -53,7 +53,7 @@ async function getPairInfo(ctx) {
     const cDivisor = 10**cDecimals
     const cPrice
         = cAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+        ? await BtcOracleContract.methods.latestAnswer().call() / cDivisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // BORROW DETAILS
@@ -139,7 +139,7 @@ async function getUserInfo(ctx) {
     const cDivisor = 10 ** cDecimals
     const cPrice
         = cAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / aDivisor
+        ? await BtcOracleContract.methods.latestAnswer().call() / cDivisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // TOTAL DETAILS //
