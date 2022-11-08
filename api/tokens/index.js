@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, LUM, SOR } = require("../../constants");
+const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, LUM, BTC, BTC_ORACLE_ADDRESS, SOR } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
@@ -12,19 +12,22 @@ async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
-
+    const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+    const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
+    
     // METHOD CALLS //
     const totalSupply = await TokenContract.methods.totalSupply().call();
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
-    const rawPrice 
-        = tokenAddress === LUM ? 0 
-            // : tokenAddress === SOR ? 0 
-            : await PriceFetcherContract.methods
-                .currentTokenUsdcPrice(tokenAddress).call() ?? 0;
-    const tokenPrice = rawPrice / 1e18
     const divisor = 10**tokenDecimals
+
+    const tokenPrice
+        = tokenAddress === LUM ? 0 
+        : tokenAddress == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / divisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1E18
+
     const marketCap = totalSupply * tokenPrice / divisor
     const luxorTreasuryBalance = await TokenContract.methods.balanceOf(LUXOR_TREASURY_ADDRESS).call();
 
