@@ -4,7 +4,8 @@ const {web3Factory} = require("../../utils/web3");
 const { 
   CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, 
   NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS,
-  NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS
+  NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS,
+  BTC, BTC_ORACLE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -15,6 +16,8 @@ const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
 const SummonerContractABI = require('../../abis/SummonerContractABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
 
 // CONTRACTS //
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
@@ -54,7 +57,12 @@ const token0Divisor = 10**(token0Decimals)
 
 // Prices & Value Locked //
 const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
-const token0Price = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
+
+const token0Price 
+    = token0 == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+
 const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
 const lpPrice = lpValuePaired / lpSupply
 
