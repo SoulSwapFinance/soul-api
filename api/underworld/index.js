@@ -109,6 +109,7 @@ async function getUserInfo(ctx) {
     const pairAddress = web3.utils.toChecksumAddress(ctx.params.id)
     const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress)
     const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
+    const PairContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
     const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress)
     const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS)
 
@@ -156,7 +157,11 @@ async function getUserInfo(ctx) {
     const userAssetBalance
         = aTicker == 'WNATIVE'
             ? nativeBalance
-            : await AssetContract.methods.balanceOf(userAddress).call() / pairDivisor
+            : await AssetContract.methods.balanceOf(userAddress).call() / aDivisor
+    const userCollateralBalance
+        = cTicker == 'WNATIVE'
+            ? nativeBalance
+            : await CollateralContract.methods.balanceOf(userAddress).call() / cDivisor
     const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
@@ -195,6 +200,7 @@ async function getUserInfo(ctx) {
             "borrowTotalElastic": totalBorrowElastic,
 
             "userAssetBalance": userAssetBalance,
+            "userCollateralBalance": userCollateralBalance,
             "userBalance": userBalance,
             "userBorrowPart": userBorrowPart,
             "userCollateralShare": userCollateralShare,
