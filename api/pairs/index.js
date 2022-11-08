@@ -60,12 +60,12 @@ async function getPairInfo(ctx) {
 
     const token0Price   
         = token0Address == BTC 
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
     
     const token1Price 
         = token1Address == BTC 
-            ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+            ? await BtcOracleContract.methods.latestAnswer().call() / token1Divisor
             : await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1E18
     
     const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
@@ -152,11 +152,11 @@ async function getUserPairInfo(ctx) {
     // Prices & Value Locked //
     const token0Price 
         = token0 == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
     const token1Price 
         = token1 == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / token1Divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token1).call() / 1e18
 
     const lpValuePaired 

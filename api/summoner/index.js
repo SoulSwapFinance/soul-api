@@ -168,7 +168,7 @@ async function getUserInfo(ctx) {
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price 
         = token0 == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1e18
 
     const lpValuePaired 
@@ -275,7 +275,7 @@ async function getPoolInfo(ctx) {
     const annualRewardsValue = soulPrice * annualRewardsPool
     const token0Price
         = token0 == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 
     const lpValuePaired 

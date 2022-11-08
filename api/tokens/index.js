@@ -18,9 +18,10 @@ async function getTokenInfo(ctx) {
     const tokenSymbol = await TokenContract.methods.symbol().call();
     const tokenName = await TokenContract.methods.name().call();
     const tokenDecimals = await TokenContract.methods.decimals().call();
+    const tokenDivisor = 10**tokenDecimals
     const tokenPrice
         = tokenAddress == BTC
-        ? await BtcOracleContract.methods.latestAnswer().call() / 1E8
+        ? await BtcOracleContract.methods.latestAnswer().call() / tokenDivisor
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(tokenAddress).call() / 1E18 
         ?? 0
 
