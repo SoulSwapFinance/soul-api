@@ -2,9 +2,9 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  CHAIN_ID, SOUL, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, 
+  CHAIN_ID, SOUL, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, BTC,
   NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, SOUL_BOND,
-  NATIVE_BNB_LP, NATIVE_SEANCE_LP, PRICE_FETCHER_ADDRESS
+  NATIVE_BNB_LP, NATIVE_SEANCE_LP, PRICE_FETCHER_ADDRESS, BTC_ORACLE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -12,6 +12,9 @@ const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
 const BondContractABI = require('../../abis/BondContractABI.json');
+const UnderworldContractABI = require('../../abis/UnderworldContractABI.json');
+const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
+const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
 
 // CONTRACTS //
 const BondContract = new web3.eth.Contract(BondContractABI, SOUL_BOND);
@@ -147,48 +150,93 @@ async function getBondInfo(ctx) {
     const pid = ctx.params.pid
     const poolInfo = await BondContract.methods.poolInfo(pid).call()
     const pairAddress = poolInfo[0]
+    const allocPoint = poolInfo[1]
+    const totalAllocPoint = await BondContract.methods.totalAllocPoint().call()
+    const allocShare = allocPoint / totalAllocPoint * 100
     // console.log('pairAddress: %s', pairAddress)
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+    const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
+    const pairType
+    = pid >=10 
+          ? 'underworld' 
+        : 'farm'
+
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
     
-    const token0Address = await PairContract.methods.token0().call();
-    const token1Address = await PairContract.methods.token1().call();
+    const token0
+    = pairType == 'farm'
+    ? await PairContract.methods.token0().call()
+    : await UnderworldContract.methods.asset().call()
 
-    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0Address)
-    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1Address)
+    const token1
+    = pairType == 'farm'
+        ? await PairContract.methods.token1().call()
+        : await UnderworldContract.methods.collateral().call()
+        
+    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0)
+    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1)
 
     const token0Symbol = await Token0Contract.methods.symbol().call();
     const token1Symbol = await Token1Contract.methods.symbol().call();
 
-    const pairDecimals = await PairContract.methods.decimals().call();
-    const pairDivisor = 10**pairDecimals
+    // Abstracta Mathematica //
+    const pairDecimals = await PairContract.methods.decimals().call()
+    const token0Decimals = await Token0Contract.methods.decimals().call()
+    const token1Decimals = await Token1Contract.methods.decimals().call()
+    const pairDivisor = 10**(pairDecimals)
+    const token0Divisor = 10**(token0Decimals)
+    const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
     const pairSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
-    const pairPrice = await getPairPrice(pairAddress)
+    // const pairPrice = await getPairPrice(pairAddress)
+    const token0Price 
+    = token0 == BTC
+        ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+    const pairPrice 
+        = pairType == 'farm'
+        // 2x the value of half the pair.
+        ? token0Price * token0Balance * 2
+        // 100% of the asset token amount * asset token price
+        : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+
     const marketCap = pairPrice * pairSupply
-    
-    // VALUES //
+
+    // Tótalîstá //
+    const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+    const lpBalance = await PairContract.methods.balanceOf(SOUL_BOND).call() / pairDivisor;
+    const lpShare = lpBalance / lpSupply * 100;
+
+    // PRICES & VALUES //
+    const annualRewards = await BondContract.methods.dailySoul().call() / 1e18 * 365 
+    const annualRewardsPool = allocShare * annualRewards / 100
+
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
     const soulPrice = rawSoulPrice / 1e18
-    const annualRewardsSummoner = await BondContract.methods.dailySoul().call() / 1e18 * 365 
-    
-    const allocPoint = poolInfo[1]
-    const totalAllocPoint = await BondContract.methods.totalAllocPoint().call()
-    const allocShare = allocPoint / totalAllocPoint * 100
-    const annualRewardsPool = allocShare * annualRewardsSummoner / 100
-
     const annualRewardsValue = soulPrice * annualRewardsPool
-    const pairTVL = await getPoolTvl(pairAddress)
-    const apr = annualRewardsValue / pairTVL * 100
+    const lpValuePaired 
+        = pairType == 'farm'
+        // 2x the value of half the pair.
+        ? token0Price * token0Balance * 2
+        // 100% of the asset token amount * asset token price
+        : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+    
+    const lpPrice = lpValuePaired / lpSupply
+    const pairTVL = lpPrice * lpBalance
+       /* = pid == 8 // force fix for btc pools
+        ? 2 * lpPrice * lpBalance
+        : lpPrice * lpBalance */
+
+    const apr = pairTVL == 0 ? 0 : annualRewardsValue / pairTVL * 100
 
     // VALUES //
         return {
             "address": pairAddress,
             "name": pairName,
             "symbol": pairSymbol,
-            "token0": token0Address,
-            "token1": token1Address,
+            "token0": token0,
+            "token1": token1,
             "token0Symbol": token0Symbol,
             "token1Symbol": token1Symbol,
 
@@ -215,23 +263,59 @@ async function getUserInfo(ctx) {
     const pairAddress = poolInfo[0]
     // console.log('pairAddress: %s', pairAddress)
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
+    const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress);
+
     const pairName = await PairContract.methods.name().call();
     const pairSymbol = await PairContract.methods.symbol().call();
+    const pairType
+    = pid >=10 
+          ? 'underworld' 
+        : 'farm'
     
-    const token0Address = await PairContract.methods.token0().call();
-    const token1Address = await PairContract.methods.token1().call();
+    // const token0 = await PairContract.methods.token0().call();
+    // const token1 = await PairContract.methods.token1().call();
 
-    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0Address)
-    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1Address)
+    const token0
+    = pairType == 'farm'
+    ? await PairContract.methods.token0().call()
+    : await UnderworldContract.methods.asset().call()
+
+    const token1
+    = pairType == 'farm'
+        ? await PairContract.methods.token1().call()
+        : await UnderworldContract.methods.collateral().call()
+
+    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0)
+    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1)
 
     const token0Symbol = await Token0Contract.methods.symbol().call();
     const token1Symbol = await Token1Contract.methods.symbol().call();
 
-    const pairDecimals = await PairContract.methods.decimals().call();
-    const pairDivisor = 10**pairDecimals
+    // const token1Balance = await Token1Contract.methods.balanceOf(pairAddress).call() / token1Divisor;
+    
+    // Abstracta Mathematica //
+    const pairDecimals = await PairContract.methods.decimals().call()
+    // const token0Decimals = await Token0Contract.methods.decimals().call()
+    // const token1Decimals = await Token1Contract.methods.decimals().call()
+    const pairDivisor = 1e18 // 10**(pairDecimals)
+    const token0Divisor = 1e18 // 10**(token0Decimals)
+    // const token1Divisor = 10**(token1Decimals)
+    
+    const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
     const pairSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
-    const pairPrice = await getPairPrice(pairAddress)
+    // const pairPrice = await getPairPrice(pairAddress)
+    const token0Price 
+    // = token0 == BTC
+        // ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+    const pairPrice 
+        = pairType == 'farm'
+        // 2x the value of half the pair.
+        ? token0Price * token0Balance * 2
+        // 100% of the asset token amount * asset token price
+        : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+
     const marketCap = pairPrice * pairSupply
 
     // VALUES //
@@ -244,8 +328,8 @@ async function getUserInfo(ctx) {
             "address": pairAddress,
             "name": pairName,
             "symbol": pairSymbol,
-            "token0": token0Address,
-            "token1": token1Address,
+            "token0": token0,
+            "token1": token1,
             "token0Symbol": token0Symbol,
             "token1Symbol": token1Symbol,
 
