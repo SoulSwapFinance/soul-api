@@ -1,6 +1,6 @@
 'use strict'
 const {web3Factory} = require("../../utils/web3")
-const { CHAIN_ID, BTC, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, MULTICALL_ADDRESS } = require("../../constants")
+const { CHAIN_ID, BTC, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, COFFINBOX_ADDRESS, MULTICALL_ADDRESS } = require("../../constants")
 
 const web3 = web3Factory( CHAIN_ID )
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json')
@@ -11,6 +11,8 @@ const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHE
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS)
 const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json')
 const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
+const CoffinContractABI = require('../../abis/CoffinContractABI.json')
+const CoffinContract = new web3.eth.Contract(CoffinContractABI, COFFINBOX_ADDRESS)
 
 const BN = require('bn.js')
 
@@ -143,11 +145,15 @@ async function getUserInfo(ctx) {
         : await PriceFetcherContract.methods.currentTokenUsdcPrice(cAddress).call() / 1E18
 
     // TOTAL DETAILS //
-    const totalBorrowElastic = await PairContract.methods.totalBorrow().call()[0]
-    const totalBorrowBase = await PairContract.methods.totalBorrow().call()[1]
-    const totalAssetElastic = await PairContract.methods.totalAsset().call()[0]
-    const totalAssetBase = await PairContract.methods.totalAsset().call()[1]
-    
+    const borrowInfo = await PairContract.methods.totalBorrow().call()
+    const assetInfo = await PairContract.methods.totalAsset().call()
+
+    const totalBorrowElastic = borrowInfo[0]
+    const totalBorrowBase = borrowInfo[1]
+
+    const totalAssetElastic = assetInfo[0]
+    const totalAssetBase = assetInfo[1]
+
     // USER DETAILS //
     const nativeBalance = await MulticallContract.methods.getEthBalance(userAddress).call()
     const userAssetBalance 
@@ -161,6 +167,9 @@ async function getUserInfo(ctx) {
     const userBalance = await PairContract.methods.balanceOf(userAddress).call()
     const userBorrowPart = await PairContract.methods.userBorrowPart(userAddress).call()
     const userCollateralShare = await PairContract.methods.userCollateralShare(userAddress).call()
+
+    // MORE DETAILS //
+    const coffinToShare = await CoffinContract.methods.toShare(aAddress, totalBorrowElastic, true).call()
 
     if (!("id" in ctx.params))
         return {"name": "Underworld Pairs"}
@@ -194,6 +203,7 @@ async function getUserInfo(ctx) {
             "collateralLogoURI": `https://raw.githubusercontent.com/soulswapfinance/assets/prod/blockchains/fantom/assets/${cAddress}/logo.png`,            
             "borrowTotalBase": totalBorrowBase,
             "borrowTotalElastic": totalBorrowElastic,
+            "coffinToShare": coffinToShare,
 
             "userAssetBalance": userAssetBalance,
             "userCollateralBalance": userCollateralBalance,
