@@ -255,9 +255,13 @@ async function getUserInfo(ctx) {
     // BOND PAIR INFO //
     const pid = ctx.params.pid
     const userAddress = web3.utils.toChecksumAddress(ctx.params.userAddress);
-
+    
     const poolInfo = await BondContract.methods.poolInfo(pid).call()
     const userInfo = await BondContract.methods.userInfo(pid, userAddress).call()
+    
+    const allocPoint = poolInfo[1]
+    const totalAllocPoint = await BondContract.methods.totalAllocPoint().call()
+    const allocShare = allocPoint / totalAllocPoint * 100
 
     const pendingSoul = await BondContract.methods.pendingSoul(pid, userAddress).call()
     const pairAddress = poolInfo[0]
@@ -271,9 +275,6 @@ async function getUserInfo(ctx) {
     = pid >=10 
           ? 'underworld' 
         : 'farm'
-    
-    // const token0 = await PairContract.methods.token0().call();
-    // const token1 = await PairContract.methods.token1().call();
 
     const token0
     = pairType == 'farm'
@@ -292,37 +293,65 @@ async function getUserInfo(ctx) {
     const token1Symbol = await Token1Contract.methods.symbol().call();
 
     // const token1Balance = await Token1Contract.methods.balanceOf(pairAddress).call() / token1Divisor;
-    
+
+
     // Abstracta Mathematica //
     const pairDecimals = await PairContract.methods.decimals().call()
-    // const token0Decimals = await Token0Contract.methods.decimals().call()
-    // const token1Decimals = await Token1Contract.methods.decimals().call()
-    const pairDivisor = 1e18 // 10**(pairDecimals)
-    const token0Divisor = 1e18 // 10**(token0Decimals)
+    const token0Decimals = await Token0Contract.methods.decimals().call()
+    const token1Decimals = await Token1Contract.methods.decimals().call()
+    const pairDivisor = 10**(pairDecimals)
+    const token0Divisor = 10**(token0Decimals)
     // const token1Divisor = 10**(token1Decimals)
     
     const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor;
-    const pairSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+    
+    // Tótalîstá //
+    const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
+    const lpBalance = await PairContract.methods.balanceOf(SOUL_BOND).call() / pairDivisor;
+    const lpShare = lpBalance / lpSupply * 100;
 
-    // const pairPrice = await getPairPrice(pairAddress)
+    // PRICES & VALUES //
+    const annualRewards = await BondContract.methods.dailySoul().call() / 1e18 * 365 
+    const annualRewardsPool = allocShare * annualRewards / 100
+
     const token0Price 
-    // = token0 == BTC
-        // ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-        = await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
-    const pairPrice 
+    = token0 == BTC
+    ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+    : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+    // const pairPrice 
+    // = pairType == 'farm'
+    // // 2x the value of half the pair.
+    // ? token0Price * token0Balance * 2
+    // // 100% of the asset token amount * asset token price
+    // : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+    
+    
+    const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
+    const soulPrice = rawSoulPrice / 1e18
+    const annualRewardsValue = soulPrice * annualRewardsPool
+    const lpValuePaired 
         = pairType == 'farm'
         // 2x the value of half the pair.
         ? token0Price * token0Balance * 2
         // 100% of the asset token amount * asset token price
         : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+    
+    const lpPrice = lpValuePaired / lpSupply
+    
+    const pairTVL = lpPrice * lpBalance
+       /* = pid == 8 // force fix for btc pools
+        ? 2 * lpPrice * lpBalance
+        : lpPrice * lpBalance */
+    
+    const marketCap = lpPrice * lpSupply
 
-    const marketCap = pairPrice * pairSupply
-
-    // VALUES //
-    const userBalance = await PairContract.methods.balanceOf(userAddress).call() / pairDivisor;
+    
+    // USER INFO //
     const stakedBalance = userInfo[0] / pairDivisor
-    const userTVL = stakedBalance * pairPrice
-    const pairTVL = await getPoolTvl(pairAddress)
+    const userBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
+    const stakedValue = lpPrice * stakedBalance
+
+    // const apr = pairTVL == 0 ? 0 : annualRewardsValue / pairTVL * 100
 
         return {
             "address": pairAddress,
@@ -335,8 +364,8 @@ async function getUserInfo(ctx) {
 
             // PAIR VALUES
             "decimals": pairDecimals,
-            "pairPrice": pairPrice,
-            "supply": pairSupply,
+            "pairPrice": lpPrice,
+            "supply": lpSupply,
             "mcap": marketCap,
             "tvl": pairTVL,
 
@@ -344,9 +373,9 @@ async function getUserInfo(ctx) {
             "userBalance": userBalance,
             "stakedBalance": stakedBalance,
             "pendingSoul": pendingSoul,
-            "userTvl": userTVL,
+            "userTvl": stakedValue,
 
-            "api": `https://api.soulswap.finance/bonds/${pid}`,
+            "api": `https://api.soulswap.finance/bonds/user/${userAddress}/${pid}`,
         }
 }
 
