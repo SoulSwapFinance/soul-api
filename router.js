@@ -16,6 +16,7 @@ const luxor = require('./api/luxor');
 const underworld = require('./api/underworld');
 const coffin = require('./api/coffinbox');
 const summoner = require('./api/summoner');
+const defarm = require('./api/defarm');
 const soulswap = require('./api/soulswap');
 const crosschain = require('./api/crosschain');
 const bonds = require('./api/bonds');
@@ -61,6 +62,10 @@ router.get('/summoner', summoner.infos)
 router.get('/summoner/stake/users/:userAddress', summoner.stakeInfo)
 router.get('/summoner/:id', summoner.poolInfo)
 router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
+
+router.get('/defarm', defarm.infos)
+router.get('/defarm/:id', defarm.poolInfo)
+router.get('/defarm/users/:userAddress/:id', defarm.userInfo)
 
 router.get('/soulswap', soulswap.infos)
 router.get('/soulswap/vault', soulswap.vaultInfo)
