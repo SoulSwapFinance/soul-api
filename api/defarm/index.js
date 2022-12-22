@@ -146,13 +146,17 @@ async function getPoolInfo(ctx) {
     const status = rewardRemaining == 0 ? 'inactive' : 'active'
     
     // Pair Pricing //
-    const PairContract = new web3.eth.Contract(PairContractABI, depositToken);
+    const PairContract = new web3.eth.Contract(PairContractABI, depositToken)
     const token0 = await PairContract.methods.token0().call()
     const token1 = await PairContract.methods.token1().call()
     
     // Create Contracts //
-    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
-    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1);    
+    const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0)
+    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1)
+    const RewardTokenContract = new web3.eth.Contract(ERC20ContractABI, rewardToken)
+
+    // Reward Token Details //
+    const rewardSymbol = await RewardTokenContract.methods.symbol().call()
     
     // Abstracta Mathematica //
     const DIVISOR = 1e18
@@ -184,6 +188,7 @@ async function getPoolInfo(ctx) {
         "pid": pid,
         "name": name,
         "symbol": symbol,
+        "rewardSymbol": rewardSymbol,
         "logoURI": logoURI,
         "mAddress": mAddress,
         "lpAddress": depositToken,
