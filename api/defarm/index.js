@@ -152,9 +152,7 @@ async function getPoolInfo(ctx) {
     
     // Create Contracts //
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
-    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1);
-    const ManifestationContract = new web3.eth.Contract(ManifestationContractABI, mAddress);
-    
+    const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1);    
     
     // Abstracta Mathematica //
     const DIVISOR = 1e18
