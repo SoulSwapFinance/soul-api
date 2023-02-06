@@ -140,10 +140,10 @@ async function getUserInfo(ctx) {
 
     const lpSupply = await PairContract.methods.totalSupply().call() / pairDivisor;
 
-    const lendingPids = [13, 14, 15, 17, 18]
+    // const lendingPids = [13, 14, 15, 17, 18]
     
     const pairType
-        = (pid >= 13 && pid <= 18 && pid != 16) 
+        = (pid >= 13 && pid <= 18 && pid != 16 && pid >= 19 && pid <= 23) 
               ? 'underworld' 
             : 'farm'
   
@@ -226,10 +226,10 @@ async function getPoolInfo(ctx) {
     const allocShare = allocPoint / totalAllocPoint * 100
 
     const status = allocPoint == 0 ? 'inactive' : 'active'
-    const lendingPids = [13, 14, 15, 17, 18]
+    // const lendingPids = [13, 14, 15, 17, 18]
     
     const pairType
-        = (pid >= 13 && pid <= 18 && pid != 16) 
+        = (pid >= 13 && pid <= 18 && pid != 16 && pid >= 19 && pid <= 23) 
               ? 'underworld' 
             : 'farm'
 
