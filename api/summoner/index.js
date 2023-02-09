@@ -143,8 +143,8 @@ async function getUserInfo(ctx) {
     // const lendingPids = [13, 14, 15, 17, 18]
     
     const pairType
-    = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 /* && pid <= 23 */) ) 
-    ? 'underworld' 
+        = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 && pid <= 24) ) 
+            ? 'underworld' 
             : 'farm'
   
     // Pair Pricing //
@@ -229,7 +229,7 @@ async function getPoolInfo(ctx) {
     // const lendingPids = [13, 14, 15, 17, 18]
     
     const pairType
-            = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 /* && pid <= 23 */) ) 
+        = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 && pid <= 24) ) 
             ? 'underworld' 
             : 'farm'
 
