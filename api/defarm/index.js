@@ -131,29 +131,30 @@ async function getPoolInfo(ctx) {
     const poolInfo = await DeFarmContract.methods.getInfo(pid).call()
     
     const mAddress = poolInfo[0]
-    const name = poolInfo[1]
-    const symbol = poolInfo[2]
-    const logoURI = poolInfo[3]
-    const rewardToken = poolInfo[4]
-    const depositToken = poolInfo[5]
-    const rewardPerSecond = poolInfo[6]
-    const rewardRemaining = poolInfo[7]
-    const startTime = poolInfo[8]
-    const endTime = poolInfo[9]
-    const dailyReward = poolInfo[10]
-    const feeDays = poolInfo[11]
+    const daoAddress = poolInfo[1]
+    const name = poolInfo[2]
+    const symbol = poolInfo[3]
+    const logoURI = poolInfo[4]
+    const rewardAddress = poolInfo[5]
+    const depositAddress = poolInfo[6]
+    const rewardPerSecond = poolInfo[7]
+    const rewardRemaining = poolInfo[8]
+    const startTime = poolInfo[9]
+    const endTime = poolInfo[10]
+    const dailyReward = poolInfo[11]
+    const feeDays = poolInfo[12]
     
     const status = rewardRemaining == 0 ? 'inactive' : 'active'
     
     // Pair Pricing //
-    const PairContract = new web3.eth.Contract(PairContractABI, depositToken)
+    const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
     const token0 = await PairContract.methods.token0().call()
     const token1 = await PairContract.methods.token1().call()
     
     // Create Contracts //
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0)
     const Token1Contract = new web3.eth.Contract(ERC20ContractABI, token1)
-    const RewardTokenContract = new web3.eth.Contract(ERC20ContractABI, rewardToken)
+    const RewardTokenContract = new web3.eth.Contract(ERC20ContractABI, rewardAddress)
 
     // Reward Token Details //
     const rewardSymbol = await RewardTokenContract.methods.symbol().call()
@@ -167,11 +168,11 @@ async function getPoolInfo(ctx) {
     const lpBalance = await PairContract.methods.balanceOf(DEFARM_ADDRESS).call() / DIVISOR;
     const lpShare = lpBalance / lpSupply * 100;
     
-    const token0Balance = await Token0Contract.methods.balanceOf(depositToken).call() / DIVISOR;
-    const token1Balance = await Token1Contract.methods.balanceOf(depositToken).call() / DIVISOR;
+    const token0Balance = await Token0Contract.methods.balanceOf(depositAddress).call() / DIVISOR;
+    const token1Balance = await Token1Contract.methods.balanceOf(depositAddress).call() / DIVISOR;
     
     // PRICES & VALUES //
-    const rawRewardPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(rewardToken).call();    
+    const rawRewardPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(rewardAddress).call();    
     const rewardPrice = rawRewardPrice / 1e18
     const annualRewardsValue = rewardPrice * annualRewardsPool
     const token0Price
@@ -191,8 +192,8 @@ async function getPoolInfo(ctx) {
         "rewardSymbol": rewardSymbol,
         "logoURI": logoURI,
         "mAddress": mAddress,
-        "lpAddress": depositToken,
-        "rewardToken": rewardToken,
+        "lpAddress": depositAddress,
+        "rewardToken": rewardAddress,
         "rewardRemaining": rewardRemaining,
         "status": status,
         "pairType": 'farm',
