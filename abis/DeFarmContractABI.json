@@ -8,6 +8,11 @@
             },
             {
                 "internalType": "address",
+                "name": "_auraAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_usdcAddress",
                 "type": "address"
             },
@@ -185,6 +190,19 @@
         "name": "addEnchanter",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "auraAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
