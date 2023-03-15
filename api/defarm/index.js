@@ -39,27 +39,33 @@ async function getUserInfo(ctx) {
 
     // Pool Info //
     const poolInfo = await DeFarmContract.methods.getInfo(pid).call()
+    
     const mAddress = poolInfo[0]
-    const rewardToken = poolInfo[4]
-    const depositToken = poolInfo[5]
-    const dailyReward = poolInfo[10]
+    const daoAddress = poolInfo[1]
+    const name = poolInfo[2]
+    const symbol = poolInfo[3]
+    const logoURI = poolInfo[4]
+    const rewardAddress = poolInfo[5]
+    const depositAddress = poolInfo[6]
+    const rewardPerSecond = poolInfo[7]
+    const rewardRemaining = poolInfo[8]
+    const startTime = poolInfo[9]
+    const endTime = poolInfo[10]
+    const dailyReward = poolInfo[11]
+    const feeDays = poolInfo[12]
 
     // Contracts //
-    const PairContract = new web3.eth.Contract(PairContractABI, depositToken)
+    const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
     const ManifestationContract = new web3.eth.Contract(ManifestationContractABI, mAddress);
     const token0 = await PairContract.methods.token0().call()
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
-    const token0Balance = await Token0Contract.methods.balanceOf(depositToken).call() / DIVISOR
+    const token0Balance = await Token0Contract.methods.balanceOf(depositAddress).call() / DIVISOR
 
     // Manifestation Details //
     const duraDays = await ManifestationContract.methods.duraDays().call()
-    const name = await ManifestationContract.methods.name().call()
-    const rewardPeriod = await ManifestationContract.methods.getRewardPeriod().call()
-    const startTime = rewardPeriod[0]
-    const endTime = rewardPeriod[1]
 
     // Reward Details //
-    const rawRewardPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(rewardToken).call();    
+    const rawRewardPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(rewardAddress).call();    
     const rewardPrice = rawRewardPrice / 1e18
     // const annualRewardsPool = Number(dailyReward) / DIVISOR * 365 
   
@@ -92,20 +98,18 @@ async function getUserInfo(ctx) {
     const stakedValue = lpPrice * stakedBalance
 
     // Fee: Rate & Time Remaining //
-    const feeSeconds = duraDays * 86_400
+    const feeSeconds = feeDays * 86_400
     const remainingSeconds = userDelta >= feeSeconds ? 0 : feeSeconds - userDelta
     const secondsRemaining = remainingSeconds <= 0 ? 0 : remainingSeconds
     const daysRemaining = secondsRemaining / 86_400
-    const daysPast = duraDays - daysRemaining
-    const rateMeow = duraDays - daysPast
-    const _currentRate = rateMeow == 0 ? 0 : rateMeow
-    const _feeRate = await ManifestationContract.methods.getFeeRate(daysPast).call() / DIVISOR
-    const currentRate = _currentRate > _feeRate ? _currentRate : _feeRate
+    const daysPast = feeDays - daysRemaining
+    const rateMeow = feeDays - daysPast
+    const currentRate = rateMeow == 0 ? 0 : rateMeow
 
     return {
             "userAddress": userAddress,
             "name": name,
-            "pairAddress": depositToken,
+            "pairAddress": depositAddress,
             "pendingRewards": pendingRewards,
             "pendingValue": pendingValue,
             "stakedBalance": stakedBalance,
@@ -192,6 +196,7 @@ async function getPoolInfo(ctx) {
         "rewardSymbol": rewardSymbol,
         "logoURI": logoURI,
         "mAddress": mAddress,
+        "daoAddress": daoAddress,
         "lpAddress": depositAddress,
         "rewardToken": rewardAddress,
         "rewardRemaining": rewardRemaining,

@@ -53,7 +53,6 @@ router.get('/luxor/users/:userAddress', luxor.userInfo)
 // router.get('/underworld', underworld.infos)
 router.get('/underworld/:id', underworld.pairInfo)
 router.get('/underworld/users/:userAddress/:id', underworld.userInfo)
-
 // router.get('/coffin', coffin.infos)
 router.get('/coffin/:id', coffin.coffinInfo)
 router.get('/coffin/users/:userAddress/:id', coffin.userInfo)
