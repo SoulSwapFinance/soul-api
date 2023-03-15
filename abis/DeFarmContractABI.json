@@ -23,18 +23,8 @@
             },
             {
                 "internalType": "address",
-                "name": "_nativeOracle",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
                 "name": "_enchantress",
                 "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_oracleDecimals",
-                "type": "uint256"
             },
             {
                 "internalType": "string",
@@ -505,6 +495,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "getManifestations",
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "",
+                "type": "uint256[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -518,19 +521,6 @@
                 "internalType": "uint256[]",
                 "name": "",
                 "type": "uint256[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getNativePrice",
-        "outputs": [
-            {
-                "internalType": "int256",
-                "name": "",
-                "type": "int256"
             }
         ],
         "stateMutability": "view",
@@ -763,6 +753,24 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "id",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "delayDays",
+                "type": "uint256"
+            }
+        ],
+        "name": "setDelay",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
