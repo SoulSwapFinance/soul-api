@@ -192,6 +192,7 @@ async function getPoolInfo(ctx) {
         "rewardSymbol": rewardSymbol,
         "logoURI": logoURI,
         "mAddress": mAddress,
+        "daoAddress": daoAddress,
         "lpAddress": depositAddress,
         "rewardToken": rewardAddress,
         "rewardRemaining": rewardRemaining,
