@@ -149,6 +149,8 @@ async function getPoolInfo(ctx) {
     const feeDays = poolInfo[12]
     
     const status = rewardRemaining == 0 ? 'inactive' : 'active'
+    // Manifestation Contract //
+    // const ManifestationContract = new web3.eth.Contract(ManifestationContractABI, mAddress)
     
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
@@ -169,7 +171,7 @@ async function getPoolInfo(ctx) {
 
     // Tótalîstá //
     const lpSupply = await PairContract.methods.totalSupply().call() / DIVISOR;
-    const lpBalance = await PairContract.methods.balanceOf(DEFARM_ADDRESS).call() / DIVISOR;
+    const lpBalance = await PairContract.methods.balanceOf(mAddress).call() / DIVISOR;
     const lpShare = lpBalance / lpSupply * 100;
     
     const token0Balance = await Token0Contract.methods.balanceOf(depositAddress).call() / DIVISOR;
