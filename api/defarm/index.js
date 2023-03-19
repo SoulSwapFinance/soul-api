@@ -6,7 +6,7 @@ const web3 = web3Factory(CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
-const DeFarmContractABI = require('../../abis/DeFarmContractABI.json');
+const DeFarmContractABI = require('../../abis/ManifesterContractABI.json');
 const ManifestationContractABI = require('../../abis/ManifestationContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
@@ -74,12 +74,12 @@ async function getUserInfo(ctx) {
     
     // User Info //
     const userInfo = await ManifestationContract.methods.getUserInfo(userAddress).call()
-    const amount = userInfo[1]
-    const rewardDebt = userInfo[2] / DIVISOR
-    const withdrawTime = userInfo[3]
-    const depositTime = userInfo[4]
-    // const timeDelta = userInfo[5]
-    // const deltaDays = userInfo[6]
+    const amount = userInfo[0]
+    const rewardDebt = userInfo[1] / DIVISOR
+    const withdrawTime = userInfo[2]
+    const depositTime = userInfo[3]
+    // const timeDelta = userInfo[4]
+    // const deltaDays = userInfo[5]
     
     const userDelta = await ManifestationContract.methods.getUserDelta(userAddress).call()
     const stakedBalance = amount / DIVISOR
