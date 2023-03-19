@@ -1,5 +1,35 @@
 [
     {
+        "inputs": [],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "enabled",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "msgSender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "ActiveToggled",
+        "type": "event"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
@@ -57,6 +87,12 @@
                 "internalType": "uint256",
                 "name": "feeDays",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
             }
         ],
         "name": "FeeDaysUpdated",
@@ -85,6 +121,155 @@
             }
         ],
         "name": "Harvested",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "creatorAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "assetAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "depositAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "rewardAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "Manifested",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "enabled",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "msgSender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "ReclaimableToggled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "msgSender",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "RewardsReclaimed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "duraDays",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "feeDays",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "dailyReward",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "RewardsSet",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "DAO",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "UpdatedDAO",
         "type": "event"
     },
     {
@@ -133,12 +318,45 @@
     },
     {
         "inputs": [],
+        "name": "Manifester",
+        "outputs": [
+            {
+                "internalType": "contract IManifester",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "accRewardPerShare",
         "outputs": [
             {
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "acceptDAO",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "assetAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -185,10 +403,10 @@
     },
     {
         "inputs": [],
-        "name": "depositToken",
+        "name": "depositAddress",
         "outputs": [
             {
-                "internalType": "contract IERC20",
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             }
@@ -344,19 +562,6 @@
     },
     {
         "inputs": [],
-        "name": "getPricePerToken",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "pricePerToken",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "getRewardPeriod",
         "outputs": [
             {
@@ -367,32 +572,6 @@
             {
                 "internalType": "uint256",
                 "name": "end",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTVL",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "tvl",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getTotalDeposit",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "totalDeposited",
                 "type": "uint256"
             }
         ],
@@ -500,7 +679,7 @@
     },
     {
         "inputs": [],
-        "name": "isActivated",
+        "name": "isActive",
         "outputs": [
             {
                 "internalType": "bool",
@@ -527,6 +706,32 @@
     {
         "inputs": [],
         "name": "isManifested",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "isNativePair",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "isReclaimable",
         "outputs": [
             {
                 "internalType": "bool",
@@ -590,44 +795,54 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "mID",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "_id",
+                "type": "uint256"
+            },
+            {
                 "internalType": "address",
-                "name": "_rewardToken",
+                "name": "_creatorAddress",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "_depositToken",
+                "name": "_assetAddress",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "_DAO",
+                "name": "_depositAddress",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "_manifester",
+                "name": "_rewardAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "string",
+                "name": "_logoURI",
+                "type": "string"
             }
         ],
         "name": "manifest",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "manifester",
-        "outputs": [
-            {
-                "internalType": "contract IManifester",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -645,12 +860,19 @@
     },
     {
         "inputs": [],
-        "name": "nativeSymbol",
+        "name": "reclaimRewards",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "rewardAddress",
         "outputs": [
             {
-                "internalType": "string",
+                "internalType": "address",
                 "name": "",
-                "type": "string"
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -670,23 +892,10 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "rewardToken",
-        "outputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_DAO",
+                "name": "_pendingDAO",
                 "type": "address"
             }
         ],
@@ -698,25 +907,17 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "requestor",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "delayDays",
                 "type": "uint256"
             }
         ],
         "name": "setDelay",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_feeDays",
-                "type": "uint256"
-            }
-        ],
-        "name": "setFeeDays",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -737,12 +938,12 @@
     {
         "inputs": [
             {
-                "internalType": "string",
-                "name": "_logoURI",
-                "type": "string"
+                "internalType": "bool",
+                "name": "enabled",
+                "type": "bool"
             }
         ],
-        "name": "setLogo",
+        "name": "setNativePair",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -750,12 +951,12 @@
     {
         "inputs": [
             {
-                "internalType": "string",
-                "name": "_logoURI",
-                "type": "string"
+                "internalType": "bool",
+                "name": "enabled",
+                "type": "bool"
             }
         ],
-        "name": "setLogoOverride",
+        "name": "setReclaimable",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -784,32 +985,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_soulDAO",
-                "type": "address"
-            }
-        ],
-        "name": "setSoulDAO",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "soulDAO",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "startTime",
         "outputs": [
@@ -820,6 +995,25 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_i",
+                "type": "uint256"
+            }
+        ],
+        "name": "stringifyUint",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "_string",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "pure",
         "type": "function"
     },
     {
@@ -862,33 +1056,7 @@
                 "type": "bool"
             }
         ],
-        "name": "toggleActive",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bool",
-                "name": "enabled",
-                "type": "bool"
-            }
-        ],
         "name": "toggleActiveOverride",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "bool",
-                "name": "enabled",
-                "type": "bool"
-            }
-        ],
-        "name": "toggleEmergency",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -908,6 +1076,19 @@
     },
     {
         "inputs": [],
+        "name": "totalDeposited",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "totalRewards",
         "outputs": [
             {
@@ -922,6 +1103,32 @@
     {
         "inputs": [],
         "name": "update",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_logoURI",
+                "type": "string"
+            }
+        ],
+        "name": "updateLogoURI",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_manifesterAddress",
+                "type": "address"
+            }
+        ],
+        "name": "updateManifester",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -981,19 +1188,6 @@
         "name": "withdraw",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "wnativeAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     }
 ]
