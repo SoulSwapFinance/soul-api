@@ -52,7 +52,7 @@ async function getUserInfo(ctx) {
     const startTime = poolInfo[9]
     const endTime = poolInfo[10]
     const dailyReward = poolInfo[11]
-    const feeDays = poolInfo[12]
+    const feeDays = poolInfo[12] / 1e18
 
     // Contracts //
     const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
