@@ -54,7 +54,7 @@ class Cache {
             ])
 
             // TOTAL SUPPLY - STAKING REWARDS (SEANCE) - DAO RESERVES - EXCHANGE LIQUIDITY
-            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[4])).sub(new BN(results[6]))
+            const circulatingSupply = new BN(results[0]).sub(new BN(results[2])).sub(new BN(results[6]))
 
             const lastRequestTimestamp = Date.now();
             this.cachedCirculatingSupply = {circulatingSupply, lastRequestTimestamp}
