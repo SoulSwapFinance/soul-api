@@ -70,7 +70,9 @@ return lpPrice
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
-    const stakedSoul = await SeanceV2Contract.methods.totalSupply().call() / 1e18;
+    const seanceSupply = await SeanceContract.methods.totalSupply().call() / 1e18;
+    const seanceV2Supply = await SeanceV2Contract.methods.totalSupply().call() / 1e18;
+    const stakedSoul = seanceSupply + seanceV2Supply;
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
     const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
     const marketCap = totalSupply * SoulPrice;
