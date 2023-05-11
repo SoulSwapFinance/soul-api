@@ -75,16 +75,16 @@ return lpPrice
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
-    const totalSoulUsdc = await SoulUsdcContract.methods.totalSupply().call() / 1e18;
-    const totalSoulNative = await NativeSoulContract.methods.totalSupply().call() / 1e18;
+    const totalSoulUsdc = await SoulUsdcContract.methods.totalSupply().call();
+    const totalSoulNative = await NativeSoulContract.methods.totalSupply().call();
 
     const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
 
-    const soulReservesNativePair = SoulContract.methods.balanceOf(NATIVE_SOUL_LP).call() / 1E18;
-    const soulReservesUSDCPair = SoulContract.methods.balanceOf(SOUL_USDC_LP).call() / 1E18; 
+    const soulReservesNativePair = SoulContract.methods.balanceOf(NATIVE_SOUL_LP).call();
+    const soulReservesUSDCPair = SoulContract.methods.balanceOf(SOUL_USDC_LP).call(); 
     
-    const soulPerUsdcPair = soulReservesUSDCPair / totalSoulUsdc;
-    const soulPerNativePair = soulReservesNativePair / totalSoulNative;
+    const soulPerUsdcPair = soulReservesUSDCPair / totalSoulUsdc / 1E18;
+    const soulPerNativePair = soulReservesNativePair / totalSoulNative / 1E18;
     
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
     const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
