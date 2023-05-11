@@ -2,10 +2,7 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, 
-  NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS,
-  NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS,
-  BTC, BTC_ORACLE_ADDRESS
+  CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, SEANCEV2, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS, NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS, BTC, BTC_ORACLE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -27,7 +24,7 @@ const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADD
 // Reserves //
 const SoulContract = new web3.eth.Contract(ERC20ContractABI, SOUL);
 const SeanceContract = new web3.eth.Contract(ERC20ContractABI, SEANCE);
-// const FantomContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE);
+const SeanceV2Contract = new web3.eth.Contract(ERC20ContractABI, SEANCEV2);
 
 // Protocol-Owned Liquidity (POL) //
 const NativeUsdcContract = new web3.eth.Contract(PairContractABI, NATIVE_USDC_LP);
@@ -73,7 +70,7 @@ return lpPrice
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
-    const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
+    const stakedSoul = await SeanceV2Contract.methods.totalSupply().call() / 1e18;
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
     const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
     const marketCap = totalSupply * SoulPrice;
