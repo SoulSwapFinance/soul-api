@@ -70,10 +70,22 @@ return lpPrice
 
 }
 
+
+
 async function getInfo(ctx) {
     // SOUL -- TOKEN INFO //
     const totalSupply = await SoulContract.methods.totalSupply().call() / 1e18;
+    const totalSoulUsdc = await SoulUsdcContract.methods.totalSupply().call() / 1e18;
+    const totalSoulNative = await NativeSoulContract.methods.totalSupply().call() / 1e18;
+
     const stakedSoul = await SeanceContract.methods.totalSupply().call() / 1e18;
+
+    const soulReservesNativePair = SoulContract.methods.balanceOf(NATIVE_SOUL_LP).call() / 1E18;
+    const soulReservesUSDCPair = SoulContract.methods.balanceOf(SOUL_USDC_LP).call() / 1E18; 
+    
+    const soulPerUsdcPair = soulReservesUSDCPair / totalSoulUsdc;
+    const soulPerNativePair = soulReservesNativePair / totalSoulNative;
+    
     const SoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call() / 1e18;
     const FtmPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(WNATIVE).call() / 1e18;
     const marketCap = totalSupply * SoulPrice;
@@ -91,6 +103,11 @@ async function getInfo(ctx) {
     const NativeBinanceBalance = await NativeBinanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const NativeSeanceBalance = await NativeSeanceContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
     const BitcoinEthereumBalance = await BtcEthContract.methods.balanceOf(SOUL_DAO).call() / 1e18;
+ 
+ 
+    const SoulPairedBalance = 
+      (soulPerUsdcPair * SoulUsdcBalance) +
+      (soulPerNativePair * NativeSoulBalance) 
 
     // PRICES //
     const NativeUsdcPrice = await getPairPrice(NATIVE_USDC_LP);
@@ -137,6 +154,7 @@ async function getInfo(ctx) {
             
             "SoulBalance": SoulBalance,
             "NativeBalance": NativeBalance,
+            "SoulPairedBalance": SoulPairedBalance,
 
             // VALUE //
             "NativeValue": NativeValue,
