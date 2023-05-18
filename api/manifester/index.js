@@ -1,33 +1,33 @@
 'use strict';
 
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, DEFARM_ADDRESS, SOUL, BTC, PRICE_FETCHER_ADDRESS, BTC_ORACLE_ADDRESS } = require("../../constants");
+const { CHAIN_ID, MANIFESTER_ADDRESS, BTC, PRICE_FETCHER_ADDRESS, BTC_ORACLE_ADDRESS } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
-const DeFarmContractABI = require('../../abis/DeFarmsContractABI.json');
-const DeFarmsPoolContractABI = require('../../abis/DeFarmsPoolContract.json');
+const ManifesterContractABI = require('../../abis/ManifesterContractABI.json');
+const ManifestationContractABI = require('../../abis/ManifestationContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
 const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
 
 // CONTRACTS //
-const DeFarmContract = new web3.eth.Contract(DeFarmContractABI, DEFARM_ADDRESS);
+const ManifesterContract = new web3.eth.Contract(ManifesterContractABI, MANIFESTER_ADDRESS);
 
 // HELPERS //
 const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
 async function getInfo() {
-    const totalManifestations = await DeFarmContract.methods.totalManifestations().call()
-    const bloodSacrifice = await DeFarmContract.methods.bloodSacrifice().call()
+    const totalManifestations = await ManifesterContract.methods.totalManifestations().call()
+    const bloodSacrifice = await ManifesterContract.methods.bloodSacrifice().call()
 
         return {
-            "address": DEFARM_ADDRESS,
+            "address": MANIFESTER_ADDRESS,
             "poolLength": totalManifestations,
             "bloodSacrifice": bloodSacrifice,
-            "api": `https://api.soulswap.finance/defarms`,
-            "ftmscan": `https://ftmscan.com/address/${DEFARM_ADDRESS}#code`,
+            "api": `https://api.soulswap.finance/manifester`,
+            "ftmscan": `https://ftmscan.com/address/${MANIFESTER_ADDRESS}#code`,
         }
 }
 
@@ -38,25 +38,25 @@ async function getUserInfo(ctx) {
     const DIVISOR = 1e18
 
     // Pool Info //
-    const poolInfo = await DeFarmContract.methods.getInfo(pid).call()
+    const poolInfo = await ManifesterContract.methods.getInfo(pid).call()
     
     const mAddress = poolInfo[0]
-    const daoAddress = poolInfo[1]
+    // const daoAddress = poolInfo[1]
     const name = poolInfo[2]
-    const symbol = poolInfo[3]
-    const logoURI = poolInfo[4]
+    // const symbol = poolInfo[3]
+    // const logoURI = poolInfo[4]
     const rewardAddress = poolInfo[5]
     const depositAddress = poolInfo[6]
-    const rewardPerSecond = poolInfo[7]
-    const rewardRemaining = poolInfo[8]
+    // const rewardPerSecond = poolInfo[7]
+    // const rewardRemaining = poolInfo[8]
     const startTime = poolInfo[9]
     const endTime = poolInfo[10]
-    const dailyReward = poolInfo[11]
+    // const dailyReward = poolInfo[11]
     const feeDays = poolInfo[12] / 1e18
 
     // Contracts //
     const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
-    const ManifestationContract = new web3.eth.Contract(DeFarmsPoolContractABI, mAddress);
+    const ManifestationContract = new web3.eth.Contract(ManifestationContractABI, mAddress);
     const token0 = await PairContract.methods.token0().call()
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
     const token0Balance = await Token0Contract.methods.balanceOf(depositAddress).call() / DIVISOR
@@ -132,7 +132,7 @@ async function getPoolInfo(ctx) {
 
     // ABCs //
     const pid = ctx.params.id
-    const poolInfo = await DeFarmContract.methods.getInfo(pid).call()
+    const poolInfo = await ManifesterContract.methods.getInfo(pid).call()
     
     const mAddress = poolInfo[0]
     const daoAddress = poolInfo[1]
@@ -150,7 +150,7 @@ async function getPoolInfo(ctx) {
     
     const status = rewardRemaining == 0 ? 'inactive' : 'active'
     // Manifestation Contract //
-    // const ManifestationContract = new web3.eth.Contract(DeFarmsPoolContractABI, mAddress)
+    // const ManifestationContract = new web3.eth.Contract(ManifestationContractABI, mAddress)
     
     // Pair Pricing //
     const PairContract = new web3.eth.Contract(PairContractABI, depositAddress)
@@ -234,12 +234,8 @@ async function userInfo(ctx) {
     ctx.body = (await getUserInfo(ctx))
 }
 
-async function stakeInfo(ctx) {
-    ctx.body = (await getStakeInfo(ctx))
-}
-
 async function poolInfo(ctx) {
     ctx.body = (await getPoolInfo(ctx))
 }
 
-module.exports = { infos, poolInfo, stakeInfo, userInfo };
+module.exports = { infos, poolInfo, userInfo };

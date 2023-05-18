@@ -17,6 +17,7 @@ const underworld = require('./api/underworld');
 const coffin = require('./api/coffinbox');
 const summoner = require('./api/summoner');
 const defarm = require('./api/defarm');
+const manifester = require('./api/manifester');
 const soulswap = require('./api/soulswap');
 const crosschain = require('./api/crosschain');
 const bonds = require('./api/bonds');
@@ -65,6 +66,10 @@ router.get('/summoner/users/:userAddress/:id', summoner.userInfo)
 router.get('/defarm', defarm.infos)
 router.get('/defarm/:id', defarm.poolInfo)
 router.get('/defarm/users/:userAddress/:id', defarm.userInfo)
+
+router.get('/manifester', manifester.infos)
+router.get('/manifester/:id', manifester.poolInfo)
+router.get('/manifester/users/:userAddress/:id', manifester.userInfo)
 
 router.get('/soulswap', soulswap.infos)
 router.get('/soulswap/vault', soulswap.vaultInfo)
