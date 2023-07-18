@@ -3,14 +3,13 @@
 const {web3Factory} = require("../../utils/web3");
 const { 
   CHAIN_ID,
-  LUX, DAI, LUM, WNATIVE
+  LUX, DAI, LUM, WNATIVE, PRICE_FETCHER_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const LumensContractABI = require('../../abis/LumensContractABI.json');
 const BondHelperABI = require('../../abis/LuxorBondHelperABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
 const StakeHelperABI = require('../../abis/StakeHelperABI.json');
@@ -47,7 +46,7 @@ const FtmContract = new web3.eth.Contract(ERC20ContractABI, WNATIVE);
 // Helpers
 const LuxorStakeHelperContract = new web3.eth.Contract(StakeHelperABI, LuxorStakeHelperAddress);
 const BondHelperContract = new web3.eth.Contract(BondHelperABI, BondHelperAddress);
-const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
 async function getInfo() {
 

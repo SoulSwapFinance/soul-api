@@ -181,7 +181,7 @@ async function getUserInfo(ctx) {
     const rewardDebt = userInfo[1] / soulDivisor
     const withdrawTime = userInfo[2]
     const depositTime = userInfo[3]
-    const timeDelta = userInfo[4]
+    // const timeDelta = userInfo[4]
 
     // Fee: Rate & Time Remaining //
     const feeSeconds = feeDays * 86_400

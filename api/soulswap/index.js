@@ -2,14 +2,13 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, SEANCEV2, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS, NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS, BTC, BTC_ORACLE_ADDRESS
+  CHAIN_ID, SOUL_DAO, WNATIVE, SOUL, SEANCE, SEANCEV2, PRICE_FETCHER_ADDRESS, NATIVE_SOUL_LP, NATIVE_ETH_LP, USDC_DAI_LP, NATIVE_BTC_LP, SOUL_USDC_LP, NATIVE_USDC_LP, NATIVE_DAI_LP, MULTICALL_ADDRESS, NATIVE_BNB_LP, NATIVE_SEANCE_LP, BTC_ETH_LP, AUTOSTAKE_ADDRESS, SUMMONER_ADDRESS, BTC, BTC_ORACLE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const PairContractABI = require('../../abis/PairContractABI.json');
-const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 const AutoStakeContractABI = require('../../abis/AutoStakeContractABI.json');
 const SummonerContractABI = require('../../abis/SummonerContractABI.json');
@@ -37,7 +36,7 @@ const NativeDaiContract = new web3.eth.Contract(PairContractABI, NATIVE_DAI_LP);
 const NativeBinanceContract = new web3.eth.Contract(PairContractABI, NATIVE_BNB_LP);
 const NativeSeanceContract = new web3.eth.Contract(PairContractABI, NATIVE_SEANCE_LP);
 const BtcEthContract = new web3.eth.Contract(PairContractABI, BTC_ETH_LP);
-const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
 async function getPairPrice(pairAddress) {
 // Helpers //
