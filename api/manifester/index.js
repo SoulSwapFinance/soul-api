@@ -62,7 +62,7 @@ async function getUserInfo(ctx) {
     const token0Balance = await Token0Contract.methods.balanceOf(depositAddress).call() / DIVISOR
 
     // Manifestation Details //
-    const duraDays = await ManifestationContract.methods.duraDays().call()
+    // const duraDays = await ManifestationContract.methods.duraDays().call()
 
     // Reward Details //
     const rawRewardPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(rewardAddress).call();    

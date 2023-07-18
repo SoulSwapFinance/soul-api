@@ -1,6 +1,6 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID } = require("../../constants");
+const { CHAIN_ID, AXL_USDC } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 const BN = require('bn.js');
 const tokenList = require('../../utils/tokenList.json')
@@ -14,12 +14,9 @@ const FACTORY_ADDRESS = "0x1120e150dA9def6Fe930f4fEDeD18ef57c0CA7eF"
 
 // tokens address
 const WNATIVE_ADDRESS = "0x21be370D5312f44cB42ce377BC9b8a0cEF1A4C83"
-const USDC_ADDRESS = "0x04068da6c83afcfa0e13ba15a6696662335d5b75"
-const USDT_ADDRESS = "0x049d68029688eabf473097a2fc38ef61633a3c7a"
 
 // pairs address
-const WNATIVE_USDT_ADDRESS = "0xdC24814AD654986928F8E4aec48D37fa30bBC5BB"
-const WNATIVE_USDC_ADDRESS = "0x160653F02b6597E7Db00BA8cA826cf43D2f39556"
+const WNATIVE_USDC_ADDRESS = "0xd1A432df5ee2Df3F891F835854ffeA072C273C65"
 
 // contracts
 const FactoryContract = new web3.eth.Contract(FactoryContractABI, FACTORY_ADDRESS)
@@ -85,14 +82,12 @@ class Cache {
         }
 
         const result = await Promise.all([
-            getReserves(WNATIVE_ADDRESS, USDC_ADDRESS, WNATIVE_USDC_ADDRESS),
-            getReserves(WNATIVE_ADDRESS, USDT_ADDRESS, WNATIVE_USDT_ADDRESS)
+            getReserves(WNATIVE_ADDRESS, AXL_USDC, WNATIVE_USDC_ADDRESS),
         ])
 
         const priceUSDC = result[0].reserveToken1.mul(E18).div(result[0].reserveToken0)
-        const priceUSDT = result[1].reserveToken1.mul(E18).div(result[1].reserveToken0)
 
-        const ftmPrice = priceUSDC.add(priceUSDT).div(TWO)
+        const ftmPrice = priceUSDC
 
         const lastRequestTimestamp = Date.now()
         const lastResult = ftmPrice

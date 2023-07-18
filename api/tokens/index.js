@@ -1,17 +1,16 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, LUM, BTC, BTC_ORACLE_ADDRESS, SOR } = require("../../constants");
+const { CHAIN_ID, LUXOR_TREASURY_ADDRESS, PRICE_FETCHER_ADDRESS, LUM, BTC, BTC_ORACLE_ADDRESS, SOR } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const BN = require('bn.js');
 
 async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.id);
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
-    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
     const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
     const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
     

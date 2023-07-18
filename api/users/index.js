@@ -1,12 +1,11 @@
 'use strict';
 const {web3Factory} = require("../../utils/web3");
-const { CHAIN_ID, LUM, SOR, BTC, BTC_ORACLE_ADDRESS, AURA, MULTICALL_ADDRESS, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
+const { CHAIN_ID, LUM, SOR, BTC, BTC_ORACLE_ADDRESS, PRICE_FETCHER_ADDRESS, AURA, MULTICALL_ADDRESS, SEANCE, SOUL_DAO, SUMMONER_ADDRESS, AUTOSTAKE_ADDRESS } = require("../../constants");
 
 const web3 = web3Factory( CHAIN_ID );
 const ERC20ContractABI = require('../../abis/ERC20ContractABI.json');
 const MulticallContractABI = require('../../abis/MulticallContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
-const fetcherAddress = '0xba5da8aC172a9f014D42837EE1B678C4Ca96fB0E';
 const AuraContract = new web3.eth.Contract(ERC20ContractABI, AURA);
 const AutoStakeContract = new web3.eth.Contract(ERC20ContractABI, AUTOSTAKE_ADDRESS);
 const MulticallContract = new web3.eth.Contract(MulticallContractABI, MULTICALL_ADDRESS);
@@ -50,7 +49,7 @@ async function getTokenInfo(ctx) {
     const tokenAddress = web3.utils.toChecksumAddress(ctx.params.tokenAddress);
 
     const TokenContract = new web3.eth.Contract(ERC20ContractABI, tokenAddress);
-    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, fetcherAddress);
+    const PriceFetcherContract = new web3.eth.Contract(PriceFetcherABI, PRICE_FETCHER_ADDRESS);
 
     // METHOD CALLS //
     const tokenSymbol = await TokenContract.methods.symbol().call();
