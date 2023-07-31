@@ -96,9 +96,12 @@ async function getInfo() {
             "NativeSoulValue": NativeSoulValue,
             "SoulUsdcValue": SoulUsdcValue,
             "NativeEthereumValue": NativeEthereumValue,
-            "UsdcDaiValue": UsdcDaiValue,
+            "UsdcEthereumValue": 0,
+            "UsdcUsdcValue": 0,
             "NativeUsdcValue": NativeUsdcValue,
             "NativeBitcoinValue": NativeBitcoinValue,
+            "UsdcBitcoinValue": 0,
+            "UsdcDaiValue": UsdcDaiValue,
             "NativeDaiValue": 0,
             "NativeBinanceValue": 0,
             "NativeSeanceValue": 0,
@@ -108,6 +111,7 @@ async function getInfo() {
 
             "api": `https://avax-api.soulswap.finance`,
         }
+}
 }
 
 async function getBondInfo(ctx) {
