@@ -112,7 +112,6 @@ async function getInfo() {
             "api": `https://avax-api.soulswap.finance`,
         }
 }
-}
 
 async function getBondInfo(ctx) {
 
