@@ -166,7 +166,7 @@ async function getUserInfo(ctx) {
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price 
-        = token0 == AXL_BTC? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
             : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
             : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
@@ -273,18 +273,18 @@ async function getPoolInfo(ctx) {
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsValue = soulPrice * annualRewardsPool
     const token0Price 
-        = token0 == AXL_BTC? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
         : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
             : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
             : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
                 : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 
-    const lpValuePaired 
-            = pairType == 'farm'
-            // 2x the value of half the pair.
-            ? token0Price * token0Balance * 2
-            // 100% of the asset token amount * asset token price
-            : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+    const lpValuePaired = token0Price * token0Balance * 2
+            // =  pairType == 'farm'
+            // // 2x the value of half the pair.
+            // ? token0Price * token0Balance * 2
+            // // 100% of the asset token amount * asset token price
+            // : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
 
     const lpPrice = lpValuePaired / lpSupply
     const poolTVL = lpPrice * lpBalance
