@@ -157,6 +157,8 @@ async function getUserInfo(ctx) {
     const Token0Contract = new web3.eth.Contract(ERC20ContractABI, token0);
     const token0Decimals = await Token0Contract.methods.decimals().call()
     const token0Divisor = 10**(token0Decimals)
+    const oracleDivisor = 1E8
+
     const token0Balance = await Token0Contract.methods.balanceOf(pairAddress).call() / token0Divisor
     
     //  [0] amount, [1] rewardDebt, [2] withdrawalTime, [3] depositTime, [4] timeDelta // [5] deltaDays
@@ -166,10 +168,10 @@ async function getUserInfo(ctx) {
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price 
-        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-        : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-            : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
-            : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
+        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / oracleDivisor
+        : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / oracleDivisor
+            : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / oracleDivisor
+            : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / oracleDivisor
                 : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
     
     const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
@@ -257,6 +259,8 @@ async function getPoolInfo(ctx) {
     const token0Decimals = await Token0Contract.methods.decimals().call()
     const token1Decimals = await Token1Contract.methods.decimals().call()
     const pairDivisor = 10**(pairDecimals)
+    const oracleDivisor = 1E8
+
     const token0Divisor = 10**(token0Decimals)
     const token1Divisor = 10**(token1Decimals)
 
@@ -273,10 +277,10 @@ async function getPoolInfo(ctx) {
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsValue = soulPrice * annualRewardsPool
     const token0Price 
-        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-        : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-            : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
-            : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
+        = token0 == AXL_BTC ? await BtcOracleContract.methods.latestAnswer().call() / oracleDivisor
+        : token0 == LZ_BTC ? await BtcOracleContract.methods.latestAnswer().call() / oracleDivisor
+            : token0 == AXL_ETH ? await EthOracleContract.methods.latestAnswer().call() / oracleDivisor
+            : token0 == LZ_ETH ? await EthOracleContract.methods.latestAnswer().call() / oracleDivisor
                 : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
 
     const lpValuePaired = token0Price * token0Balance * 2
