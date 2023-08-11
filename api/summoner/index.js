@@ -2,8 +2,8 @@
 
 const {web3Factory} = require("../../utils/web3");
 const { 
-  CHAIN_ID, SUMMONER_ADDRESS, SEANCE,
-  SOUL, DAI, WNATIVE, BTC, PRICE_FETCHER_ADDRESS, BTC_ORACLE_ADDRESS
+  CHAIN_ID, SUMMONER_ADDRESS, SEANCE, AXL_ETH, LZ_ETH, AXL_BTC, LZ_BTC,
+  SOUL, DAI, WNATIVE, PRICE_FETCHER_ADDRESS, BTC_ORACLE_ADDRESS, ETH_ORACLE_ADDRESS
 } = require("../../constants");
 const web3 = web3Factory(CHAIN_ID);
 
@@ -14,6 +14,7 @@ const SummonerContractABI = require('../../abis/SummonerContractABI.json');
 const PriceFetcherABI = require('../../abis/PriceFetcherABI.json');
 const ChainlinkOracleABI = require('../../abis/ChainlinkOracleABI.json');
 const BtcOracleContract = new web3.eth.Contract(ChainlinkOracleABI, BTC_ORACLE_ADDRESS)
+const EthOracleContract = new web3.eth.Contract(ChainlinkOracleABI, ETH_ORACLE_ADDRESS)
 
 // CONTRACTS //
 const SummonerContract = new web3.eth.Contract(SummonerContractABI, SUMMONER_ADDRESS);
@@ -129,7 +130,7 @@ async function getUserInfo(ctx) {
     const feeDays = poolInfo[4] / 1e18
 
     const PairContract = new web3.eth.Contract(PairContractABI, pairAddress)
-    const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
+    // const UnderworldContract = new web3.eth.Contract(UnderworldContractABI, pairAddress)
     
     const rawSoulPrice = await PriceFetcherContract.methods.currentTokenUsdcPrice(SOUL).call();    
     const soulPrice = rawSoulPrice / 1e18
@@ -142,16 +143,14 @@ async function getUserInfo(ctx) {
 
     // const lendingPids = [13, 14, 15, 17, 18]
     
-    const pairType
-        = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 && pid <= 24) ) 
-            ? 'underworld' 
-            : 'farm'
+    const pairType = 'farm'
+        // = ( (pid >= 13 && pid <= 18 && pid != 16) || (pid >= 19 && pid <= 24) ) 
+        //     ? 'underworld' 
+        //     : 'farm'
   
     // Pair Pricing //
-    const token0
-        = pairType == 'farm'
-        ? await PairContract.methods.token0().call()
-        : await UnderworldContract.methods.asset().call()
+    const token0 = await PairContract.methods.token0().call()
+        // : await UnderworldContract.methods.asset().call()
 
     const pendingSoul = await SummonerContract.methods.pendingSoul(pid, userAddress).call() / soulDivisor
     const pendingValue = pendingSoul * soulPrice
@@ -167,13 +166,10 @@ async function getUserInfo(ctx) {
     const stakedBalance = userInfo[0] / pairDivisor
     const walletBalance =  await PairContract.methods.balanceOf(userAddress).call() / pairDivisor
     const token0Price 
-        = token0 == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-            : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
-    const lpValuePaired 
-            = pairType == 'farm'
-            ? token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
-            : token0Price * await PairContract.methods.totalSupply().call() / pairDivisor
+        = (token0 == AXL_BTC || token0 == LZ_BTC)? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+            : (token0 == AXL_ETH || token0 == LZ_ETH) ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
+                : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+    const lpValuePaired = token0Price * token0Balance * 2 // intuition: 2x the value of half the pair.
 
     const lpPrice = lpValuePaired / lpSupply
     const stakedValue = lpPrice * stakedBalance
@@ -274,9 +270,10 @@ async function getPoolInfo(ctx) {
     const soulPrice = rawSoulPrice / 1e18
     const annualRewardsValue = soulPrice * annualRewardsPool
     const token0Price 
-        = token0 == BTC
-            ? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
-            : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+        = (token0 == AXL_BTC || token0 == LZ_BTC)? await BtcOracleContract.methods.latestAnswer().call() / token0Divisor
+        : (token0 == AXL_ETH || token0 == LZ_ETH) ? await EthOracleContract.methods.latestAnswer().call() / token0Divisor
+        : await PriceFetcherContract.methods.currentTokenUsdcPrice(token0).call() / 1E18
+
     const lpValuePaired 
             = pairType == 'farm'
             // 2x the value of half the pair.
