@@ -14,6 +14,8 @@ const underworld = require('./api/underworld');
 
 const summoner = require('./api/summoner');
 const soulswap = require('./api/soulswap');
+const manifester = require('./api/manifester');
+
 const bonds = require('./api/bonds');
 
 router.get('/supply/circulating', supply.circulatingSupply);
@@ -49,6 +51,11 @@ router.get('/bonds/users/:userAddress/:pid', bonds.userInfo)
 // router.get('/underworld', underworld.infos)
 router.get('/underworld/:id', underworld.pairInfo)
 router.get('/underworld/users/:userAddress/:id', underworld.userInfo)
+
+router.get('/manifester', manifester.infos)
+router.get('/manifester/:id', manifester.poolInfo)
+router.get('/manifester/users/:userAddress/:id', manifester.userInfo)
+
 
 // router.get('/coffin', coffin.infos)
 // router.get('/coffin/:id', coffin.coffinInfo)
