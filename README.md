@@ -27,3 +27,8 @@ yarn start
 #### **/priceftm/token**: Used to display current derived price of token. **token** needs to be an address or the symbol of a token with enough liquidity.
 
 #### **/priceusd/token**: Used to display current price in usdt of token. **token** needs to be an address or the symbol of a token with enough liquidity.
+
+## Examples
+---
+- Price of Soul (by ticker): [https://api.soulswap.finance/price/soul](https://api.soulswap.finance/price/soul)
+- Price of Soul (by address): [https://api.soulswap.finance/price/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07](https://api.soulswap.finance/price/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07)
