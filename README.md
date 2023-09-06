@@ -30,5 +30,7 @@ yarn start
 
 ## Examples
 ---
-- Price of Soul (by ticker): [https://api.soulswap.finance/price/soul](https://api.soulswap.finance/price/soul)
-- Price of Soul (by address): [https://api.soulswap.finance/price/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07](https://api.soulswap.finance/price/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07)
+- Price of Soul (by ticker)
+  - Fantom: [https://api.soulswap.finance/price/soul](https://api.soulswap.finance/price/soul)
+- Price of Soul (by address)
+  - Fantom: [https://api.soulswap.finance/priceusd/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07](https://api.soulswap.finance/priceusd/0xe2fb177009ff39f52c0134e8007fa0e4baacbd07)
