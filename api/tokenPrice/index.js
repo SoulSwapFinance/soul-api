@@ -1,12 +1,26 @@
 const fetch = require('node-fetch')
 
+// const getId = () =>{
+//     return 
+// }
+
 async function getPrice(tokenSymbol) {
     const eligibleSymbols = [
         'soul', 'soulswap',
     ]
 
+    const btcId = 'bitcoin'
+    const ethId = 'ethereum'
+    const ftmId = 'ethereum'
+    const arbId = 'arbitrum'
+    const crvId = 'curve-dao-token'
+    const nexoId = 'nexo'
+
     const stableCoins = [
-        'usdc'
+        'usdc', 'axlusdc', 'lzusdc', 'usdc.e',
+        'dai', 'axldai', 'lzdai', 'dai.e',
+        'usdt', 'usdt.e', 'lzusdt', 'axlusdt',
+        'mim', 'frax'
     ]
 
     const SLUG_FROM_SYMBOL = {
@@ -15,14 +29,49 @@ async function getPrice(tokenSymbol) {
         ['soul']: 'soul-swap',
         ['soulswap']: 'soul-swap',
 
-        // NETWORK TOKENS //
-        ['eth']: 'ethereum',
-        ['weth']: 'ethereum',
-        ['weth.e']: 'ethereum',
+        /*/ TOP 100 TOKENS /*/
+        // Bitcoin //
+        ['btc']: btcId,
+        ['wbtc']: btcId,
+        ['btc.e']: btcId,
+        ['btc.b']: btcId,
+        ['btcb']: btcId,
+        ['axlbtc']: btcId,
+        ['lzbtc']: btcId,
+        
+        // Ethereum //
+        ['eth']: ethId,
+        ['weth']: ethId,
+        ['axleth']: ethId,
+        ['lzeth']: ethId,
+        ['weth.e']: ethId,
+        ['steth']: ethId,
+    
+        // Cardano //
+        ['ada']: 'cardano',
+        
+        // Binance //
+        ['bnb']: 'binancecoin',
+        ['wbnb']: 'binancecoin',
+        ['wbnb.e']: 'binancecoin',
+        
+        // Solana //
+        ['sol']: 'solana',
+        ['wsol']: 'solana',
+        
+        // Polkadot //
+        ['dot']: 'polkadot',
+        
+        // Fantom //
+        ['ftm']: ftmId,
+        ['wftm']: ftmId,
+        
+        // Avalanche //
+        ['avax']: 'avalanche-2',
+        ['wavax']: 'avalanche-2',
 
-        ['btc']: 'bitcoin',
-        ['wbtc']: 'bitcoin',
-        ['axlbtc']: 'bitcoin'
+        // Misc. //
+        ['arb']: arbId
     }
 
 
@@ -30,14 +79,13 @@ async function getPrice(tokenSymbol) {
     // const isDefault = !eligibleSymbols.includes(tokenSymbol)
     const isStablecoin = stableCoins.includes(tokenSymbol)
     // const symbol = isDefault ? 'default' : tokenSymbol
-    const symbol = tokenSymbol
 
     // console.log('isDefault: %s', isDefault)
 
-    const tokenSlug = SLUG_FROM_SYMBOL[symbol] ?? SLUG_FROM_SYMBOL['default']
+    const tokenSlug = SLUG_FROM_SYMBOL[tokenSymbol] ?? SLUG_FROM_SYMBOL['default']
     if (tokenSlug != '') {
         let response =
-            await fetch(`https://api.coingecko.com/api/v3/coins/${tokenSlug.toLowerCase()}`, {
+            await fetch(`https://api.coingecko.com/api/v3/coins/${tokenSlug}`, {
                 method: 'GET'
             })
         const data = await response.json()
