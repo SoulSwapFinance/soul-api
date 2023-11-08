@@ -1,4 +1,5 @@
 const BN = require('bn.js');
+const fetch = require('node-fetch');
 
 async function getPrice(tokenSymbol) {
     const eligibleSymbols = [
