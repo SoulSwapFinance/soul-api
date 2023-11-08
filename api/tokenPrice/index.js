@@ -1,5 +1,4 @@
-const BN = require('bn.js');
-const fetch = require('node-fetch');
+const fetch = require('node-fetch')
 
 async function getPrice(tokenSymbol) {
     const eligibleSymbols = [
@@ -41,9 +40,10 @@ async function getPrice(tokenSymbol) {
             await fetch(`https://api.coingecko.com/api/v3/coins/${tokenSlug.toLowerCase()}`, {
                 method: 'GET'
             })
-        const data = await response.json() ?? { market_data: { current_price: { usd: 0 } } }
+        const data = await response.json()
         const tokenPrice =
             isStablecoin ? '1'
+            // @ts-ignore
                 : await data.market_data.current_price.usd.toString()
         return tokenPrice
     } else {
