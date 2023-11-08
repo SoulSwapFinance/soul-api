@@ -17,7 +17,7 @@
     "koa-etag": "^4.0.0",
     "koa-helmet": "^6.1.0",
     "koa-router": "^10.1.1",
-    "node-fetch": "^3.3.2",
+    "node-fetch": "^2.6.6",
     "web3": "^1.6.0"
   },
   "devDependencies": {},
