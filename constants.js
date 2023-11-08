@@ -2,6 +2,7 @@ const BN = require("bn.js")
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3002'
 const CHAIN_ID = 250
 const RPC = process.env.RPC || 'https://rpc.ankr.com/fantom'
+// const RPCs = ['https://rpc.ankr.com/fantom', 'https://rpc.ankr.com/avalanche']
 
 const LUXOR_TREASURY_ADDRESS = "0xDF2A28Cc2878422354A93fEb05B41Bd57d71DB24"
 const SOUL_DAO = "0x1C63C726926197BD3CB75d86bCFB1DaeBcD87250"
