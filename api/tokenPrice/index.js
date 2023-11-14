@@ -5,23 +5,21 @@ const fetch = require('node-fetch')
 // }
 
 async function getPrice(tokenSymbol) {
-    const eligibleSymbols = [
-        'soul', 'soulswap',
-    ]
+    // const eligibleSymbols = [
+    //     'soul', 'soulswap',
+    // ]
 
     const btcId = 'bitcoin'
     const ethId = 'ethereum'
-    const ftmId = 'ethereum'
+    const ftmId = 'fantom'
     const arbId = 'arbitrum'
     const crvId = 'curve-dao-token'
     const nexoId = 'nexo'
-
-    const stableCoins = [
-        'usdc', 'axlusdc', 'lzusdc', 'usdc.e',
-        'dai', 'axldai', 'lzdai', 'dai.e',
-        'usdt', 'usdt.e', 'lzusdt', 'axlusdt',
-        'mim', 'frax'
-    ]
+    const usdcId = 'usd-coin'
+    const usdtId = 'tether'
+    const daiId = 'dai'
+    const fraxId = 'frax'
+    const bnbId = 'binancecoin'
 
     const SLUG_FROM_SYMBOL = {
         ['default']: '',
@@ -30,6 +28,7 @@ async function getPrice(tokenSymbol) {
         ['soulswap']: 'soul-swap',
 
         /*/ TOP 100 TOKENS /*/
+
         // Bitcoin //
         ['btc']: btcId,
         ['wbtc']: btcId,
@@ -38,6 +37,28 @@ async function getPrice(tokenSymbol) {
         ['btcb']: btcId,
         ['axlbtc']: btcId,
         ['lzbtc']: btcId,
+        
+        // Stablecoins //
+        ['usdc']: usdcId,
+        ['usdc.e']: usdcId,
+        ['axlusdc']: usdcId,
+        ['lzusdc']: usdcId,
+
+        ['usdt']: usdtId,
+        ['usdt.e']: usdtId,
+        ['axlusdt']: usdtId,
+        ['lzusdt']: usdtId,
+
+        ['dai']: daiId,
+        ['axldai']: daiId,
+        ['lzdai']: daiId,
+        ['dai.e']: daiId,
+
+        ['mim']: 'magic-internet-money',
+        ['frax']: fraxId,
+        ['frax.e']: fraxId,
+        ['axlFrax']: fraxId,
+        ['lzFrax']: fraxId,
         
         // Ethereum //
         ['eth']: ethId,
@@ -51,9 +72,9 @@ async function getPrice(tokenSymbol) {
         ['ada']: 'cardano',
         
         // Binance //
-        ['bnb']: 'binancecoin',
-        ['wbnb']: 'binancecoin',
-        ['wbnb.e']: 'binancecoin',
+        ['bnb']: bnbId,
+        ['wbnb']: bnbId,
+        ['wbnb.e']: bnbId,
         
         // Solana //
         ['sol']: 'solana',
@@ -77,7 +98,7 @@ async function getPrice(tokenSymbol) {
 
 
     // const isDefault = !eligibleSymbols.includes(tokenSymbol)
-    const isStablecoin = stableCoins.includes(tokenSymbol)
+    // const isStablecoin = stableCoins.includes(tokenSymbol)
     // const symbol = isDefault ? 'default' : tokenSymbol
 
     // console.log('isDefault: %s', isDefault)
@@ -89,10 +110,7 @@ async function getPrice(tokenSymbol) {
                 method: 'GET'
             })
         const data = await response.json()
-        const tokenPrice =
-            isStablecoin ? '1'
-            // @ts-ignore
-                : await data.market_data.current_price.usd.toString()
+        const tokenPrice = await data.market_data.current_price.usd.toString()
         return tokenPrice
     } else {
         return 0
