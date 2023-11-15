@@ -32,10 +32,10 @@ async function getPrice(tokenSymbol) {
         // Bitcoin //
         ['btc']: btcId,
         ['wbtc']: btcId,
-        ['btc.e']: btcId,
+        ['wbtc.e']: btcId,
         ['btc.b']: btcId,
         ['btcb']: btcId,
-        ['axlbtc']: btcId,
+        ['axlwbtc']: btcId,
         ['lzbtc']: btcId,
         
         // Stablecoins //
