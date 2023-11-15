@@ -7,6 +7,7 @@ const noop = require('./api/noop');
 const supply = require('./api/supply');
 const price = require('./api/price');
 const tokenPrice = require('./api/tokenPrice');
+const tokenInfo = require('./api/tokenInfo');
 const tokens = require('./api/tokens');
 const sor = require('./api/sor');
 const nft = require('./api/nft');
@@ -41,7 +42,12 @@ router.get('/tokens/:id', tokens.tokenInfo);
 router.get('/pairs/:id', pairs.pairInfo);
 router.get('/pairs/:userAddress/:id', pairs.userPairInfo);
 
+router.get('/tokenInfo/price/:symbol', tokenInfo.tokenPrice)
+router.get('/tokenInfo/logo/:symbol', tokenInfo.tokenLogo)
+router.get('/tokenInfo/:symbol', tokenInfo.tokenInfo)
+
 router.get('/price/:symbol', tokenPrice.tokenPrice)
+
 router.get('/priceftm/:tokenAddress', price.derivedPriceOfToken)
 router.get('/priceusd/:tokenAddress', price.priceOfToken)
 
