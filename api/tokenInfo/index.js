@@ -1,5 +1,10 @@
 const fetch = require('node-fetch')
 
+// type TokensInfo = {
+//     "symbol": symbol,
+//     "logo": logo,
+//     "price": price,
+// }
 const ID_FROM_SYMBOL = {
     ['btc']: 'bitcoin',
     ['eth']: 'ethereum',
@@ -7,6 +12,7 @@ const ID_FROM_SYMBOL = {
     ['arb']: 'arbitrum',
     ['crv']: 'curve-dao-token',
     ['nexo']: 'nexo',
+    ['ada']: 'cardano',
     ['usdc']: 'usd-coin',
     ['usdt']: 'tether',
     ['dai']: 'dai',
@@ -19,6 +25,7 @@ const DATA_FROM_SYMBOL = {
         "name": 'bitcoin',
         "symbol": 'btc',
         "logo": 'https://raw.githubusercontent.com/soulswapfinance/assets/master/logos/btc.png',
+        "id": ID_FROM_SYMBOL['btc'],
     }
 
     // ['eth']: 'ethereum',
@@ -102,6 +109,10 @@ const SYMBOL_FROM_TOKEN_SYMBOL = {
 
     // Arbitrum //
     ['arb']: 'arb',
+    
+    // Misc //
+    ['nexo']: 'nexo',
+    ['crv']: 'crv',
 }
 
 const SLUG_FROM_SYMBOL = {
@@ -118,13 +129,14 @@ const SLUG_FROM_SYMBOL = {
     ['mim']: 'magic-internet-money',
     ['frax']: ID_FROM_SYMBOL['frax'],
     ['eth']: ID_FROM_SYMBOL['eth'],
-    ['ada']: 'cardano',
+    ['ada']: ID_FROM_SYMBOL['ada'],
     ['bnb']: ID_FROM_SYMBOL['bnb'],
     ['sol']: 'solana',
     ['dot']: 'polkadot',
     ['ftm']: ID_FROM_SYMBOL['ftm'],
     ['avax']: 'avalanche-2',
-    ['arb']: ID_FROM_SYMBOL['arb']
+    ['arb']: ID_FROM_SYMBOL['arb'],
+    ['nexo']: ID_FROM_SYMBOL['nexo'],
 }
 
 async function getTokenLogo(tokenSymbol) {
@@ -140,7 +152,14 @@ async function getTokenPrice(tokenSymbol) {
         let response =
         await fetch(`https://api.coingecko.com/api/v3/coins/${tokenSlug}`, {
             method: 'GET'
-        })
+        }) 
+        // ?? {
+        //     "market_data": {
+        //         "current_price": {
+        //             "usd": 0
+        //         }
+        //     }
+        // }
         const data = await response.json()
         const tokenPrice = await data.market_data.current_price.usd.toString()
         return tokenPrice
@@ -185,7 +204,7 @@ async function getTokenInfo(ctx) {
     const tokenSymbol = ctx.params.symbol.toLowerCase()
     const symbol = SYMBOL_FROM_TOKEN_SYMBOL[tokenSymbol] ?? SYMBOL_FROM_TOKEN_SYMBOL['default']
     const logo = await getTokenLogo(symbol)
-    const price = await getTokenPrice(symbol)
+    const price = await getPrice(symbol)
 
     if (!("symbol" in ctx.params))
         return {"name": "TokenInfo"};
@@ -196,6 +215,23 @@ async function getTokenInfo(ctx) {
             "price": price,
         }
     }
+}
+
+async function getTokensInfo(ctx) {
+    const tokensInfo = []
+    const symbols = [
+        'btc', 'eth', 'ftm', 'avax', 'soul', 'usdc', 'usdt', 'dai', 'frax', 'bnb'
+    ]
+    
+    for (i=0; i<symbols.length; i++) {
+     tokensInfo[i] = {
+            id: i+1,
+            symbol: SYMBOL_FROM_TOKEN_SYMBOL[symbols[i]] ?? SYMBOL_FROM_TOKEN_SYMBOL['default'],
+            logo: await getTokenLogo(symbols[i]),
+            // price: await getTokenPrice(symbols[i]) || '0'
+        }
+    }
+        return tokensInfo
 }
 
 async function tokenPrice(ctx) {
@@ -210,4 +246,8 @@ async function tokenInfo(ctx) {
     ctx.body = (await getTokenInfo(ctx))
 }
 
-module.exports = { tokenLogo, tokenPrice, tokenInfo };
+async function tokensInfo(ctx) {
+    ctx.body = (await getTokensInfo(ctx))
+}
+
+module.exports = { tokenLogo, tokenPrice, tokenInfo, tokensInfo };
