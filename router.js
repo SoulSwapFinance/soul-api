@@ -45,6 +45,7 @@ router.get('/pairs/:userAddress/:id', pairs.userPairInfo);
 router.get('/tokenInfo/price/:symbol', tokenInfo.tokenPrice)
 router.get('/tokenInfo/logo/:symbol', tokenInfo.tokenLogo)
 router.get('/tokenInfo/:symbol', tokenInfo.tokenInfo)
+router.get('/tokenInfo', tokenInfo.tokensInfo)
 
 router.get('/price/:symbol', tokenPrice.tokenPrice)
 
